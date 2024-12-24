@@ -9,8 +9,8 @@ import { SubmitButton } from "@/components/SubmitButton";
 export default async function Home() {
   const session = await auth();
   return (
-    <main>
-      <h1 className="text-red-700">Tes</h1>
+    <main className="bg-white text-gray">
+      <h1 className="text-green">Tes</h1>
 
       <section className="main-container">
         <h1 className="header-text">NextJS MongoDB Prisma Auth</h1>

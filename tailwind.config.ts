@@ -52,6 +52,11 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        green: "#606C38",
+        white: "#CFCBBA",
+        gray: "#1F3D3B",
+        "orange-primary": "#BC6C29",
+        "orange-secondary": "#DEA25E",
       },
       borderRadius: {
         lg: "var(--radius)",
