@@ -44,3 +44,21 @@ model Account {
   @@unique([provider, providerAccountId])
 }
  
+model Umkm {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  description       String
+  photo             String[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Wisata {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  location    String
+  photo       String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
