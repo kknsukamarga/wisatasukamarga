@@ -25,6 +25,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { handleSignOut } from "@/actions/sign-out";
+import { Button } from "@/components/ui/button";
 
 export function NavUser({
   user,
@@ -75,7 +77,7 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Sparkles />
@@ -96,13 +98,26 @@ export function NavUser({
                 <Bell />
                 Notifications
               </DropdownMenuItem>
-            </DropdownMenuGroup>
+            </DropdownMenuGroup> */}
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              {/* <SignOutButton /> */}
+            <form action={handleSignOut}>
+              <DropdownMenuItem>
+                <Button
+                  variant={"ghost"}
+                  size={"sm"}
+                  className="w-full h-6 flex justify-between items-center px-0"
+                >
+                  <div className="w-full font-normal flex gap-2 items-center">
+                    <LogOut />
+                    Log out
+                  </div>
+                </Button>
+              </DropdownMenuItem>
+            </form>
+            {/* <DropdownMenuItem>
               <LogOut />
               Log out
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

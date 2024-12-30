@@ -18,10 +18,11 @@ import Footer from "@/components/guest/footer";
 
 export default async function Page() {
   const session = await auth();
+  const isLoggedIn = !!session?.user?.email;
 
   return (
     <main className="bg-white">
-      <Navbar />
+      <Navbar isLoggedIn={isLoggedIn} />
       <Hero />
       <About />
       <HighlightWisata />
