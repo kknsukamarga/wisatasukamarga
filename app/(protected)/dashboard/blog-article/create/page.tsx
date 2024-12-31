@@ -1,7 +1,9 @@
+import BlogForm from "../_components/blog-form";
+
 export default function BlogCreatePage() {
   return (
     <div>
-      <h1>Create Blog Page</h1>
+      <BlogForm initialData={null} pageTitle="Create Blog" />
     </div>
   );
 }
