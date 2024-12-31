@@ -9,7 +9,7 @@ import {
 function UmkmHero() {
   return (
     <div
-      className={`${Questa.className} min-h-screen flex flex-col items-center justify-center`}
+      className={`${Questa.className} min-h-[50vh] flex flex-col items-center justify-center`}
       id="hero"
     >
       <p className="text-7xl font-bold">UMKM HERO</p>
