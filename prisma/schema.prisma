@@ -21,7 +21,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
- 
+
 model Account {
   id                String  @id @default(auto()) @map("_id") @db.ObjectId
   userId            String  @db.ObjectId
@@ -35,12 +35,22 @@ model Account {
   scope             String?
   id_token          String? @db.String
   session_state     String?
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@unique([provider, providerAccountId])
 }
- 
+
+model Blog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String   @unique // Untuk URL unik berdasarkan judul
+  coverImage  String   // Link gambar sampul
+  content     String   // Content dari rich text editor akan disimpan dalam bentuk String (HTML/JSON)
+  author      String   // Author akan ditulis manual di dashboard
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
