@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -72,14 +93,6 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
-}
-
-::-webkit-scrollbar {
-  width: 0px;
-}
-
-* {
-  scroll-behavior: smooth;
 }
 
 @layer base {
