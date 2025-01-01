@@ -50,6 +50,7 @@
     "react-dom": "^18",
     "react-dropzone": "^14.3.5",
     "react-hook-form": "^7.54.2",
+    "react-quill": "^2.0.0",
     "sass": "^1.83.0",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.6.0",
