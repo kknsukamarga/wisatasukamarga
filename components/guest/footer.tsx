@@ -9,11 +9,13 @@ export default function Footer() {
             <MountainIcon className="h-6 w-6" />
             <span className="text-lg font-semibold">Acme Inc</span>
           </Link>
+
           <p className="text-muted-foreground">
             Beautifully designed components that you can copy and paste into
             your apps.
           </p>
         </div>
+
         <div className="grid gap-2">
           <h4 className="text-sm font-semibold">Quick Links</h4>
           <Link href="#" className="text-sm hover:underline" prefetch={false}>

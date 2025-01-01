@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import MorphNav from "../ui/morph-menu/morph-nav";
 
 const defaultLinks = [
   { href: "#about", label: "About" },
+  { href: "#highlight-wisata", label: "Highlight Wisata" },
+  { href: "#highlight-umkm", label: "Highlight UMKM" },
+  { href: "#testimonials", label: "Testimonials" },
+  { href: "#interactive-map", label: "Interactive Map" },
   { href: "#blog", label: "Blog" },
   { href: "#contact", label: "Contact" },
-  { href: "#highlight-umkm", label: "Highlight UMKM" },
-  { href: "#highlight-wisata", label: "Highlight Wisata" },
-  { href: "#interactive-map", label: "Interactive Map" },
-  { href: "#testimonials", label: "Testimonials" },
 ];
 
 function NavbarMobile({ isLoggedIn }: { isLoggedIn: boolean }) {
@@ -61,7 +62,7 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   ];
 
   return (
-    <header className="flex h-20 w-full shrink-0 fixed items-center px-4 md:px-6">
+    <header className="flex h-20 w-full shrink-0 fixed items-center px-4 md:px-6 z-50 text-white">
       <NavbarMobile isLoggedIn={isLoggedIn} />
       <Link href="/" className="mr-6 hidden lg:flex" prefetch={false}>
         <MountainIcon className="h-6 w-6" />
@@ -79,6 +80,8 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
           </Link>
         ))}
       </nav>
+
+      <MorphNav />
     </header>
   );
 }
