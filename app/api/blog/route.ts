@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     // Fetch all blogs
     const blogs = await prisma.blog.findMany();
     return NextResponse.json(blogs);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error during GET blogs:", error); // Log error ke console
     return NextResponse.json(
       { error: "Something went wrong", details: error.message },
