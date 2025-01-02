@@ -1,0 +1,52 @@
+[
+  {
+    "id": "1",
+    "title": "Understanding JavaScript Closures",
+    "slug": "understanding-javascript-closures",
+    "coverImage": "https://via.placeholder.com/150",
+    "content": "<p>JavaScript closures are a fundamental concept...</p>",
+    "author": "John Doe",
+    "createdAt": "2024-06-25T10:00:00Z",
+    "updatedAt": "2024-06-25T10:00:00Z"
+  },
+  {
+    "id": "2",
+    "title": "A Guide to Responsive Web Design",
+    "slug": "a-guide-to-responsive-web-design",
+    "coverImage": "https://via.placeholder.com/150",
+    "content": "<p>Responsive web design ensures that web pages...</p>",
+    "author": "Jane Smith",
+    "createdAt": "2024-06-24T09:00:00Z",
+    "updatedAt": "2024-06-24T09:00:00Z"
+  },
+  {
+    "id": "3",
+    "title": "Exploring Node.js Streams",
+    "slug": "exploring-nodejs-streams",
+    "coverImage": "https://via.placeholder.com/150",
+    "content": "<p>Node.js streams are an efficient way to handle...</p>",
+    "author": "Alice Johnson",
+    "createdAt": "2024-06-23T08:00:00Z",
+    "updatedAt": "2024-06-23T08:00:00Z"
+  },
+  {
+    "id": "4",
+    "title": "CSS Grid vs Flexbox",
+    "slug": "css-grid-vs-flexbox",
+    "coverImage": "https://via.placeholder.com/150",
+    "content": "<p>CSS Grid and Flexbox are two powerful layout...</p>",
+    "author": "Bob Brown",
+    "createdAt": "2024-06-22T07:30:00Z",
+    "updatedAt": "2024-06-22T07:30:00Z"
+  },
+  {
+    "id": "5",
+    "title": "Understanding RESTful APIs",
+    "slug": "understanding-restful-apis",
+    "coverImage": "https://via.placeholder.com/150",
+    "content": "<p>RESTful APIs are the backbone of modern web...</p>",
+    "author": "Emily Davis",
+    "createdAt": "2024-06-21T06:45:00Z",
+    "updatedAt": "2024-06-21T06:45:00Z"
+  }
+]

@@ -158,7 +158,7 @@ const Card = ({
             </span>
           </div>
 
-          <div className="imgContainer relative w-full md:w-[60%] h-full rounded-3xl overflow-hidden">
+          <div className="imgContainer relative w-full md:w-[60%] h-full rounded-xl md:rounded-3xl overflow-hidden">
             <motion.div style={{ scale: imageScale }} className="w-full h-full">
               <Image fill src={`${src}`} alt="image" className="object-cover" />
             </motion.div>

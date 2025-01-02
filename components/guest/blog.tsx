@@ -64,7 +64,7 @@ export function BentoGridBlog() {
 function Blog() {
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center"
+      className="min-h-screen py-24 md:py:12 flex flex-col items-center justify-center"
       id="blog"
     >
       <h2 className={`${TangoSansBold.className} text-2xl text-center`}>

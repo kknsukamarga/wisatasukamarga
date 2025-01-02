@@ -1,15 +1,13 @@
 import { z } from "zod";
 
-// We're keeping a simple non-relational schema here.
-// IRL, you will have a schema for your data models.
-export const expenseSchema = z.object({
+// Schema for the Umkm data model
+export const umkmSchema = z.object({
   id: z.string(),
-  label: z.string(),
-  note: z.string(),
-  category: z.string(),
-  type: z.enum(["income", "expense"]),
-  amount: z.number(),
-  date: z.string(),
+  product_name: z.string(),
+  slug: z.string(),
+  description: z.string(),
+  price: z.number(),
+  whatsapp_number: z.string(),
 });
 
-export type Expense = z.infer<typeof expenseSchema>;
+export type Umkm = z.infer<typeof umkmSchema>;

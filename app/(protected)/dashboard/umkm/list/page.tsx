@@ -27,7 +27,7 @@ export default async function UMKMListPage() {
       <h1>List Data UMKM</h1>
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground">
-          Here&apos;s a list of your expenses for this month!
+          List of UMKM data that is currently available
         </p>
       </div>
       <DataTable data={data} columns={columns} />

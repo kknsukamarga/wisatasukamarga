@@ -38,7 +38,7 @@ export default function MorphNav(): JSX.Element {
   const [isActive, setIsActive] = useState<boolean>(false);
 
   return (
-    <div className={`${styles.header} right-5 top-5 md:right-10 md:top-10`}>
+    <div className={`${styles.header} right-5 top-5 md:right-5 md:top-5`}>
       <motion.div
         className={styles.menu}
         variants={menu}
