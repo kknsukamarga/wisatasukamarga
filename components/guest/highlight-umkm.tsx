@@ -14,7 +14,7 @@ function HighlightUMKM() {
       id="highlight-umkm"
     >
       HighlightUMKM
-      <EmblaCarousel slides={SLIDES} options={OPTIONS} />
+      {/* <EmblaCarousel slides={SLIDES} options={OPTIONS} /> */}
       <div className="w-full flex justify-center items-center">
         <Link href="/umkm" className="mx-auto">
           <Button className="mt-12">Lihat semua produk umkm</Button>
