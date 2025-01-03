@@ -1,14 +1,12 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Expense } from "./schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { TrendingUp, TrendingDown } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Umkm } from "./schema";
 
-export const columns: ColumnDef<Expense>[] = [
+export const columns: ColumnDef<Umkm>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -34,117 +32,66 @@ export const columns: ColumnDef<Expense>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "label",
+    accessorKey: "product_name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Label" />
+      <DataTableColumnHeader column={column} title="Product Name" />
     ),
     cell: ({ row }) => (
-      <div className="w-[150px] capitalize">{row.getValue("label")}</div>
+      <div className="w-[150px] font-medium truncate">
+        {row.getValue("product_name")}
+      </div>
     ),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
-    accessorKey: "note",
+    accessorKey: "slug",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Note" />
+      <DataTableColumnHeader column={column} title="Slug" />
     ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium capitalize">
-            {row.getValue("note")}
-          </span>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="text-gray-500 truncate">{row.getValue("slug")}</div>
+    ),
   },
   {
-    accessorKey: "category",
+    accessorKey: "description",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Category" />
+      <DataTableColumnHeader column={column} title="Description" />
     ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex w-[100px] items-center">
-          <span className="capitalize"> {row.getValue("category")}</span>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
+    cell: ({ row }) => (
+      <div className="text-gray-700 truncate max-w-[300px]">
+        {row.getValue("description")}
+      </div>
+    ),
   },
   {
-    accessorKey: "type",
+    accessorKey: "price",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Type" />
+      <DataTableColumnHeader column={column} title="Price" />
     ),
-    cell: ({ row }) => {
-      const type = row.getValue("type");
-      return (
-        <div className="flex w-[100px] items-center">
-          {type === "income" ? (
-            <TrendingUp size={20} className="mr-2 text-green-500" />
-          ) : (
-            <TrendingDown size={20} className="mr-2 text-red-500" />
-          )}
-          <span className="capitalize"> {row.getValue("type")}</span>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
+    cell: ({ row }) => (
+      <div className="text-green-500 font-semibold">
+        {new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+        }).format(row.getValue("price"))}
+      </div>
+    ),
   },
   {
-    accessorKey: "amount",
+    accessorKey: "whatsapp_number",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Amount" />
+      <DataTableColumnHeader column={column} title="WhatsApp Number" />
     ),
-    cell: ({ row }) => {
-      const type = row.getValue("type");
-      return (
-        <div className="flex w-[100px] items-center">
-          <span
-            className={cn(
-              "capitalize",
-              type === "income" ? "text-green-500" : "text-red-500"
-            )}
-          >
-            {" "}
-            {row.getValue("amount")}
-          </span>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "date",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date" />
+    cell: ({ row }) => (
+      <div className="text-blue-500">
+        <a
+          href={`https://wa.me/${row.getValue("whatsapp_number")}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {row.getValue("whatsapp_number")}
+        </a>
+      </div>
     ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("date"));
-      const formattedDate = date.toLocaleDateString("en-US", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-      return (
-        <div className="flex w-[100px] items-center">
-          <span className="capitalize">{formattedDate}</span>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      const rowDate = new Date(row.getValue(id));
-      const [startDate, endDate] = value;
-      return rowDate >= startDate && rowDate <= endDate;
-    },
   },
   {
     id: "actions",

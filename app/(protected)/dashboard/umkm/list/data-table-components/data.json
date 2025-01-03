@@ -1,122 +1,98 @@
 [
   {
-    "label": "salary",
-    "note": "monthly salary",
-    "category": "income",
-    "type": "income",
-    "amount": 5000,
-    "date": "2024-06-25"
+    "id": "1",
+    "product_name": "Handmade Wooden Table",
+    "slug": "handmade-wooden-table",
+    "description": "A beautifully crafted handmade wooden table.",
+    "price": 1200000,
+    "whatsapp_number": "6281234567890"
   },
   {
-    "label": "groceries",
-    "note": "weekly grocery shopping",
-    "category": "food",
-    "type": "expense",
-    "amount": 150,
-    "date": "2024-06-24"
+    "id": "2",
+    "product_name": "Eco-Friendly Tote Bag",
+    "slug": "eco-friendly-tote-bag",
+    "description": "Stylish and reusable tote bag made from eco-friendly materials.",
+    "price": 75000,
+    "whatsapp_number": "6289876543210"
   },
   {
-    "label": "electricity bill",
-    "note": "monthly electricity bill",
-    "category": "utilities",
-    "type": "expense",
-    "amount": 100,
-    "date": "2024-06-23"
+    "id": "3",
+    "product_name": "Organic Coffee Beans",
+    "slug": "organic-coffee-beans",
+    "description": "Freshly roasted organic coffee beans sourced from local farmers.",
+    "price": 150000,
+    "whatsapp_number": "6281122334455"
   },
   {
-    "label": "freelance work",
-    "note": "payment for freelance project",
-    "category": "income",
-    "type": "income",
-    "amount": 800,
-    "date": "2024-06-22"
+    "id": "4",
+    "product_name": "Handcrafted Ceramic Vase",
+    "slug": "handcrafted-ceramic-vase",
+    "description": "Elegant ceramic vase perfect for home decor.",
+    "price": 250000,
+    "whatsapp_number": "6285566778899"
   },
   {
-    "label": "rent",
-    "note": "monthly rent payment",
-    "category": "housing",
-    "type": "expense",
-    "amount": 1200,
-    "date": "2024-06-21"
+    "id": "5",
+    "product_name": "Artisan Soap Set",
+    "slug": "artisan-soap-set",
+    "description": "A set of handmade artisan soaps with natural ingredients.",
+    "price": 125000,
+    "whatsapp_number": "6286677889900"
   },
   {
-    "label": "gym membership",
-    "note": "monthly gym fee",
-    "category": "health",
-    "type": "expense",
-    "amount": 50,
-    "date": "2024-06-20"
+    "id": "6",
+    "product_name": "Bamboo Sunglasses",
+    "slug": "bamboo-sunglasses",
+    "description": "Eco-friendly sunglasses made from sustainable bamboo.",
+    "price": 350000,
+    "whatsapp_number": "6289988776655"
   },
   {
-    "label": "restaurant",
-    "note": "dinner at a restaurant",
-    "category": "food",
-    "type": "expense",
-    "amount": 75,
-    "date": "2024-06-19"
+    "id": "7",
+    "product_name": "Knitted Woolen Scarf",
+    "slug": "knitted-woolen-scarf",
+    "description": "Warm and cozy scarf handmade from high-quality wool.",
+    "price": 200000,
+    "whatsapp_number": "6282233445566"
   },
   {
-    "label": "internet bill",
-    "note": "monthly internet bill",
-    "category": "utilities",
-    "type": "expense",
-    "amount": 60,
-    "date": "2024-06-18"
+    "id": "8",
+    "product_name": "Leather Wallet",
+    "slug": "leather-wallet",
+    "description": "Classic leather wallet with multiple compartments.",
+    "price": 500000,
+    "whatsapp_number": "6283344556677"
   },
   {
-    "label": "transport",
-    "note": "public transport pass",
-    "category": "transport",
-    "type": "expense",
-    "amount": 40,
-    "date": "2024-06-17"
+    "id": "9",
+    "product_name": "Terrarium Glass Bowl",
+    "slug": "terrarium-glass-bowl",
+    "description": "Beautiful terrarium perfect for small plants and succulents.",
+    "price": 300000,
+    "whatsapp_number": "6284455667788"
   },
   {
-    "label": "office supplies",
-    "note": "stationery items for office",
-    "category": "work",
-    "type": "expense",
-    "amount": 30,
-    "date": "2024-06-16"
+    "id": "10",
+    "product_name": "Handwoven Straw Hat",
+    "slug": "handwoven-straw-hat",
+    "description": "Lightweight and stylish straw hat for sunny days.",
+    "price": 100000,
+    "whatsapp_number": "6285566778899"
   },
   {
-    "label": "concert tickets",
-    "note": "tickets for a concert",
-    "category": "entertainment",
-    "type": "expense",
-    "amount": 100,
-    "date": "2024-06-15"
+    "id": "11",
+    "product_name": "Recycled Paper Notebook",
+    "slug": "recycled-paper-notebook",
+    "description": "Eco-friendly notebook made from 100% recycled paper.",
+    "price": 50000,
+    "whatsapp_number": "6286677889900"
   },
   {
-    "label": "car maintenance",
-    "note": "annual car servicing",
-    "category": "transport",
-    "type": "expense",
-    "amount": 200,
-    "date": "2024-06-14"
-  },
-  {
-    "label": "book purchase",
-    "note": "buying a new book",
-    "category": "education",
-    "type": "expense",
-    "amount": 25,
-    "date": "2024-06-13"
-  },
-  {
-    "label": "movie night",
-    "note": "tickets for a movie",
-    "category": "entertainment",
-    "type": "expense",
-    "amount": 30,
-    "date": "2024-06-12"
-  },
-  {
-    "label": "gift",
-    "note": "birthday gift for a friend",
-    "category": "gifts",
-    "type": "expense",
-    "amount": 50,
-    "date": "2024-06-11"
+    "id": "12",
+    "product_name": "Vintage Vinyl Records",
+    "slug": "vintage-vinyl-records",
+    "description": "Rare collection of vintage vinyl records.",
+    "price": 400000,
+    "whatsapp_number": "6287788990011"
   }
 ]
