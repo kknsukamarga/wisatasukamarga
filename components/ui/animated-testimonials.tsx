@@ -78,7 +78,7 @@ export const AnimatedTestimonials = ({
                     duration: 0.4,
                     ease: "easeInOut",
                   }}
-                  className="absolute inset-0 origin-bottom"
+                  className="absolute inset-0 p-5 origin-bottom"
                 >
                   <Image
                     src={testimonial.src}

@@ -63,7 +63,7 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   ];
 
   return (
-    <header className="flex h-20 w-full shrink-0 fixed items-center px-4 md:px-6 z-50 text-white">
+    <header className="flex h-20 w-full shrink-0 fixed items-center px-4 md:px-6 z-[1000] text-white">
       {/* <NavbarMobile isLoggedIn={isLoggedIn} /> */}
       <Link
         href="/"
