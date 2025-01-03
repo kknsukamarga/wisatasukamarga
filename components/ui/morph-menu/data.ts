@@ -1,23 +1,23 @@
 export const links = [
   {
-    title: "Projects",
+    title: "Beranda",
     href: "/",
   },
   {
-    title: "Agency",
-    href: "/",
+    title: "Wisata",
+    href: "/wisata",
   },
   {
-    title: "Expertise",
-    href: "/",
+    title: "UMKM",
+    href: "/umkm",
   },
   {
-    title: "Careers",
-    href: "/",
+    title: "Blog & Artikel",
+    href: "/blogs",
   },
   {
-    title: "Contact",
-    href: "/",
+    title: "Peta Interaktif",
+    href: "/peta-interaktif",
   },
 ];
 

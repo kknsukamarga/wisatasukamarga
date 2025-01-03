@@ -56,6 +56,7 @@ export default {
         },
         green: "#606C38",
         white: "#CFCBBA",
+        "white-foreground": "#f6f7ee",
         gray: "#1F3D3B",
         "orange-primary": "#BC6C29",
         "orange-secondary": "#DEA25E",

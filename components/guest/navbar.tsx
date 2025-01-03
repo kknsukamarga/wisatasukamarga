@@ -65,9 +65,13 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <header className="flex h-20 w-full shrink-0 fixed items-center px-4 md:px-6 z-50 text-white">
       {/* <NavbarMobile isLoggedIn={isLoggedIn} /> */}
-      <Link href="/" className="mr-6 gap-4 flex items-center" prefetch={false}>
+      <Link
+        href="/"
+        className="mr-6 gap-4 flex items-center bg-gray px-4 py-2.5 shadow-md rounded-full text-white"
+        prefetch={false}
+      >
         <MountainIcon className="h-6 w-6" />
-        <p className={TangoSans.className}>Suka Marga</p>
+        <p>Suka Marga</p>
       </Link>
       {/* <nav className="ml-auto hidden lg:flex gap-6">
         {links.map((link) => (
@@ -108,7 +112,7 @@ function MenuIcon(props: any) {
   );
 }
 
-function MountainIcon(props: any) {
+export function MountainIcon(props: any) {
   return (
     <svg
       {...props}

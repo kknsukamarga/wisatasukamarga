@@ -2,6 +2,8 @@ import React from "react";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { Columns, Copy, FileBadge, Signature } from "lucide-react";
 import { TangoSansBold } from "@/app/fonts";
+import Link from "next/link";
+import { Button } from "../ui/button";
 
 const Skeleton = () => (
   <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl   dark:bg-dot-white/[0.2] bg-dot-black/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]  border border-transparent dark:border-white/[0.2] bg-neutral-100 dark:bg-black"></div>
@@ -72,6 +74,12 @@ function Blog() {
       </h2>
 
       <BentoGridBlog />
+
+      <div className="w-full flex justify-center items-center">
+        <Link href="/blogs" className="mx-auto">
+          <Button className="mt-12">Lihat semua berita dan artikel</Button>
+        </Link>
+      </div>
     </div>
   );
 }

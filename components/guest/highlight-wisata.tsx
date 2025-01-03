@@ -7,6 +7,7 @@ import { motion, MotionValue, useScroll, useTransform } from "framer-motion";
 import Lenis from "@studio-freight/lenis";
 import { TangoSansBold } from "@/app/fonts";
 import { Button } from "../ui/button";
+import { MountainIcon } from "./navbar";
 
 export interface Project {
   title: string;
@@ -188,9 +189,14 @@ const HighlightWisata: React.FC = () => {
   }, []);
 
   return (
-    <div id="highlight-wisata" className="py-24">
+    <div
+      id="highlight-wisata"
+      className="py-24 bg-contain bg-center"
+      style={{ backgroundImage: "url('/leaf-pattern.jpg')" }}
+      ref={container}
+    >
       <h2
-        className={`${TangoSansBold.className} text-2xl text-green text-center`}
+        className={`${TangoSansBold.className} w-fit bg-white-foreground mx-auto px-4 py-2.5 rounded-md text-2xl text-green text-center`}
       >
         Spot Wisata Suka Marga
       </h2>
@@ -210,6 +216,12 @@ const HighlightWisata: React.FC = () => {
             />
           );
         })}
+      </div>
+
+      <div className="w-full flex justify-center items-center">
+        <Link href="/wisata" className="mx-auto">
+          <Button className="mt-12">Lihat semua wisata</Button>
+        </Link>
       </div>
     </div>
   );
