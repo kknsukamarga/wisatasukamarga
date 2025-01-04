@@ -8,24 +8,49 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface DataTableRowActionsProps<TData> {
-  row: Row<TData>;
+// Define the data structure
+interface UMKMData {
+  slug: string; // Ensure 'slug' exists as a property
+  [key: string]: any; // Allow other properties dynamically
 }
 
-export function DataTableRowActions<TData>({
-  row,
-}: DataTableRowActionsProps<TData>) {
-  // const task = taskSchema.parse(row.original);
+interface DataTableRowActionsProps {
+  row: Row<UMKMData>;
+}
+
+export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+  const handleDelete = async () => {
+    const { slug } = row.original; // Accessing `slug` now works correctly
+
+    if (!slug) {
+      alert("Error: Slug not found for this row.");
+      return;
+    }
+
+    const confirmed = confirm("Are you sure you want to delete this UMKM?");
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/umkm?slug=${slug}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete UMKM.");
+      }
+
+      alert("UMKM deleted successfully.");
+      // Optionally, trigger a data refresh or navigation
+    } catch (error) {
+      console.error("Error deleting UMKM:", error);
+      alert("An error occurred while deleting the UMKM.");
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -40,10 +65,8 @@ export function DataTableRowActions<TData>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem>Make a copy</DropdownMenuItem>
-        <DropdownMenuItem>Favorite</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleDelete}>
           Delete
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
