@@ -60,7 +60,7 @@ model Wisata {
   name             String
   image            String   
   description      String  
-  price            String
+  price            Int
   location         String
   status           String
   createdAt   DateTime @default(now())

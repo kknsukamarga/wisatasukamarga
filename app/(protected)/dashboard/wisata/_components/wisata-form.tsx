@@ -24,30 +24,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// Load the rich text editor dynamically to avoid SSR issues
-const RichTextEditor = dynamic(
-  () => import("../_components/rich-text-editor"),
-  { ssr: false }
-);
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
+    message: "Nama harus terdiri dari minimal 2 karakter.",
   }),
   image: z
     .any()
-    .refine((files) => files?.length > 0, "An image is required."),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
+    .refine((files) => files?.length > 0, "Gambar wajib diunggah."),
+  description: z.string().min(50, {
+    message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
-  price: z.string().min(1, {
-    message: "Price is required.",
+  price: z.number().min(1, {
+    message: "Harga wajib diisi.",
   }),
-  location: z.string().min(2, {
-    message: "Location must be at least 2 characters.",
+  location: z
+  .string()
+  .min(2, {
+    message: "Lokasi harus berupa tautan Google Maps yang valid.",
+  })
+  .refine((value) => {
+    const googleMapsRegex = /^https?:\/\/(www\.)?(google\.com\/maps|maps\.app\.goo\.gl)\/.*$/;
+    return googleMapsRegex.test(value);
+  }, {
+    message: "Lokasi harus berupa tautan Google Maps yang valid.",
   }),
-  status: z.string().nonempty("Status must be selected."),
+  status: z.enum(["Buka", "Tutup", "Pemeliharaan"]).refine((value) => !!value, {
+    message: "Status harus dipilih.",
+  }),
 });
+
 
 export default function WisataForm({
   initialData,
@@ -60,7 +67,7 @@ export default function WisataForm({
     name: initialData?.name || "",
     image: initialData?.image || "",
     description: initialData?.description || "",
-    price: initialData?.price || "",
+    price: initialData?.price || '',
     location: initialData?.location || "",
     status: initialData?.status || "",
   };
@@ -128,9 +135,9 @@ export default function WisataForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter wisata name" {...field} />
+                    <Input placeholder="Masukkan Nama Wisata..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,7 +150,7 @@ export default function WisataForm({
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image</FormLabel>
+                  <FormLabel>Gambar</FormLabel>
                   <FormControl>
                     <FileUploader
                       value={field.value}
@@ -157,23 +164,20 @@ export default function WisataForm({
               )}
             />
 
-            {/* Description */}
-            <FormField
+             {/* Deskripsi */}
+             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Deskripsi</FormLabel>
                   <FormControl>
-                    <RichTextEditor
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
+                    <Textarea placeholder="Masukkan Deskripsi..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
-              />
+            />
 
             {/* Price */}
             <FormField
@@ -181,9 +185,14 @@ export default function WisataForm({
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel>Harga</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter wisata price" {...field} />
+                    <Input
+                      type="number" 
+                      placeholder="Masukkan Harga Tiket Masuk Wisata..."
+                      {...field}
+                      onChange={(e) => field.onChange(parseInt(e.target.value, 10))} // Konversi nilai menjadi angka
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -196,9 +205,9 @@ export default function WisataForm({
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location</FormLabel>
+                  <FormLabel>Lokasi</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter wisata location" {...field} />
+                    <Input placeholder="Masukkan Link Lokasi Google Maps..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -206,31 +215,30 @@ export default function WisataForm({
             />
 
 <FormField
-  control={form.control}
-  name="status"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Status</FormLabel>
-      <Select
-        onValueChange={(value) => field.onChange(value)}
-        value={field.value} // Use field.value directly as it's a string
-      >
-        <FormControl>
-          <SelectTrigger>
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-        </FormControl>
-        <SelectContent>
-          <SelectItem value="Buka">Buka</SelectItem>
-          <SelectItem value="Tutup">Tutup</SelectItem>
-          <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
-        </SelectContent>
-      </Select>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
-
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(value)}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih Status Wisata Sekarang..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Buka">Buka</SelectItem>
+                        <SelectItem value="Tutup">Tutup</SelectItem>
+                        <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
             {/* Submit Button */}
             <div className="flex justify-end w-full">
