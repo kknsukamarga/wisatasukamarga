@@ -46,10 +46,7 @@ const formSchema = z.object({
   location: z.string().min(2, {
     message: "Location must be at least 2 characters.",
   }),
-  status: z.enum(["Buka", "Tutup", "Pemeliharaan"]).refine((value) => !!value, {
-    message: "Status must be selected.",
-  }),
-  
+  status: z.string().nonempty("Status must be selected."),
 });
 
 export default function WisataForm({
@@ -209,30 +206,31 @@ export default function WisataForm({
             />
 
 <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(value)}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Buka">Buka</SelectItem>
-                        <SelectItem value="Tutup">Tutup</SelectItem>
-                        <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+  control={form.control}
+  name="status"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Status</FormLabel>
+      <Select
+        onValueChange={(value) => field.onChange(value)}
+        value={field.value} // Use field.value directly as it's a string
+      >
+        <FormControl>
+          <SelectTrigger>
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+        </FormControl>
+        <SelectContent>
+          <SelectItem value="Buka">Buka</SelectItem>
+          <SelectItem value="Tutup">Tutup</SelectItem>
+          <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
+        </SelectContent>
+      </Select>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
 
             {/* Submit Button */}
             <div className="flex justify-end w-full">
