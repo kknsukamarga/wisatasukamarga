@@ -2,7 +2,7 @@
 
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Row } from "@tanstack/react-table";
-
+import { useRouter } from "next/navigation"; // Import Next.js router
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,9 +24,10 @@ interface DataTableRowActionsProps {
 }
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
-  const handleDelete = async () => {
-    const { slug } = row.original; // Accessing `slug` now works correctly
+  const router = useRouter();
+  const { slug } = row.original;
 
+  const handleDelete = async () => {
     if (!slug) {
       alert("Error: Slug not found for this row.");
       return;
@@ -52,6 +53,15 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
     }
   };
 
+  const handleEdit = () => {
+    if (!slug) {
+      alert("Error: Slug not found for this row.");
+      return;
+    }
+
+    router.push(`/dashboard/umkm/edit/${slug}`);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -64,7 +74,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleDelete}>
           Delete

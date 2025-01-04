@@ -45,19 +45,24 @@ const formSchema = z.object({
   }),
 });
 
-interface UMKMFormProps {
-  initialData?: Partial<z.infer<typeof formSchema>>; // Optional initial data
+interface UMKMEditFormProps {
+  initialData: Partial<z.infer<typeof formSchema>>; // Required initial data for editing
   pageTitle: string; // Page title for the form
+  slug: string; // Unique identifier for the UMKM entry
 }
 
-export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
+export default function UMKMEditForm({
+  initialData,
+  pageTitle,
+  slug,
+}: UMKMEditFormProps) {
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       product_name: initialData?.product_name || "",
-      image: initialData?.image || null,
+      image: initialData?.image || undefined, // Default undefined for FileUploader compatibility
       price: initialData?.price || 0,
       description: initialData?.description || "",
       wanumber: initialData?.wanumber || "",
@@ -66,18 +71,21 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    console.log("Submitting values:", values); // Debug log
 
     const formData = {
       product_name: values.product_name,
-      image: values.image[0]?.name || "", // Placeholder file name
-      price: values.price, // Harga sebagai integer
+      image: values.image?.[0]?.name || "", // Ensure image is properly accessed
+      price: values.price,
       description: values.description,
       wanumber: values.wanumber,
     };
 
+    console.log("Formatted formData:", formData); // Debug log
+
     try {
-      const response = await fetch("/api/umkm", {
-        method: "POST",
+      const response = await fetch(`/api/umkm?slug=${slug}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -86,18 +94,17 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Gagal mengirim UMKM:", errorData);
-        alert(errorData.error || "Gagal mengirim data UMKM.");
+        console.error("Failed to update UMKM:", errorData);
+        alert(errorData.error || "Gagal memperbarui data UMKM.");
         return;
       }
 
       const data = await response.json();
-      console.log("UMKM berhasil dibuat:", data);
-      alert("UMKM berhasil ditambahkan!");
-      form.reset();
+      console.log("UMKM updated successfully:", data);
+      alert("UMKM berhasil diperbarui!");
     } catch (error) {
-      console.error("Terjadi kesalahan saat mengirim data UMKM:", error);
-      alert("Terjadi kesalahan saat mengirim data UMKM.");
+      console.error("Error updating UMKM:", error);
+      alert("Terjadi kesalahan saat memperbarui data UMKM.");
     } finally {
       setLoading(false);
     }
@@ -134,7 +141,6 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
                   <FormLabel>Gambar Produk</FormLabel>
                   <FormControl>
                     <FileUploader
-                      value={field.value}
                       onValueChange={field.onChange}
                       maxFiles={1}
                       maxSize={MAX_FILE_SIZE}
@@ -196,7 +202,7 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
             />
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
-                {loading ? "Mengirim..." : "Tambah UMKM"}
+                {loading ? "Mengirim..." : "Simpan Perubahan"}
               </Button>
             </div>
           </form>

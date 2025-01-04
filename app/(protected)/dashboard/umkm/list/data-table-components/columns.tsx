@@ -16,7 +16,7 @@ export const columns: ColumnDef<Umkm>[] = [
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Pilih semua"
         className="translate-y-0.5"
       />
     ),
@@ -24,7 +24,7 @@ export const columns: ColumnDef<Umkm>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label="Pilih baris"
         className="translate-y-0.5"
       />
     ),
@@ -34,7 +34,7 @@ export const columns: ColumnDef<Umkm>[] = [
   {
     accessorKey: "product_name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Product Name" />
+      <DataTableColumnHeader column={column} title="Nama Produk" />
     ),
     cell: ({ row }) => (
       <div className="w-[150px] font-medium truncate">
@@ -54,7 +54,7 @@ export const columns: ColumnDef<Umkm>[] = [
   {
     accessorKey: "description",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Description" />
+      <DataTableColumnHeader column={column} title="Deskripsi" />
     ),
     cell: ({ row }) => (
       <div className="text-gray-700 truncate max-w-[300px]">
@@ -65,7 +65,7 @@ export const columns: ColumnDef<Umkm>[] = [
   {
     accessorKey: "price",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Price" />
+      <DataTableColumnHeader column={column} title="Harga" />
     ),
     cell: ({ row }) => (
       <div className="text-green-500 font-semibold">
@@ -79,7 +79,7 @@ export const columns: ColumnDef<Umkm>[] = [
   {
     accessorKey: "wanumber",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="WhatsApp Number" />
+      <DataTableColumnHeader column={column} title="Nomor WhatsApp" />
     ),
     cell: ({ row }) => (
       <div className="text-blue-500">
