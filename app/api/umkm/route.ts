@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { v2 as cloudinary } from "cloudinary";
 
 const prisma = new PrismaClient();
 
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 type UMKMParams = {
   product_name: string;
-  image: string;
+  image: string; // Base64 encoded string
   price: number;
   description: string;
   wanumber: string;
-  slug?: string;
 };
 
 // Handle semua metode HTTP
@@ -45,14 +52,13 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
 export async function POST(req: NextRequest) {
   const body: UMKMParams = await req.json();
 
   try {
     const { product_name, image, price, description, wanumber } = body;
 
-    // Validasi input
+    // Validate required fields
     if (!product_name || !image || !price || !description || !wanumber) {
       return NextResponse.json(
         { error: "Semua field wajib diisi" },
@@ -60,12 +66,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Buat slug unik dari nama produk
+    // Upload Base64 image to Cloudinary
+    const cloudinaryResponse = await cloudinary.uploader.upload(image, {
+      folder: "umkm",
+      public_id: product_name.toLowerCase().replace(/\s+/g, "-"),
+    });
+
+    // Use the secure URL returned by Cloudinary
+    const imageUrl = cloudinaryResponse.secure_url;
+
+    // Generate a unique slug
     let slug = product_name
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
-
     let existingSlug = await prisma.umkm.findUnique({ where: { slug } });
     let counter = 1;
 
@@ -79,7 +93,7 @@ export async function POST(req: NextRequest) {
       data: {
         product_name,
         slug,
-        image,
+        image: imageUrl,
         price,
         description,
         wanumber,
@@ -89,10 +103,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(newUmkm, { status: 201 });
   } catch (error) {
     console.error("Terjadi kesalahan saat menambahkan UMKM:", error);
-    return NextResponse.json(
-      { error: "Gagal menambahkan UMKM" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 }
 
