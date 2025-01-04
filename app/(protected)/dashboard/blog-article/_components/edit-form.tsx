@@ -20,6 +20,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 
+const MAX_FILE_SIZE = 5000000;
+
 const formSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
   coverImage: z
@@ -27,6 +29,10 @@ const formSchema = z.object({
     .refine(
       (files) => Array.isArray(files) && files.length > 0,
       "A cover image is required."
+    )
+    .refine(
+      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
+      `Cover image size must not exceed 5MB.`
     ),
   content: z
     .string()
@@ -38,7 +44,7 @@ const formSchema = z.object({
 
 export default function EditForm() {
   const router = useRouter();
-  const { slug } = useParams(); // Ambil slug dari URL
+  const { slug } = useParams();
   const [initialData, setInitialData] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -52,7 +58,6 @@ export default function EditForm() {
     },
   });
 
-  // Fetch data berdasarkan slug
   useEffect(() => {
     async function fetchBlogData() {
       if (!slug) return;
@@ -67,10 +72,9 @@ export default function EditForm() {
         const data = await response.json();
         setInitialData(data);
 
-        // Set nilai default di form
         form.reset({
           title: data.title,
-          coverImage: [{ name: data.coverImage }], // Simpan sebagai array
+          coverImage: [{ name: data.coverImage }],
           content: data.content,
           author: data.author,
         });
@@ -85,14 +89,21 @@ export default function EditForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
-    const updatedData = {
-      title: values.title,
-      coverImage: values.coverImage[0]?.name || "",
-      content: values.content,
-      author: values.author,
-    };
-
     try {
+      let base64Image = "";
+
+      if (values.coverImage && values.coverImage.length > 0) {
+        const file = values.coverImage[0];
+        base64Image = await toBase64(file);
+      }
+
+      const updatedData = {
+        title: values.title,
+        coverImage: base64Image,
+        content: values.content,
+        author: values.author,
+      };
+
       const response = await fetch(`/api/blog?slug=${slug}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -106,7 +117,7 @@ export default function EditForm() {
       }
 
       alert("Blog updated successfully!");
-      router.push("/dashboard/blog-article/list"); // Navigasi kembali ke list
+      router.push("/dashboard/blog-article/list");
     } catch (error) {
       console.error("Error updating blog:", error);
       alert("An error occurred while updating the blog.");
@@ -115,8 +126,17 @@ export default function EditForm() {
     }
   }
 
+  function toBase64(file: any) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  }
+
   if (!initialData) {
-    return <p>Loading...</p>; // Tampilkan loading sementara data belum di-load
+    return <p>Loading...</p>;
   }
 
   return (
@@ -153,7 +173,7 @@ export default function EditForm() {
                       value={field.value}
                       onValueChange={field.onChange}
                       maxFiles={1}
-                      maxSize={5 * 1024 * 1024}
+                      maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
                   <FormMessage />

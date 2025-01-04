@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const body = await req.json();
+  const body: BlogParams = await req.json();
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get("slug");
 
@@ -116,17 +116,45 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Slug is required" }, { status: 400 });
     }
 
+    const existingBlog = await prisma.blog.findUnique({
+      where: { slug },
+    });
+
+    if (!existingBlog) {
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+    }
+
+    const { title, coverImage, content, author } = body;
+
     // Validate input
-    if (!body.title && !body.coverImage && !body.content && !body.author) {
+    if (!title || !coverImage || !content || !author) {
       return NextResponse.json(
-        { error: "At least one field is required to update" },
+        { error: "All fields are required for update" },
         { status: 400 }
       );
     }
 
+    let imageUrl = existingBlog.coverImage; // Default to existing cover image
+
+    // Upload Base64 image to Cloudinary if a new image is provided
+    if (coverImage && coverImage !== imageUrl) {
+      const cloudinaryResponse = await cloudinary.uploader.upload(coverImage, {
+        folder: "blogs",
+        public_id: title.toLowerCase().replace(/\s+/g, "-"),
+      });
+
+      imageUrl = cloudinaryResponse.secure_url; // Use the secure URL returned by Cloudinary
+    }
+
+    // Update the blog entry
     const updatedBlog = await prisma.blog.update({
       where: { slug },
-      data: body,
+      data: {
+        title,
+        coverImage: imageUrl,
+        content,
+        author,
+      },
     });
 
     return NextResponse.json(updatedBlog);
