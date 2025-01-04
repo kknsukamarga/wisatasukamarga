@@ -77,18 +77,18 @@ export const columns: ColumnDef<Umkm>[] = [
     ),
   },
   {
-    accessorKey: "whatsapp_number",
+    accessorKey: "wanumber",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="WhatsApp Number" />
     ),
     cell: ({ row }) => (
       <div className="text-blue-500">
         <a
-          href={`https://wa.me/${row.getValue("whatsapp_number")}`}
+          href={`https://wa.me/${row.getValue("wanumber")}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {row.getValue("whatsapp_number")}
+          {row.getValue("wanumber")}
         </a>
       </div>
     ),
