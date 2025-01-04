@@ -20,13 +20,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 
+const MAX_FILE_SIZE = 5000000;
+
 const formSchema = z.object({
   title: z.string().min(2, {
     message: "Title must be at least 2 characters.",
   }),
   coverImage: z
     .any()
-    .refine((files) => files?.length > 0, "A cover image is required."),
+    .refine((files) => files?.length > 0, "A cover image is required.")
+    .refine(
+      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
+      `Cover image size must not exceed 5MB.`
+    ),
   content: z.string().min(10, {
     message: "Content must be at least 10 characters.",
   }),
@@ -42,31 +48,36 @@ export default function BlogForm({
   initialData: any | null;
   pageTitle: string;
 }) {
-  const defaultValues = {
-    title: initialData?.title || "",
-    coverImage: initialData?.coverImage || "",
-    content: initialData?.content || "",
-    author: initialData?.author || "",
-  };
-
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      title: initialData?.title || "",
+      coverImage: initialData?.coverImage || null,
+      content: initialData?.content || "",
+      author: initialData?.author || "",
+    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
-    const formData = {
-      title: values.title,
-      coverImage: values.coverImage[0]?.name || "",
-      content: values.content,
-      author: values.author,
-    };
-
     try {
+      let base64Image = "";
+
+      if (values.coverImage && values.coverImage.length > 0) {
+        const file = values.coverImage[0];
+        base64Image = await toBase64(file);
+      }
+
+      const formData = {
+        title: values.title,
+        coverImage: base64Image,
+        content: values.content,
+        author: values.author,
+      };
+
       const response = await fetch("/api/blog", {
         method: "POST",
         headers: {
@@ -94,6 +105,15 @@ export default function BlogForm({
     }
   }
 
+  function toBase64(file: any) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  }
+
   return (
     <Card className="mx-auto w-full">
       <CardHeader>
@@ -117,7 +137,6 @@ export default function BlogForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="coverImage"
@@ -129,14 +148,13 @@ export default function BlogForm({
                       value={field.value}
                       onValueChange={field.onChange}
                       maxFiles={1}
-                      maxSize={5 * 1024 * 1024}
+                      maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="content"
@@ -163,7 +181,6 @@ export default function BlogForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="author"
@@ -177,7 +194,6 @@ export default function BlogForm({
                 </FormItem>
               )}
             />
-
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
                 {loading ? "Submitting..." : "Submit Blog"}

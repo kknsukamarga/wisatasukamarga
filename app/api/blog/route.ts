@@ -1,7 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { v2 as cloudinary } from "cloudinary";
 
 const prisma = new PrismaClient();
+
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+type BlogParams = {
+  title: string;
+  coverImage: string; // Base64 encoded string
+  content: string;
+  author: string;
+};
 
 // Handle all HTTP methods
 export async function GET(req: NextRequest) {
@@ -35,25 +49,33 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  const body: BlogParams = await req.json();
 
   try {
     const { title, coverImage, content, author } = body;
 
-    // Validate input
+    // Validate required fields
     if (!title || !coverImage || !content || !author) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "Semua field wajib diisi" },
         { status: 400 }
       );
     }
 
-    // Generate unique slug from title
+    // Upload Base64 image to Cloudinary
+    const cloudinaryResponse = await cloudinary.uploader.upload(coverImage, {
+      folder: "blogs",
+      public_id: title.toLowerCase().replace(/\s+/g, "-"),
+    });
+
+    // Use the secure URL returned by Cloudinary
+    const imageUrl = cloudinaryResponse.secure_url;
+
+    // Generate a unique slug
     let slug = title
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
-
     let existingSlug = await prisma.blog.findUnique({ where: { slug } });
     let counter = 1;
 
@@ -63,11 +85,12 @@ export async function POST(req: NextRequest) {
       counter++;
     }
 
+    // Create a new blog entry
     const newBlog = await prisma.blog.create({
       data: {
         title,
         slug,
-        coverImage,
+        coverImage: imageUrl, // Save Cloudinary URL
         content,
         author,
       },
@@ -75,9 +98,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(newBlog, { status: 201 });
   } catch (error) {
-    console.error("Error creating blog:", error);
+    console.error("Terjadi kesalahan saat menambahkan blog:", error);
     return NextResponse.json(
-      { error: "Failed to create blog" },
+      { error: "Gagal menambahkan blog. Silakan coba lagi." },
       { status: 500 }
     );
   }
