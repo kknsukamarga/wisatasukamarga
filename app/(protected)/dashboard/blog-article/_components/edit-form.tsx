@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { FileUploader } from "@/components/file-uploader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,54 +14,78 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import dynamic from "next/dynamic";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 
 const formSchema = z.object({
-  title: z.string().min(2, {
-    message: "Title must be at least 2 characters.",
-  }),
+  title: z.string().min(2, { message: "Title must be at least 2 characters." }),
   coverImage: z
     .any()
-    .refine((files) => files?.length > 0, "A cover image is required."),
-  content: z.string().min(10, {
-    message: "Content must be at least 10 characters.",
-  }),
-  author: z.string().min(2, {
-    message: "Author name must be at least 2 characters.",
-  }),
+    .refine(
+      (files) => Array.isArray(files) && files.length > 0,
+      "A cover image is required."
+    ),
+  content: z
+    .string()
+    .min(10, { message: "Content must be at least 10 characters." }),
+  author: z
+    .string()
+    .min(2, { message: "Author name must be at least 2 characters." }),
 });
 
-export default function BlogForm({
-  initialData,
-  pageTitle,
-}: {
-  initialData: any | null;
-  pageTitle: string;
-}) {
-  const defaultValues = {
-    title: initialData?.title || "",
-    coverImage: initialData?.coverImage || "",
-    content: initialData?.content || "",
-    author: initialData?.author || "",
-  };
-
+export default function EditForm() {
+  const router = useRouter();
+  const { slug } = useParams(); // Ambil slug dari URL
+  const [initialData, setInitialData] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      title: "",
+      coverImage: [],
+      content: "",
+      author: "",
+    },
   });
+
+  // Fetch data berdasarkan slug
+  useEffect(() => {
+    async function fetchBlogData() {
+      if (!slug) return;
+
+      try {
+        const response = await fetch(`/api/blog?slug=${slug}`);
+        if (!response.ok) {
+          console.error("Failed to fetch blog data");
+          return;
+        }
+
+        const data = await response.json();
+        setInitialData(data);
+
+        // Set nilai default di form
+        form.reset({
+          title: data.title,
+          coverImage: [{ name: data.coverImage }], // Simpan sebagai array
+          content: data.content,
+          author: data.author,
+        });
+      } catch (error) {
+        console.error("Error fetching blog data:", error);
+      }
+    }
+
+    fetchBlogData();
+  }, [slug, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
-    const formData = {
+    const updatedData = {
       title: values.title,
       coverImage: values.coverImage[0]?.name || "",
       content: values.content,
@@ -67,38 +93,37 @@ export default function BlogForm({
     };
 
     try {
-      const response = await fetch("/api/blog", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      const response = await fetch(`/api/blog?slug=${slug}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Failed to submit blog:", errorData);
-        alert(errorData.error || "Failed to submit blog.");
+        alert(errorData.error || "Failed to update blog.");
         return;
       }
 
-      const data = await response.json();
-      console.log("Blog created successfully:", data);
-      alert("Blog created successfully!");
-      form.reset();
+      alert("Blog updated successfully!");
+      router.push("/dashboard/blog-article/list"); // Navigasi kembali ke list
     } catch (error) {
-      console.error("Error submitting blog:", error);
-      alert("An error occurred while submitting the blog.");
+      console.error("Error updating blog:", error);
+      alert("An error occurred while updating the blog.");
     } finally {
       setLoading(false);
     }
+  }
+
+  if (!initialData) {
+    return <p>Loading...</p>; // Tampilkan loading sementara data belum di-load
   }
 
   return (
     <Card className="mx-auto w-full">
       <CardHeader>
         <CardTitle className="text-left text-2xl font-bold">
-          {pageTitle}
+          Edit Blog
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -117,7 +142,6 @@ export default function BlogForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="coverImage"
@@ -136,7 +160,6 @@ export default function BlogForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="content"
@@ -163,7 +186,6 @@ export default function BlogForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="author"
@@ -177,10 +199,9 @@ export default function BlogForm({
                 </FormItem>
               )}
             />
-
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
-                {loading ? "Submitting..." : "Submit Blog"}
+                {loading ? "Updating..." : "Update Blog"}
               </Button>
             </div>
           </form>
