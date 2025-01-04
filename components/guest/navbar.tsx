@@ -3,6 +3,7 @@ import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import MorphNav from "../ui/morph-menu/morph-nav";
 import { TangoSans } from "@/app/fonts";
+import Image from "next/image";
 
 const defaultLinks = [
   { href: "#about", label: "About" },
@@ -70,8 +71,15 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         className="mr-6 gap-4 flex items-center bg-gray px-4 py-2.5 shadow-md rounded-full text-white"
         prefetch={false}
       >
-        <MountainIcon className="h-6 w-6" />
-        <p>Suka Marga</p>
+        {/* <MountainIcon className="h-6 w-6" /> */}
+        <Image
+          src="/logo-putih.png"
+          alt="logo-putih"
+          width={1201}
+          height={936}
+          className="h-8 w-16"
+        />
+        {/* <p>Suka Marga</p> */}
       </Link>
       {/* <nav className="ml-auto hidden lg:flex gap-6">
         {links.map((link) => (
@@ -86,7 +94,7 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         ))}
       </nav> */}
 
-      <MorphNav />
+      <MorphNav isLoggedIn={isLoggedIn} />
     </header>
   );
 }

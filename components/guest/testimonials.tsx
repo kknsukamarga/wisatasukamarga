@@ -4,11 +4,22 @@ function Testimonials() {
       className="min-h-screen flex flex-col py-24 md:py:12 items-center justify-center"
       id="testimonials"
     >
-      <h2
-        className={`${TangoSansBold.className} text-green text-2xl text-center`}
-      >
-        Testimonials
-      </h2>
+      <div className="flex mx-auto justify-center items-center flex-col text-center w-fit">
+        <div className="p-2 rounded-full bg-orange-primary z-20">
+          <Image src="/icon-lake.png" alt="icon-lake" width={32} height={32} />
+        </div>
+
+        <h2
+          className={`${TangoSansBold.className} mx-auto text-2xl text-gray text-center gap-2 mt-5`}
+        >
+          Apa Kata Warlok ???
+        </h2>
+
+        <p className="md:w-[60%] w-[90%] mx-auto mt-2">
+          Berikut adalah beberapa kalimat dari warga lokal tentang pengalaman
+          mereka tentang wisata suka marga.
+        </p>
+      </div>
 
       <TestimonialsCard />
     </div>
@@ -19,6 +30,7 @@ export default Testimonials;
 
 import { TangoSansBold } from "@/app/fonts";
 import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
+import Image from "next/image";
 
 export function TestimonialsCard() {
   const testimonials = [

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { links } from "../ui/morph-menu/data";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -7,8 +8,14 @@ export default function Footer() {
       <div className="container mx-auto grid grid-cols-1 gap-8 px-4 sm:grid-cols-2 md:grid-cols-4 md:px-6 lg:max-w-7xl">
         <div className="flex flex-col items-start gap-4">
           <Link href="#" className="flex items-center gap-2" prefetch={false}>
-            <MountainIcon className="h-6 w-6" />
-            <span className="text-lg font-semibold">Suka Marga</span>
+            <Image
+              src="/logo-hijau.png"
+              alt="logo-putih"
+              width={500}
+              height={250}
+              className="h-16 w-24"
+            />
+            {/* <span className="text-lg font-semibold">Suka Marga</span> */}
           </Link>
 
           <p className="text-muted-foreground">

@@ -1,14 +1,13 @@
-import React, { useRef } from "react";
-import { EmblaOptionsType } from "embla-carousel";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
-import { useAutoplay } from "./EmblaCarouselAutoplay";
-import { useAutoplayProgress } from "./EmblaCarouselAutoplayProgress";
+import React, { useCallback } from "react";
+import { EmblaOptionsType, EmblaCarouselType } from "embla-carousel";
+import { DotButton, useDotButton } from "./EmblaCarouselDotButton";
 import {
-  NextButton,
   PrevButton,
+  NextButton,
   usePrevNextButtons,
 } from "./EmblaCarouselArrowButtons";
+import Autoplay from "embla-carousel-autoplay";
+import useEmblaCarousel from "embla-carousel-react";
 
 type PropType = {
   slides: number[];
@@ -17,62 +16,63 @@ type PropType = {
 
 const EmblaCarousel: React.FC<PropType> = (props) => {
   const { slides, options } = props;
-  const progressNode = useRef<HTMLDivElement>(null);
-  const [emblaRef, emblaApi] = useEmblaCarousel(options, [
-    Autoplay({ playOnInit: false, delay: 3000 }),
-  ]);
+  const [emblaRef, emblaApi] = useEmblaCarousel(options, [Autoplay()]);
+
+  const onNavButtonClick = useCallback((emblaApi: EmblaCarouselType) => {
+    const autoplay = emblaApi?.plugins()?.autoplay;
+    if (!autoplay) return;
+
+    const resetOrStop =
+      autoplay.options.stopOnInteraction === false
+        ? autoplay.reset
+        : autoplay.stop;
+
+    resetOrStop();
+  }, []);
+
+  const { selectedIndex, scrollSnaps, onDotButtonClick } = useDotButton(
+    emblaApi,
+    onNavButtonClick
+  );
 
   const {
     prevBtnDisabled,
     nextBtnDisabled,
     onPrevButtonClick,
     onNextButtonClick,
-  } = usePrevNextButtons(emblaApi);
-
-  const { autoplayIsPlaying, toggleAutoplay, onAutoplayButtonClick } =
-    useAutoplay(emblaApi);
-
-  const { showAutoplayProgress } = useAutoplayProgress(emblaApi, progressNode);
+  } = usePrevNextButtons(emblaApi, onNavButtonClick);
 
   return (
-    <div className="embla">
-      <div className="embla__viewport" ref={emblaRef}>
-        <div className="embla__container">
+    <section className="embla z-30">
+      <div className="embla__viewport z-30" ref={emblaRef}>
+        <div className="embla__container z-30">
           {slides.map((index) => (
-            <div className="embla__slide" key={index}>
-              <div className="embla__slide__number">
-                <span>{index + 1}</span>
-              </div>
+            <div className="embla__slide z-30" key={index}>
+              <div className="embla__slide__number z-30">{index + 1}</div>
             </div>
           ))}
         </div>
       </div>
 
       <div className="embla__controls">
+        <div className="embla__dots z-30">
+          {scrollSnaps.map((_, index) => (
+            <DotButton
+              key={index}
+              onClick={() => onDotButtonClick(index)}
+              className={"z-30 embla__dot".concat(
+                index === selectedIndex ? " embla__dot--selected" : ""
+              )}
+            />
+          ))}
+        </div>
+
         <div className="embla__buttons">
-          <PrevButton
-            onClick={() => onAutoplayButtonClick(onPrevButtonClick)}
-            disabled={prevBtnDisabled}
-          />
-          <NextButton
-            onClick={() => onAutoplayButtonClick(onNextButtonClick)}
-            disabled={nextBtnDisabled}
-          />
+          <PrevButton onClick={onPrevButtonClick} disabled={prevBtnDisabled} />
+          <NextButton onClick={onNextButtonClick} disabled={nextBtnDisabled} />
         </div>
-
-        <div
-          className={`embla__progress`.concat(
-            showAutoplayProgress ? "" : " embla__progress--hidden"
-          )}
-        >
-          <div className="embla__progress__bar" ref={progressNode} />
-        </div>
-
-        <button className="embla__play" onClick={toggleAutoplay} type="button">
-          {autoplayIsPlaying ? "Stop" : "Start"}
-        </button>
       </div>
-    </div>
+    </section>
   );
 };
 

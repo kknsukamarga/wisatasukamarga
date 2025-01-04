@@ -26,17 +26,17 @@ export default function Hero() {
       ref={ref}
       className="w-full min-h-screen overflow-hidden relative grid place-items-center"
     >
-      <div className="flex justify-center items-center flex-col">
+      <div className="flex justify-center items-center flex-col z-40">
         <motion.p
           style={{ y: textY }}
-          className={`font-bold text-white text-lg relative z-10 ${Questa.className}`}
+          className={`font-bold text-white text-lg relative z-40 ${Questa.className}`}
         >
           Desa Wisata
         </motion.p>
 
         <motion.h1
           style={{ y: textY }}
-          className={`font-bold text-white text-7xl md:text-9xl relative z-10 ${Questa.className}`}
+          className={`font-bold text-white text-7xl md:text-9xl relative z-40 ${Questa.className}`}
         >
           Suka Marga
         </motion.h1>
@@ -60,6 +60,8 @@ export default function Hero() {
           backgroundSize: "cover",
         }}
       />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-gray to-transparent z-30" />
     </div>
   );
 }
