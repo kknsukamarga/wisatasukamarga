@@ -3,7 +3,14 @@
  * @type {string[]}
  */
 
-export const publicRoutes = ["/", "/sign-in"];
+export const publicRoutes = [
+  "/",
+  "/sign-in",
+  "/wisata",
+  "/umkm",
+  "/blogs",
+  "/peta-interaktif",
+];
 
 export const authRoutes = ["/sign-in"];
 

@@ -1,7 +1,7 @@
 function Testimonials() {
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center"
+      className="min-h-screen flex flex-col py-24 md:py:12 items-center justify-center"
       id="testimonials"
     >
       <h2

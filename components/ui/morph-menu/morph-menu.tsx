@@ -11,7 +11,7 @@ interface Link {
 export default function MorphMenu(): JSX.Element {
   return (
     <div className={styles.nav}>
-      <div className={styles.body}>
+      <div className={`${styles.body} gap-8`}>
         {links.map((link: Link, i: number) => {
           const { title, href } = link;
           return (
@@ -23,7 +23,9 @@ export default function MorphMenu(): JSX.Element {
                 animate="enter"
                 exit="exit"
               >
-                <a href={href}>{title}</a>
+                <a href={href} className="text-3xl md:text-5xl">
+                  {title}
+                </a>
               </motion.div>
             </div>
           );

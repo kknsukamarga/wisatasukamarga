@@ -81,7 +81,6 @@
 
   .body {
     display: flex;
-    gap: 10px;
     flex-direction: column;
     .linkContainer {
       perspective: 120px;
@@ -90,7 +89,6 @@
     a {
       text-decoration: none;
       color: #cfcbba;
-      font-size: 46px;
     }
   }
   .footer {

@@ -14,7 +14,20 @@ export default function RichTextEditor({
 }: RichTextEditorProps) {
   return (
     <div>
-      <ReactQuill theme="snow" value={value} onChange={onChange} />
+      <ReactQuill
+        value={value}
+        onChange={onChange}
+        theme="snow"
+        modules={{
+          toolbar: [
+            ["bold", "italic", "underline"],
+            ["blockquote", "code-block"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["link", "image"],
+          ],
+        }}
+        className="max-w-screen-2xl"
+      />
     </div>
   );
 }

@@ -4,9 +4,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Umkm } from "./schema";
+import { cn } from "@/lib/utils";
+import { Blog } from "./schema";
 
-export const columns: ColumnDef<Umkm>[] = [
+export const columns: ColumnDef<Blog>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -32,13 +33,13 @@ export const columns: ColumnDef<Umkm>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "product_name",
+    accessorKey: "title",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Product Name" />
+      <DataTableColumnHeader column={column} title="Title" />
     ),
     cell: ({ row }) => (
       <div className="w-[150px] font-medium truncate">
-        {row.getValue("product_name")}
+        {row.getValue("title")}
       </div>
     ),
   },
@@ -52,46 +53,56 @@ export const columns: ColumnDef<Umkm>[] = [
     ),
   },
   {
-    accessorKey: "description",
+    accessorKey: "coverImage",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Description" />
+      <DataTableColumnHeader column={column} title="Cover Image" />
     ),
     cell: ({ row }) => (
-      <div className="text-gray-700 truncate max-w-[300px]">
-        {row.getValue("description")}
-      </div>
+      <img
+        src={row.getValue("coverImage")}
+        alt="Cover"
+        className="h-10 w-10 object-cover rounded"
+      />
     ),
   },
   {
-    accessorKey: "price",
+    accessorKey: "author",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Price" />
+      <DataTableColumnHeader column={column} title="Author" />
     ),
     cell: ({ row }) => (
-      <div className="text-green-500 font-semibold">
-        {new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR",
-        }).format(row.getValue("price"))}
-      </div>
+      <div className="capitalize">{row.getValue("author")}</div>
     ),
   },
   {
-    accessorKey: "whatsapp_number",
+    accessorKey: "createdAt",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="WhatsApp Number" />
+      <DataTableColumnHeader column={column} title="Created At" />
     ),
-    cell: ({ row }) => (
-      <div className="text-blue-500">
-        <a
-          href={`https://wa.me/${row.getValue("whatsapp_number")}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {row.getValue("whatsapp_number")}
-        </a>
-      </div>
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("createdAt"));
+      const formattedDate = date.toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+      return <div>{formattedDate}</div>;
+    },
+  },
+  {
+    accessorKey: "updatedAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Updated At" />
     ),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("updatedAt"));
+      const formattedDate = date.toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+      return <div>{formattedDate}</div>;
+    },
   },
   {
     id: "actions",
