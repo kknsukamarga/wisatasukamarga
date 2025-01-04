@@ -59,7 +59,7 @@ model Umkm {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   product_name String
   slug         String   @unique
-  image        String
+  image        String[]   
   price        Int
   description  String
   wanumber     String

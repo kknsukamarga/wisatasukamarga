@@ -67,15 +67,21 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
-    const formData = {
-      product_name: values.product_name,
-      image: values.image[0]?.name || "", // Placeholder file name
-      price: values.price, // Harga sebagai integer
-      description: values.description,
-      wanumber: values.wanumber,
-    };
-
     try {
+      let base64Image;
+      if (values.image && values.image.length > 0) {
+        const file = values.image[0];
+        base64Image = await toBase64(file);
+      }
+
+      const formData = {
+        product_name: values.product_name,
+        image: base64Image,
+        price: values.price,
+        description: values.description,
+        wanumber: values.wanumber,
+      };
+
       const response = await fetch("/api/umkm", {
         method: "POST",
         headers: {
@@ -101,6 +107,15 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
     } finally {
       setLoading(false);
     }
+  }
+
+  function toBase64(file: any) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
   }
 
   return (
@@ -136,7 +151,7 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
                     <FileUploader
                       value={field.value}
                       onValueChange={field.onChange}
-                      maxFiles={1}
+                      maxFiles={4}
                       maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
