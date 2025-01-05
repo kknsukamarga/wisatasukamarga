@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { FileUploader } from "@/components/file-uploader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,18 +14,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const MAX_FILE_SIZE = 5000000;
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -51,90 +46,83 @@ const formSchema = z.object({
         message: "Lokasi harus berupa tautan Google Maps yang valid.",
       }
     ),
-  status: z.enum(["Buka", "Tutup", "Pemeliharaan"]).refine((value) => !!value, {
+  status: z.enum(["Buka", "Tutup", "Pemeliharaan"], {
     message: "Status harus dipilih.",
   }),
 });
 
-export default function WisataForm({
+export default function EditForm({
   initialData,
   pageTitle,
 }: {
-  initialData: any | null;
+  initialData: any;
   pageTitle: string;
 }) {
-  const defaultValues = {
-    name: initialData?.name || "",
-    image: initialData?.image || null,
-    description: initialData?.description || "",
-    price: initialData?.price || "",
-    location: initialData?.location || "",
-    status: initialData?.status || "",
-  };
-
+  const router = useRouter();
+  const { id } = useParams();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      name: initialData?.name || "",
+      image: [],
+      description: initialData?.description || "",
+      price: initialData?.price || 0,
+      location: initialData?.location || "",
+      status: initialData?.status || "Buka",
+    },
   });
-
-  const toBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
     try {
-      let base64Image = "";
+      let base64Image = initialData?.image || "";
 
       if (values.image && values.image.length > 0) {
         const file = values.image[0];
         base64Image = await toBase64(file);
       }
 
-      // Explicitly convert price to integer
-      const formData = {
+      const updatedData = {
         name: values.name,
         image: base64Image,
         description: values.description,
-        price: parseInt(values.price as unknown as string, 10), // Convert to Int
+        price: values.price,
         location: values.location,
         status: values.status,
-        fasilitasWisata: null,
       };
 
-      const response = await fetch("/api/wisata", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      const response = await fetch(`/api/wisata?id=${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Failed to submit wisata:", errorData);
-        alert(errorData.error || "Failed to submit wisata.");
+        alert(errorData.error || "Failed to update wisata.");
         return;
       }
 
-      const data = await response.json();
-      console.log("Wisata created successfully:", data);
-      alert("Wisata created successfully!");
-      form.reset();
+      alert("Wisata updated successfully!");
+      router.push("/dashboard/wisata/list");
     } catch (error) {
-      console.error("Error submitting wisata:", error);
-      alert("An error occurred while submitting the wisata.");
+      console.error("Error updating wisata:", error);
+      alert("An error occurred while updating the wisata.");
     } finally {
       setLoading(false);
     }
+  }
+
+  function toBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   }
 
   return (
@@ -147,88 +135,76 @@ export default function WisataForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Name */}
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan Nama Wisata..." {...field} />
+                    <Input placeholder="Enter wisata name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Image */}
             <FormField
               control={form.control}
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gambar</FormLabel>
+                  <FormLabel>Image</FormLabel>
                   <FormControl>
                     <FileUploader
                       value={field.value}
                       onValueChange={field.onChange}
                       maxFiles={1}
-                      maxSize={5 * 1024 * 1024} // 5MB
+                      maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Description */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Masukkan Deskripsi..." {...field} />
+                    <Input placeholder="Enter wisata description" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Price */}
             <FormField
               control={form.control}
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Harga</FormLabel>
+                  <FormLabel>Price</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
-                      placeholder="Masukkan Harga Tiket Masuk Wisata..."
+                      placeholder="Enter wisata price"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value, 10))
-                      }
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Location */}
             <FormField
               control={form.control}
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Lokasi</FormLabel>
+                  <FormLabel>Location</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Masukkan Link Lokasi Google Maps..."
+                      placeholder="Enter wisata Google Maps link"
                       {...field}
                     />
                   </FormControl>
@@ -236,38 +212,25 @@ export default function WisataForm({
                 </FormItem>
               )}
             />
-
-            {/* Status */}
             <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
-                  <Select
-                    onValueChange={(value) => field.onChange(value)}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih Status Wisata Sekarang..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Buka">Buka</SelectItem>
-                      <SelectItem value="Tutup">Tutup</SelectItem>
-                      <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter status (Buka, Tutup, Pemeliharaan)"
+                      {...field}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Submit Button */}
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
-                {loading ? "Submitting..." : "Submit Wisata"}
+                {loading ? "Updating..." : "Update Wisata"}
               </Button>
             </div>
           </form>

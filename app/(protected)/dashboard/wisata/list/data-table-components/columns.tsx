@@ -1,14 +1,14 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Expense } from "./schema";
+import { Wisata } from "./schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import Image from "next/image";
 
-export const columns: ColumnDef<Expense>[] = [
+export const columns: ColumnDef<Wisata>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -34,116 +34,122 @@ export const columns: ColumnDef<Expense>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "label",
+    accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Label" />
+      <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => (
-      <div className="w-[150px] capitalize">{row.getValue("label")}</div>
+      <div className="w-[150px] font-medium capitalize">
+        {row.getValue("name")}
+      </div>
     ),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
-    accessorKey: "note",
+    accessorKey: "image",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Note" />
+      <DataTableColumnHeader column={column} title="Image" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[24px] h-[24px]">
+        <Image
+          src={row.getValue("image")}
+          alt={row.getValue("name")}
+          width={24}
+          height={24}
+        />
+      </div>
+    ),
+  },
+  {
+    accessorKey: "description",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Description" />
+    ),
+    cell: ({ row }) => (
+      <div className="max-w-[300px] truncate">
+        {row.getValue("description")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "price",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Price" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[100px]">
+        {new Intl.NumberFormat("en-ID", {
+          style: "currency",
+          currency: "IDR",
+        }).format(row.getValue("price"))}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "location",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Location" />
+    ),
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("location")}</div>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
+      // Explicitly type `status`
+      const status: string = row.getValue("status") as string;
+
+      const statusColors: Record<string, string> = {
+        Buka: "text-green",
+        Tutup: "text-red-500",
+        Pemeliharaan: "text-yellow-500",
+      };
+
       return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium capitalize">
-            {row.getValue("note")}
-          </span>
+        <div className={cn("font-medium capitalize", statusColors[status])}>
+          {status}
         </div>
       );
     },
   },
   {
-    accessorKey: "category",
+    accessorKey: "createdAt",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Category" />
+      <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ row }) => {
+      const date = new Date(row.getValue("createdAt"));
       return (
-        <div className="flex w-[100px] items-center">
-          <span className="capitalize"> {row.getValue("category")}</span>
+        <div className="text-sm">
+          {date.toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
         </div>
       );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
     },
   },
   {
-    accessorKey: "type",
+    accessorKey: "updatedAt",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Type" />
+      <DataTableColumnHeader column={column} title="Updated At" />
     ),
     cell: ({ row }) => {
-      const type = row.getValue("type");
+      const date = new Date(row.getValue("updatedAt"));
       return (
-        <div className="flex w-[100px] items-center">
-          {type === "income" ? (
-            <TrendingUp size={20} className="mr-2 text-green-500" />
-          ) : (
-            <TrendingDown size={20} className="mr-2 text-red-500" />
-          )}
-          <span className="capitalize"> {row.getValue("type")}</span>
+        <div className="text-sm">
+          {date.toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
         </div>
       );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "amount",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Amount" />
-    ),
-    cell: ({ row }) => {
-      const type = row.getValue("type");
-      return (
-        <div className="flex w-[100px] items-center">
-          <span
-            className={cn(
-              "capitalize",
-              type === "income" ? "text-green-500" : "text-red-500"
-            )}
-          >
-            {" "}
-            {row.getValue("amount")}
-          </span>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "date",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date" />
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("date"));
-      const formattedDate = date.toLocaleDateString("en-US", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-      return (
-        <div className="flex w-[100px] items-center">
-          <span className="capitalize">{formattedDate}</span>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      const rowDate = new Date(row.getValue(id));
-      const [startDate, endDate] = value;
-      return rowDate >= startDate && rowDate <= endDate;
     },
   },
   {
