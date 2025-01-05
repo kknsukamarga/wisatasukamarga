@@ -70,6 +70,10 @@ const data = {
           url: "/dashboard/wisata/create",
         },
         {
+          title: "Tambah Fasilitas Wisata",
+          url: "/dashboard/wisata/create-fasilitas",
+        },
+        {
           title: "Data Wisata",
           url: "/dashboard/wisata/list",
         },
