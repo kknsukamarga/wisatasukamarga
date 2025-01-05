@@ -15,6 +15,7 @@ type BlogParams = {
   coverImage: string; // Base64 encoded string
   content: string;
   author: string;
+  category: "TEMPAT_WISATA" | "KARYA_UMKM"; // Enum category
 };
 
 // Handle all HTTP methods
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
     const blogs = await prisma.blog.findMany();
     return NextResponse.json(blogs);
   } catch (error: any) {
-    console.error("Error during GET blogs:", error); // Log error ke console
+    console.error("Error during GET blogs:", error);
     return NextResponse.json(
       { error: "Something went wrong", details: error.message },
       { status: 500 }
@@ -52,12 +53,20 @@ export async function POST(req: NextRequest) {
   const body: BlogParams = await req.json();
 
   try {
-    const { title, coverImage, content, author } = body;
+    const { title, coverImage, content, author, category } = body;
 
     // Validate required fields
-    if (!title || !coverImage || !content || !author) {
+    if (!title || !coverImage || !content || !author || !category) {
       return NextResponse.json(
         { error: "Semua field wajib diisi" },
+        { status: 400 }
+      );
+    }
+
+    // Validate category
+    if (!["TEMPAT_WISATA", "KARYA_UMKM"].includes(category)) {
+      return NextResponse.json(
+        { error: "Kategori tidak valid" },
         { status: 400 }
       );
     }
@@ -68,7 +77,6 @@ export async function POST(req: NextRequest) {
       public_id: title.toLowerCase().replace(/\s+/g, "-"),
     });
 
-    // Use the secure URL returned by Cloudinary
     const imageUrl = cloudinaryResponse.secure_url;
 
     // Generate a unique slug
@@ -76,6 +84,7 @@ export async function POST(req: NextRequest) {
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
+
     let existingSlug = await prisma.blog.findUnique({ where: { slug } });
     let counter = 1;
 
@@ -90,9 +99,10 @@ export async function POST(req: NextRequest) {
       data: {
         title,
         slug,
-        coverImage: imageUrl, // Save Cloudinary URL
+        coverImage: imageUrl,
         content,
         author,
+        category,
       },
     });
 
@@ -124,26 +134,35 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
-    const { title, coverImage, content, author } = body;
+    const { title, coverImage, content, author, category } = body;
 
-    // Validate input
-    if (!title || !coverImage || !content || !author) {
+    // Validate required fields
+    if (!title || !coverImage || !content || !author || !category) {
       return NextResponse.json(
-        { error: "All fields are required for update" },
+        { error: "Semua field wajib diisi" },
         { status: 400 }
       );
     }
 
-    let imageUrl = existingBlog.coverImage; // Default to existing cover image
+    // Validate category
+    if (!["TEMPAT_WISATA", "KARYA_UMKM"].includes(category)) {
+      return NextResponse.json(
+        { error: "Kategori tidak valid" },
+        { status: 400 }
+      );
+    }
 
-    // Upload Base64 image to Cloudinary if a new image is provided
-    if (coverImage && coverImage !== imageUrl) {
+    let imageUrl = existingBlog.coverImage;
+
+    // Check if coverImage is a new Base64 image or an existing URL
+    const isBase64 = coverImage.startsWith("data:image/");
+    if (isBase64) {
       const cloudinaryResponse = await cloudinary.uploader.upload(coverImage, {
         folder: "blogs",
         public_id: title.toLowerCase().replace(/\s+/g, "-"),
       });
 
-      imageUrl = cloudinaryResponse.secure_url; // Use the secure URL returned by Cloudinary
+      imageUrl = cloudinaryResponse.secure_url;
     }
 
     // Update the blog entry
@@ -154,6 +173,7 @@ export async function PUT(req: NextRequest) {
         coverImage: imageUrl,
         content,
         author,
+        category,
       },
     });
 

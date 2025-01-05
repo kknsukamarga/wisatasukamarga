@@ -12,6 +12,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // Import for dropdown
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
@@ -39,6 +46,9 @@ const formSchema = z.object({
   author: z.string().min(2, {
     message: "Author name must be at least 2 characters.",
   }),
+  category: z.enum(["TEMPAT_WISATA", "KARYA_UMKM"], {
+    errorMap: () => ({ message: "Please select a valid category." }),
+  }),
 });
 
 export default function BlogForm({
@@ -57,6 +67,7 @@ export default function BlogForm({
       coverImage: initialData?.coverImage || null,
       content: initialData?.content || "",
       author: initialData?.author || "",
+      category: initialData?.category || "",
     },
   });
 
@@ -76,6 +87,7 @@ export default function BlogForm({
         coverImage: base64Image,
         content: values.content,
         author: values.author,
+        category: values.category,
       };
 
       const response = await fetch("/api/blog", {
@@ -190,6 +202,27 @@ export default function BlogForm({
                   <FormControl>
                     <Input placeholder="Enter author name" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="TEMPAT_WISATA">
+                        Tempat Wisata
+                      </SelectItem>
+                      <SelectItem value="KARYA_UMKM">Karya UMKM</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
