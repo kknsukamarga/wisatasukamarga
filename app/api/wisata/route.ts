@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { v2 as cloudinary } from "cloudinary";
 
 const prisma = new PrismaClient();
+
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Handle all HTTP methods
 export async function GET(req: NextRequest) {
@@ -12,7 +19,7 @@ export async function GET(req: NextRequest) {
     if (id) {
       // Fetch single wisata by id
       const wisata = await prisma.wisata.findUnique({
-        where: { id },
+        where: { id},
       });
 
       if (!wisata) {
@@ -22,7 +29,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(wisata);
     }
 
-    // Fetch all wisatas
+    // Fetch all wisata records
     const wisatas = await prisma.wisata.findMany();
     return NextResponse.json(wisatas);
   } catch (error: any) {
@@ -48,10 +55,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Upload Base64 image to Cloudinary
+    const cloudinaryResponse = await cloudinary.uploader.upload(image, {
+      folder: "wisata",
+      public_id: name.toLowerCase().replace(/\s+/g, "-"),
+    });
+
+    // Use the secure URL returned by Cloudinary
+    const imageUrl = cloudinaryResponse.secure_url;
+
     const newWisata = await prisma.wisata.create({
       data: {
         name,
-        image,
+        image: imageUrl,
         description,
         price,
         location,
@@ -79,17 +95,32 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    // Validate input
-    if (!body.name && !body.image && !body.description && !body.price && !body.location && !body.status) {
-      return NextResponse.json(
-        { error: "At least one field is required to update" },
-        { status: 400 }
-      );
+    const existingWisata = await prisma.wisata.findUnique({
+      where: { id},
+    });
+
+    if (!existingWisata) {
+      return NextResponse.json({ error: "Wisata not found" }, { status: 404 });
+    }
+
+    let imageUrl = existingWisata.image; // Default to existing image URL
+
+    // Upload new Base64 image to Cloudinary if provided
+    if (body.image && body.image !== imageUrl) {
+      const cloudinaryResponse = await cloudinary.uploader.upload(body.image, {
+        folder: "wisata",
+        public_id: body.name.toLowerCase().replace(/\s+/g, "-"),
+      });
+
+      imageUrl = cloudinaryResponse.secure_url;
     }
 
     const updatedWisata = await prisma.wisata.update({
       where: { id },
-      data: body,
+      data: {
+        ...body,
+        image: imageUrl,
+      },
     });
 
     return NextResponse.json(updatedWisata);

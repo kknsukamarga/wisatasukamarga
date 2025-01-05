@@ -14,9 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import dynamic from "next/dynamic";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Select,
   SelectContent,
@@ -36,25 +35,29 @@ const formSchema = z.object({
   description: z.string().min(50, {
     message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
-  price: z.number().min(1, {
-    message: "Harga wajib diisi.",
-  }),
+  price: z
+    .number()
+    .min(1, {
+      message: "Harga wajib diisi.",
+    }),
   location: z
-  .string()
-  .min(2, {
-    message: "Lokasi harus berupa tautan Google Maps yang valid.",
-  })
-  .refine((value) => {
-    const googleMapsRegex = /^https?:\/\/(www\.)?(google\.com\/maps|maps\.app\.goo\.gl)\/.*$/;
-    return googleMapsRegex.test(value);
-  }, {
-    message: "Lokasi harus berupa tautan Google Maps yang valid.",
-  }),
+    .string()
+    .min(2, {
+      message: "Lokasi harus berupa tautan Google Maps yang valid.",
+    })
+    .refine(
+      (value) => {
+        const googleMapsRegex = /^https?:\/\/(www\.)?(google\.com\/maps|maps\.app\.goo\.gl)\/.*$/;
+        return googleMapsRegex.test(value);
+      },
+      {
+        message: "Lokasi harus berupa tautan Google Maps yang valid.",
+      }
+    ),
   status: z.enum(["Buka", "Tutup", "Pemeliharaan"]).refine((value) => !!value, {
     message: "Status harus dipilih.",
   }),
 });
-
 
 export default function WisataForm({
   initialData,
@@ -65,9 +68,9 @@ export default function WisataForm({
 }) {
   const defaultValues = {
     name: initialData?.name || "",
-    image: initialData?.image || "",
+    image: initialData?.image || null,
     description: initialData?.description || "",
-    price: initialData?.price || '',
+    price: initialData?.price || "",
     location: initialData?.location || "",
     status: initialData?.status || "",
   };
@@ -79,19 +82,35 @@ export default function WisataForm({
     defaultValues,
   });
 
+  const toBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
-    const formData = {
-      name: values.name,
-      image: values.image[0]?.name || "",
-      description: values.description,
-      price: values.price,
-      location: values.location,
-      status: values.status,
-    };
-
     try {
+      let base64Image = "";
+
+      if (values.image && values.image.length > 0) {
+        const file = values.image[0];
+        base64Image = await toBase64(file);
+      }
+
+      const formData = {
+        name: values.name,
+        image: base64Image, // Send Base64 string to backend
+        description: values.description,
+        price: values.price,
+        location: values.location,
+        status: values.status,
+      };
+
       const response = await fetch("/api/wisata", {
         method: "POST",
         headers: {
@@ -164,8 +183,8 @@ export default function WisataForm({
               )}
             />
 
-             {/* Deskripsi */}
-             <FormField
+            {/* Description */}
+            <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
@@ -188,10 +207,12 @@ export default function WisataForm({
                   <FormLabel>Harga</FormLabel>
                   <FormControl>
                     <Input
-                      type="number" 
+                      type="number"
                       placeholder="Masukkan Harga Tiket Masuk Wisata..."
                       {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10))} // Konversi nilai menjadi angka
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value, 10))
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -207,38 +228,42 @@ export default function WisataForm({
                 <FormItem>
                   <FormLabel>Lokasi</FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan Link Lokasi Google Maps..." {...field} />
+                    <Input
+                      placeholder="Masukkan Link Lokasi Google Maps..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-<FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(value)}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih Status Wisata Sekarang..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Buka">Buka</SelectItem>
-                        <SelectItem value="Tutup">Tutup</SelectItem>
-                        <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* Status */}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(value)}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Status Wisata Sekarang..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Buka">Buka</SelectItem>
+                      <SelectItem value="Tutup">Tutup</SelectItem>
+                      <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Submit Button */}
             <div className="flex justify-end w-full">
