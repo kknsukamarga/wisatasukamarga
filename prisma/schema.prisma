@@ -62,5 +62,12 @@ model Umkm {
   image        String[]   
   price        Int
   description  String
+  owner        String
+  category     umkmCategory @default(product)     
   wanumber     String
+}
+
+enum umkmCategory {
+  service
+  product
 }

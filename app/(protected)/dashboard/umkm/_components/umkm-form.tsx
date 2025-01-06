@@ -44,6 +44,12 @@ const formSchema = z.object({
   wanumber: z.string().min(8, {
     message: "Nomor WhatsApp minimal 8 karakter.",
   }),
+  owner: z.string().min(2, {
+    message: "Nama pemilik minimal 2 karakter.",
+  }),
+  category: z.enum(["service", "product"], {
+    required_error: "Kategori harus dipilih.",
+  }),
 });
 
 interface UMKMFormProps {
@@ -63,6 +69,8 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
       price: initialData?.price || 0,
       description: initialData?.description || "",
       wanumber: initialData?.wanumber || "",
+      owner: initialData?.owner || "",
+      category: initialData?.category || "product",
     },
   });
 
@@ -83,6 +91,8 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
         price: values.price,
         description: values.description,
         wanumber: values.wanumber,
+        owner: values.owner,
+        category: values.category,
       };
 
       const response = await fetch("/api/umkm", {
@@ -153,6 +163,38 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
                   <FormLabel>Nama Produk</FormLabel>
                   <FormControl>
                     <Input placeholder="Masukkan nama produk" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="owner"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nama Pemilik</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Masukkan nama pemilik" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kategori</FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
+                      className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring focus:ring-opacity-50"
+                    >
+                      <option value="product">Product</option>
+                      <option value="service">Service</option>
+                    </select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

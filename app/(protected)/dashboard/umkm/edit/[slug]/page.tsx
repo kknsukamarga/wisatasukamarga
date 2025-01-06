@@ -8,6 +8,8 @@ interface UMKMData {
   price: number;
   description: string;
   wanumber: string;
+  owner: string;
+  category?: "service" | "product";
 }
 
 export default function UMKMEditPage({ params }: { params: { slug: string } }) {
@@ -30,6 +32,8 @@ export default function UMKMEditPage({ params }: { params: { slug: string } }) {
           price: data.price,
           description: data.description,
           wanumber: data.wanumber,
+          owner: data.owner,
+          category: data.category,
         });
       } catch (err) {
         setError((err as Error).message || "Unknown error occurred");
