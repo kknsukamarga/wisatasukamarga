@@ -12,10 +12,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -23,53 +24,72 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: "Nama harus terdiri dari minimal 2 karakter.",
+    message: "Nama fasilitas harus terdiri dari minimal 2 karakter.",
   }),
-  image: z.any().refine((files) => files?.length > 0, "Gambar wajib diunggah."),
-  description: z.string().min(50, {
-    message: "Deskripsi harus terdiri dari minimal 50 karakter.",
+  FasilitasImage: z
+    .any()
+    .refine((files) => files?.length > 0, "Gambar wajib diunggah."),
+  description: z.string().min(20, {
+    message: "Deskripsi harus terdiri dari minimal 20 karakter.",
   }),
-  price: z.number().min(1, {
-    message: "Harga wajib diisi dan harus lebih besar dari 0.",
-  }),
-  location: z
-    .string()
-    .min(2, {
-      message: "Lokasi harus berupa tautan Google Maps yang valid.",
-    })
-    .refine(
-      (value) => {
-        const googleMapsRegex =
-          /^https?:\/\/(www\.)?(google\.com\/maps|maps\.app\.goo\.gl)\/.*$/;
-        return googleMapsRegex.test(value);
-      },
-      {
-        message: "Lokasi harus berupa tautan Google Maps yang valid.",
-      }
-    ),
-  status: z.enum(["Buka", "Tutup", "Pemeliharaan"]).refine((value) => !!value, {
-    message: "Status harus dipilih.",
-  }),
+  //   wisataId: z.string().nonempty({
+  //     message: "Wisata terkait harus dipilih.",
+  //   }),
 });
 
-export default function WisataForm({
+export default function FasilitasForm({
   initialData,
+  wisataOptions,
   pageTitle,
 }: {
   initialData: any | null;
+  wisataOptions: { id: string; name: string }[];
   pageTitle: string;
 }) {
+  const [file, setFile] = useState<File | null>(null);
+
+  const convertImageUrlToFile = async (imageUrl: string) => {
+    try {
+      // Fetch the image from the URL
+      const response = await fetch(imageUrl);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+
+      // Convert the response into a Blob
+      const blob = await response.blob();
+
+      // Create a File from the Blob
+      const file = new File([blob], "image.jpg", { type: blob.type });
+
+      // Set the File in state
+      setFile(file);
+    } catch (error) {
+      console.error("Error converting image URL to file:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (initialData.image) {
+      convertImageUrlToFile(initialData.image);
+    }
+  }, [initialData.image]);
+
+  useEffect(() => {
+    if (file) {
+      form.setValue("FasilitasImage", [file]); // Update form field with file array
+    }
+  }, [file]);
+
   const defaultValues = {
-    name: initialData?.name || "",
-    image: initialData?.image || null,
-    description: initialData?.description || "",
-    price: initialData?.price || "",
-    location: initialData?.location || "",
-    status: initialData?.status || "",
+    name: initialData?.fasilitasWisata.name || "",
+    FasilitasImage: file ? [file] : [],
+    description: initialData?.fasilitasWisata.description || "",
+    wisataId: initialData?.wisataId || "",
   };
 
   const [loading, setLoading] = useState(false);
@@ -94,23 +114,19 @@ export default function WisataForm({
     try {
       let base64Image = "";
 
-      if (values.image && values.image.length > 0) {
-        const file = values.image[0];
+      if (values.FasilitasImage && values.FasilitasImage.length > 0) {
+        const file = values.FasilitasImage[0];
         base64Image = await toBase64(file);
       }
 
-      // Explicitly convert price to integer
       const formData = {
         name: values.name,
         image: base64Image,
         description: values.description,
-        price: parseInt(values.price as unknown as string, 10), // Convert to Int
-        location: values.location,
-        status: values.status,
-        fasilitasWisata: null,
+        wisataId: initialData.id,
       };
 
-      const response = await fetch("/api/wisata", {
+      const response = await fetch("/api/fasilitas-wisata/change", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -120,18 +136,18 @@ export default function WisataForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Failed to submit wisata:", errorData);
-        alert(errorData.error || "Failed to submit wisata.");
+        console.error("Failed to submit fasilitas wisata:", errorData);
+        alert(errorData.error || "Failed to submit fasilitas wisata.");
         return;
       }
 
       const data = await response.json();
-      console.log("Wisata created successfully:", data);
-      alert("Wisata created successfully!");
+      console.log("Fasilitas wisata created successfully:", data);
+      alert("Fasilitas wisata created successfully!");
       form.reset();
     } catch (error) {
-      console.error("Error submitting wisata:", error);
-      alert("An error occurred while submitting the wisata.");
+      console.error("Error submitting fasilitas wisata:", error);
+      alert("An error occurred while submitting the fasilitas wisata.");
     } finally {
       setLoading(false);
     }
@@ -153,9 +169,12 @@ export default function WisataForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama</FormLabel>
+                  <FormLabel>Nama Fasilitas</FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan Nama Wisata..." {...field} />
+                    <Input
+                      placeholder="Masukkan Nama Fasilitas..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -165,7 +184,7 @@ export default function WisataForm({
             {/* Image */}
             <FormField
               control={form.control}
-              name="image"
+              name="FasilitasImage"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Gambar</FormLabel>
@@ -197,77 +216,10 @@ export default function WisataForm({
               )}
             />
 
-            {/* Price */}
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Harga</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Masukkan Harga Tiket Masuk Wisata..."
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value, 10))
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Location */}
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Lokasi</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Masukkan Link Lokasi Google Maps..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Status */}
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select
-                    onValueChange={(value) => field.onChange(value)}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih Status Wisata Sekarang..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Buka">Buka</SelectItem>
-                      <SelectItem value="Tutup">Tutup</SelectItem>
-                      <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Submit Button */}
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
-                {loading ? "Submitting..." : "Submit Wisata"}
+                {loading ? "Submitting..." : "Submit Fasilitas"}
               </Button>
             </div>
           </form>
