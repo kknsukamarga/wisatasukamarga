@@ -22,6 +22,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { revalidatePath } from "next/cache";
+import { useToast } from "@/hooks/use-toast";
 
 interface UMKMData {
   slug: string;
@@ -33,6 +35,8 @@ interface DataTableRowActionsProps {
 }
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+  const { toast } = useToast();
+
   const { slug } = row.original;
   const router = useRouter(); // Router for navigation
   const [isDialogOpen, setDialogOpen] = useState(false); // State for delete confirmation dialog
@@ -56,8 +60,16 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         throw new Error("Failed to delete UMKM.");
       }
 
-      setDialogOpen(false); // Close the delete confirmation dialog
-      setSuccessDialogOpen(true); // Open the success dialog
+      setDialogOpen(false);
+
+      toast({
+        title: "Berhasil!",
+        description: "UMKM berhasil dihapus.",
+      });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error deleting UMKM:", error);
     } finally {
