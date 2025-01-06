@@ -13,10 +13,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { init } from "next/dist/compiled/webpack/webpack";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -30,7 +31,8 @@ const formSchema = z.object({
     .refine(
       (files) => files?.[0]?.size <= MAX_FILE_SIZE,
       `Ukuran file maksimal adalah 5MB.`
-    ),
+    )
+    .optional(), // Optional since the user may not want to update the image
   price: z.preprocess(
     (value) => Number(value),
     z.number().int().positive({
@@ -57,12 +59,47 @@ export default function UMKMEditForm({
   slug,
 }: UMKMEditFormProps) {
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[] | null>(null);
+  useEffect(() => {
+    const convertAllImagesToFiles = async () => {
+      if (initialData.image && Array.isArray(initialData.image)) {
+        try {
+          const convertedFiles = await Promise.all(
+            initialData.image.map(async (imageUrl: string) => {
+              const response = await fetch(imageUrl);
+              if (!response.ok) {
+                throw new Error(
+                  `Failed to fetch image: ${response.statusText}`
+                );
+              }
+              const blob = await response.blob();
+              const fileName = imageUrl.split("/").pop() || "image.jpg";
+              return new File([blob], fileName, { type: blob.type });
+            })
+          );
+          setFiles(convertedFiles); // Update state only once with all files
+          form.setValue("image", convertedFiles); // Set form value with converted files
+        } catch (error) {
+          console.error("Error converting images to files:", error);
+        }
+      }
+    };
 
+    convertAllImagesToFiles();
+  }, [initialData.image]);
+
+  useEffect(() => {
+    console.log("files", files);
+    if (files) {
+      form.setValue("image", files);
+    }
+  }, [files]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       product_name: initialData?.product_name || "",
-      image: initialData?.image || undefined, // Default undefined for FileUploader compatibility
+      image: files ? files : [], // Default undefined for FileUploader compatibility
       price: initialData?.price || 0,
       description: initialData?.description || "",
       wanumber: initialData?.wanumber || "",
@@ -71,19 +108,27 @@ export default function UMKMEditForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-    console.log("Submitting values:", values); // Debug log
-
-    const formData = {
-      product_name: values.product_name,
-      image: values.image?.[0]?.name || "", // Ensure image is properly accessed
-      price: values.price,
-      description: values.description,
-      wanumber: values.wanumber,
-    };
-
-    console.log("Formatted formData:", formData); // Debug log
 
     try {
+      let base64Images = initialData.image || []; // Use existing images if no new ones are uploaded
+
+      // Convert new images to Base64 if provided
+      if (values.image && values.image.length > 0) {
+        const files = Array.from(values.image); // Ensure it's an array
+        const newBase64Images = await Promise.all(
+          files.map((file: any) => toBase64(file))
+        );
+        base64Images = [...newBase64Images]; // Append new images to existing ones
+      }
+
+      const formData = {
+        product_name: values.product_name,
+        image: base64Images, // Send array of Base64 strings
+        price: values.price,
+        description: values.description,
+        wanumber: values.wanumber,
+      };
+
       const response = await fetch(`/api/umkm?slug=${slug}`, {
         method: "PUT",
         headers: {
@@ -108,6 +153,16 @@ export default function UMKMEditForm({
     } finally {
       setLoading(false);
     }
+  }
+
+  // Helper function to convert a file to Base64
+  function toBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   }
 
   return (
@@ -141,8 +196,9 @@ export default function UMKMEditForm({
                   <FormLabel>Gambar Produk</FormLabel>
                   <FormControl>
                     <FileUploader
+                      value={field.value}
                       onValueChange={field.onChange}
-                      maxFiles={1}
+                      maxFiles={4}
                       maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
