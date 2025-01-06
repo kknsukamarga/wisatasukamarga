@@ -9,30 +9,29 @@ export default function UMKMListPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUMKM = async () => {
-      try {
-        const response = await fetch("/api/umkm", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+  const fetchUMKM = async () => {
+    try {
+      const response = await fetch("/api/umkm", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch UMKM data");
-        }
-
-        const fetchedData = await response.json();
-
-        setData(fetchedData || []); // Set an empty array if data is null or undefined
-      } catch (err) {
-        setError((err as Error).message || "Unknown error");
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch UMKM data");
       }
-    };
 
+      const fetchedData = await response.json();
+
+      setData(fetchedData || []); // Set an empty array if data is null or undefined
+    } catch (err) {
+      setError((err as Error).message || "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchUMKM();
   }, []);
 

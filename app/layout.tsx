@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "NextJS MongoDB Prisma Starter",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased overflow-x-hidden`}>{children}</body>
+      <body className={`antialiased overflow-x-hidden`}>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

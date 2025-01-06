@@ -11,13 +11,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { init } from "next/dist/compiled/webpack/webpack";
+import { redirect } from "next/navigation";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -59,7 +60,7 @@ export default function UMKMEditForm({
   slug,
 }: UMKMEditFormProps) {
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  const { toast } = useToast();
   const [files, setFiles] = useState<File[] | null>(null);
   useEffect(() => {
     const convertAllImagesToFiles = async () => {
@@ -139,17 +140,30 @@ export default function UMKMEditForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Failed to update UMKM:", errorData);
-        alert(errorData.error || "Gagal memperbarui data UMKM.");
+        toast({
+          title: "Terjadi kesalahan saat memperbarui data UMKM.",
+          description: "Error: " + errorData.message,
+          variant: "default",
+        });
         return;
       }
 
       const data = await response.json();
-      console.log("UMKM updated successfully:", data);
-      alert("UMKM berhasil diperbarui!");
+      toast({
+        title: "UMKM berhasil diperbarui.",
+        description: "Data UMKM berhasil diperbarui.",
+        variant: "default",
+      });
+
+      setTimeout(() => {
+        window.location.replace("/dashboard/umkm/list");
+      }, 2000);
     } catch (error) {
-      console.error("Error updating UMKM:", error);
-      alert("Terjadi kesalahan saat memperbarui data UMKM.");
+      toast({
+        title: "Terjadi kesalahan saat memperbarui data UMKM.",
+        description: "Error: " + error,
+        variant: "default",
+      });
     } finally {
       setLoading(false);
     }

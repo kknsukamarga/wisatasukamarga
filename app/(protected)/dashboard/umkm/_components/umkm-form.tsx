@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast"; // Import the custom useToast hook
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,11 +47,12 @@ const formSchema = z.object({
 });
 
 interface UMKMFormProps {
-  initialData?: Partial<z.infer<typeof formSchema>>; // Optional initial data
-  pageTitle: string; // Page title for the form
+  initialData?: Partial<z.infer<typeof formSchema>>;
+  pageTitle: string;
 }
 
 export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -94,21 +96,36 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Gagal mengirim UMKM:", errorData);
-        alert(errorData.error || "Gagal mengirim data UMKM.");
+        toast({
+          title: "Gagal",
+          description: errorData.error || "Gagal mengirim data UMKM.",
+          variant: "destructive",
+        });
         return;
       }
 
       const data = await response.json();
       console.log("UMKM berhasil dibuat:", data);
-      alert("UMKM berhasil ditambahkan!");
+
+      // Show success toast
+      toast({
+        title: "Berhasil",
+        description: "UMKM berhasil ditambahkan!",
+      });
+
       form.reset();
     } catch (error) {
       console.error("Terjadi kesalahan saat mengirim data UMKM:", error);
-      alert("Terjadi kesalahan saat mengirim data UMKM.");
+      toast({
+        title: "Gagal",
+        description: "Terjadi kesalahan saat mengirim data UMKM.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   }
+
   function toBase64(file: any) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
