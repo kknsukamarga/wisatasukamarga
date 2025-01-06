@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { v2 as cloudinary } from "cloudinary";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -13,7 +14,7 @@ cloudinary.config({
 
 type UMKMParams = {
   product_name: string;
-  image: string; // Base64 encoded string
+  image: string[]; // Base64 encoded string
   price: number;
   description: string;
   wanumber: string;
@@ -53,27 +54,37 @@ export async function GET(req: NextRequest) {
   }
 }
 export async function POST(req: NextRequest) {
-  const body: UMKMParams = await req.json();
-
+  const body = await req.json();
   try {
-    const { product_name, image, price, description, wanumber } = body;
+    const { product_name, images, price, description, wanumber } = body;
 
     // Validate required fields
-    if (!product_name || !image || !price || !description || !wanumber) {
+    if (
+      !product_name ||
+      !images ||
+      images.length === 0 ||
+      !price ||
+      !description ||
+      !wanumber
+    ) {
       return NextResponse.json(
         { error: "Semua field wajib diisi" },
         { status: 400 }
       );
     }
 
-    // Upload Base64 image to Cloudinary
-    const cloudinaryResponse = await cloudinary.uploader.upload(image, {
-      folder: "umkm",
-      public_id: product_name.toLowerCase().replace(/\s+/g, "-"),
-    });
-
-    // Use the secure URL returned by Cloudinary
-    const imageUrl = cloudinaryResponse.secure_url;
+    // Upload all Base64 images to Cloudinary
+    const uploadedImages = await Promise.all(
+      images.map(async (image: any, index: any) => {
+        const cloudinaryResponse = await cloudinary.uploader.upload(image, {
+          folder: "umkm",
+          public_id: `${product_name.toLowerCase().replace(/\s+/g, "-")}-${
+            index + 1
+          }`,
+        });
+        return cloudinaryResponse.secure_url; // Return the secure URL
+      })
+    );
 
     // Generate a unique slug
     let slug = product_name
@@ -89,11 +100,12 @@ export async function POST(req: NextRequest) {
       counter++;
     }
 
+    // Save the UMKM data to the database
     const newUmkm = await prisma.umkm.create({
       data: {
         product_name,
         slug,
-        image: imageUrl,
+        image: uploadedImages,
         price,
         description,
         wanumber,
@@ -101,14 +113,16 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(newUmkm, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Terjadi kesalahan saat menambahkan UMKM:", error);
-    return NextResponse.json({ error: error }, { status: 500 });
+    return NextResponse.json(
+      { error: "Gagal menambahkan UMKM", details: error.message },
+      { status: 500 }
+    );
   }
 }
-
 export async function PUT(req: NextRequest) {
-  const body: Partial<UMKMParams> = await req.json();
+  const body = await req.json();
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get("slug");
 
@@ -120,30 +134,47 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Validasi input
-    if (
-      !body.product_name &&
-      !body.image &&
-      !body.price &&
-      !body.description &&
-      !body.wanumber
-    ) {
+    const { product_name, image, price, description, wanumber } = body;
+    // Fetch existing UMKM entry
+    const existingUmkm = await prisma.umkm.findUnique({ where: { slug } });
+    if (!existingUmkm) {
       return NextResponse.json(
-        { error: "Setidaknya satu field harus diisi untuk memperbarui" },
-        { status: 400 }
+        { error: "UMKM tidak ditemukan" },
+        { status: 404 }
       );
     }
 
+    const updatedImageUrl = await Promise.all(
+      image.map(async (image: any, index: any) => {
+        const cloudinaryResponse = await cloudinary.uploader.upload(image, {
+          folder: "umkm",
+          public_id: `${product_name.toLowerCase().replace(/\s+/g, "-")}-${
+            index + 1
+          }`,
+        });
+        return cloudinaryResponse.secure_url;
+      })
+    );
+
+    const updatedData = {
+      product_name: product_name || existingUmkm.product_name,
+      image: updatedImageUrl,
+      price: price || existingUmkm.price,
+      description: description || existingUmkm.description,
+      wanumber: wanumber || existingUmkm.wanumber,
+    };
+
+    // Update the UMKM entry in the database
     const updatedUmkm = await prisma.umkm.update({
       where: { slug },
-      data: body,
+      data: updatedData,
     });
 
-    return NextResponse.json(updatedUmkm);
-  } catch (error) {
+    return NextResponse.json(updatedUmkm, { status: 200 });
+  } catch (error: any) {
     console.error("Terjadi kesalahan saat memperbarui UMKM:", error);
     return NextResponse.json(
-      { error: "Gagal memperbarui UMKM" },
+      { error: "Gagal memperbarui UMKM", details: error.message },
       { status: 500 }
     );
   }

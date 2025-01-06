@@ -4,7 +4,7 @@ import UMKMEditForm from "../../_components/umkm-edit-form";
 
 interface UMKMData {
   product_name: string;
-  image: string;
+  image: string[];
   price: number;
   description: string;
   wanumber: string;

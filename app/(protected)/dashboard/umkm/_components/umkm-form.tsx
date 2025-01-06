@@ -68,15 +68,16 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
     setLoading(true);
 
     try {
-      let base64Image;
+      let base64Images = [];
       if (values.image && values.image.length > 0) {
-        const file = values.image[0];
-        base64Image = await toBase64(file);
+        base64Images = await Promise.all(
+          values.image.map(async (file: any) => await toBase64(file))
+        );
       }
 
       const formData = {
         product_name: values.product_name,
-        image: base64Image,
+        images: base64Images, // Send an array of Base64 strings
         price: values.price,
         description: values.description,
         wanumber: values.wanumber,
@@ -108,7 +109,6 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
       setLoading(false);
     }
   }
-
   function toBase64(file: any) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
