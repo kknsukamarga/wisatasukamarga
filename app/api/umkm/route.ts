@@ -17,6 +17,8 @@ type UMKMParams = {
   price: number;
   description: string;
   wanumber: string;
+  owner: string;
+  category?: "service" | "product";
 };
 
 // Handle semua metode HTTP
@@ -55,7 +57,15 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const body = await req.json();
   try {
-    const { product_name, images, price, description, wanumber } = body;
+    const {
+      product_name,
+      images,
+      price,
+      description,
+      wanumber,
+      owner,
+      category,
+    } = body;
 
     // Validate required fields
     if (
@@ -64,7 +74,9 @@ export async function POST(req: NextRequest) {
       images.length === 0 ||
       !price ||
       !description ||
-      !wanumber
+      !wanumber ||
+      !owner ||
+      !category
     ) {
       return NextResponse.json(
         { error: "Semua field wajib diisi" },
@@ -108,6 +120,8 @@ export async function POST(req: NextRequest) {
         price,
         description,
         wanumber,
+        owner,
+        category,
       },
     });
 
@@ -133,7 +147,15 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const { product_name, image, price, description, wanumber } = body;
+    const {
+      product_name,
+      image,
+      price,
+      description,
+      wanumber,
+      owner,
+      category,
+    } = body;
     // Fetch existing UMKM entry
     const existingUmkm = await prisma.umkm.findUnique({ where: { slug } });
     if (!existingUmkm) {
@@ -161,6 +183,8 @@ export async function PUT(req: NextRequest) {
       price: price || existingUmkm.price,
       description: description || existingUmkm.description,
       wanumber: wanumber || existingUmkm.wanumber,
+      owner: owner || existingUmkm.owner,
+      category: category || existingUmkm.category,
     };
 
     // Update the UMKM entry in the database

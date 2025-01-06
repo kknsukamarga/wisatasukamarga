@@ -37,18 +37,31 @@ export const columns: ColumnDef<Umkm>[] = [
       <DataTableColumnHeader column={column} title="Nama Produk" />
     ),
     cell: ({ row }) => (
-      <div className="w-[150px] font-medium truncate">
+      <div className="max-w-[120px] font-medium truncate">
         {row.getValue("product_name")}
       </div>
     ),
   },
   {
-    accessorKey: "slug",
+    accessorKey: "owner",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Slug" />
+      <DataTableColumnHeader column={column} title="Nama Pemilik" />
     ),
     cell: ({ row }) => (
-      <div className="text-gray-500 truncate">{row.getValue("slug")}</div>
+      <div className="max-w-[120px] font-medium truncate">
+        {row.getValue("owner")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "category",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Kategori" />
+    ),
+    cell: ({ row }) => (
+      <div className="max-w-[120px] font-medium capitalize truncate">
+        {row.getValue("category")}
+      </div>
     ),
   },
   {
@@ -57,7 +70,7 @@ export const columns: ColumnDef<Umkm>[] = [
       <DataTableColumnHeader column={column} title="Deskripsi" />
     ),
     cell: ({ row }) => (
-      <div className="text-gray-700 truncate max-w-[300px]">
+      <div className="max-w-[300px] text-gray-700 truncate">
         {row.getValue("description")}
       </div>
     ),
@@ -68,7 +81,7 @@ export const columns: ColumnDef<Umkm>[] = [
       <DataTableColumnHeader column={column} title="Harga" />
     ),
     cell: ({ row }) => (
-      <div className="text-green-500 font-semibold">
+      <div className="max-w-[120px] text-green-500 font-semibold truncate">
         {new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -82,7 +95,7 @@ export const columns: ColumnDef<Umkm>[] = [
       <DataTableColumnHeader column={column} title="Nomor WhatsApp" />
     ),
     cell: ({ row }) => (
-      <div className="text-blue-500">
+      <div className="max-w-[120px] text-blue-500 truncate">
         <a
           href={`https://wa.me/${row.getValue("wanumber")}`}
           target="_blank"
