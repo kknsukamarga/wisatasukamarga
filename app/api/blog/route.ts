@@ -165,11 +165,30 @@ export async function PUT(req: NextRequest) {
       imageUrl = cloudinaryResponse.secure_url;
     }
 
+    // Generate new slug
+    let newSlug = title
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+
+    // Ensure slug uniqueness
+    let existingSlug = await prisma.blog.findUnique({
+      where: { slug: newSlug },
+    });
+    let counter = 1;
+
+    while (existingSlug && existingSlug.id !== existingBlog.id) {
+      newSlug = `${newSlug}-${counter}`;
+      existingSlug = await prisma.blog.findUnique({ where: { slug: newSlug } });
+      counter++;
+    }
+
     // Update the blog entry
     const updatedBlog = await prisma.blog.update({
       where: { slug },
       data: {
         title,
+        slug: newSlug,
         coverImage: imageUrl,
         content,
         author,

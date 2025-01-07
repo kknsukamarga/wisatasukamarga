@@ -2,7 +2,9 @@ import { auth } from "@/auth";
 // import Hero from "@/components/guest/blog/hero";
 import Footer from "@/components/guest/footer";
 import Navbar from "@/components/guest/navbar";
-import Main from "@/components/guest/blog/main";
+import ArtikelTerbaru from "@/components/guest/blog/ArtikelTerbaru";
+import Kategori from "@/components/guest/blog/Kategori";
+import SemuaArtikel from "@/components/guest/blog/SemuaArtikel";
 
 export default async function Page() {
   const session = await auth();
@@ -12,9 +14,11 @@ export default async function Page() {
     <main className="bg-white">
       <Navbar isLoggedIn={isLoggedIn} />
       {/* <Hero /> */}
-      <div className="flex flex-col items-center justify-center h-screen">
-        <Main />
-      </div>
+      {/* <div className="flex flex-col items-center justify-center"> */}
+      <ArtikelTerbaru />
+      <Kategori />
+      <SemuaArtikel />
+      {/* </div> */}
       <Footer />
     </main>
   );

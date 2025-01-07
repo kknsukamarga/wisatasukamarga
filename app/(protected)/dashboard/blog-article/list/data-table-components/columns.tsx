@@ -75,6 +75,17 @@ export const columns: ColumnDef<Blog>[] = [
     ),
   },
   {
+    accessorKey: "category",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Category" />
+    ),
+    cell: ({ row }) => (
+      <div className="capitalize">
+        {row.getValue("category").replace("_", " ")}
+      </div>
+    ),
+  },
+  {
     accessorKey: "createdAt",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created At" />

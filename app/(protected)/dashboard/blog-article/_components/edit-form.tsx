@@ -20,7 +20,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"; // Import for dropdown
+} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,14 +33,16 @@ const formSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
   coverImage: z
     .any()
-    .refine(
-      (files) => Array.isArray(files) && files.length > 0,
-      "A cover image is required."
-    )
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Cover image size must not exceed 5MB.`
-    ),
+    .refine((value) => {
+      if (typeof value === "string" && value.startsWith("http")) return true;
+      if (Array.isArray(value) && value.length > 0) return true;
+      return false;
+    }, "A cover image is required.")
+    .refine((value) => {
+      if (typeof value === "string" && value.startsWith("http")) return true;
+      if (Array.isArray(value) && value[0]?.size <= MAX_FILE_SIZE) return true;
+      return false;
+    }, `Cover image size must not exceed 5MB.`),
   content: z
     .string()
     .min(10, { message: "Content must be at least 10 characters." }),
@@ -56,13 +58,14 @@ export default function EditForm() {
   const router = useRouter();
   const { slug } = useParams();
   const [initialData, setInitialData] = useState<any | null>(null);
+  const [generatedSlug, setGeneratedSlug] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      coverImage: [],
+      coverImage: "",
       content: "",
       author: "",
       category: "",
@@ -82,10 +85,11 @@ export default function EditForm() {
 
         const data = await response.json();
         setInitialData(data);
+        setGeneratedSlug(data.slug); // Set initial slug
 
         form.reset({
           title: data.title,
-          coverImage: [{ name: data.coverImage }],
+          coverImage: data.coverImage,
           content: data.content,
           author: data.author,
           category: data.category,
@@ -98,20 +102,42 @@ export default function EditForm() {
     fetchBlogData();
   }, [slug, form]);
 
+  // Function to generate slug
+  const generateSlug = (title: string) =>
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .slice(0, 50); // Limit slug length to 50 characters
+
+  // Watch for changes to the title and update slug
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (value.title) {
+        setGeneratedSlug(generateSlug(value.title));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
     try {
-      let base64Image = "";
+      let finalCoverImage = "";
 
-      if (values.coverImage && values.coverImage.length > 0) {
+      if (Array.isArray(values.coverImage) && values.coverImage.length > 0) {
         const file = values.coverImage[0];
-        base64Image = await toBase64(file);
+        finalCoverImage = await toBase64(file);
+      } else if (typeof values.coverImage === "string") {
+        finalCoverImage = values.coverImage;
       }
 
       const updatedData = {
         title: values.title,
-        coverImage: base64Image,
+        slug: generatedSlug,
+        coverImage: finalCoverImage,
         content: values.content,
         author: values.author,
         category: values.category,
@@ -139,8 +165,8 @@ export default function EditForm() {
     }
   }
 
-  function toBase64(file: any) {
-    return new Promise<string>((resolve, reject) => {
+  function toBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result as string);
@@ -175,6 +201,10 @@ export default function EditForm() {
                 </FormItem>
               )}
             />
+            <div>
+              <FormLabel>Generated Slug</FormLabel>
+              <p>{generatedSlug}</p>
+            </div>
             <FormField
               control={form.control}
               name="coverImage"
@@ -183,10 +213,15 @@ export default function EditForm() {
                   <FormLabel>Cover Image</FormLabel>
                   <FormControl>
                     <FileUploader
-                      value={field.value}
+                      value={Array.isArray(field.value) ? field.value : []}
                       onValueChange={field.onChange}
                       maxFiles={1}
                       maxSize={MAX_FILE_SIZE}
+                      initialUrl={
+                        typeof field.value === "string"
+                          ? field.value
+                          : undefined
+                      }
                     />
                   </FormControl>
                   <FormMessage />
