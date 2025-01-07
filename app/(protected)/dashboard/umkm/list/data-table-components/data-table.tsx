@@ -32,12 +32,24 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading: boolean;
+  error: string | null;
+  page: number;
+  setPage: any;
+  pageSize: number;
+  setPageSize: any;
+  length: number;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading,
+  error,
+  page,
+  setPage,
+  length,
+  pageSize,
+  setPageSize,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -115,16 +127,27 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className={`h-24 text-center ${error ? "text-red-500" : ""}`}
                 >
-                  {isLoading ? "" : "No results."}
+                  {isLoading
+                    ? "Loading..."
+                    : error
+                    ? `Error ${error}`
+                    : "No Results."}
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination
+        table={table}
+        page={page}
+        setPage={setPage}
+        length={length}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+      />
     </div>
   );
 }

@@ -3,20 +3,27 @@
 import { DataTable } from "./data-table-components/data-table";
 import { columns } from "./data-table-components/columns";
 import { useState, useEffect } from "react";
+import { useReactTable } from "@tanstack/react-table";
 
 export default function UMKMListPage() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({ umkm: [], length: 0 });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchUMKM = async () => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/umkm", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `/api/umkm?page=${page}&pagesize=${pageSize}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch UMKM data");
@@ -33,8 +40,7 @@ export default function UMKMListPage() {
   };
   useEffect(() => {
     fetchUMKM();
-  }, []);
-
+  }, [page, pageSize]);
   return (
     <div className="h-full flex-1 flex-col space-y-2 px-8 md:flex">
       <h1>List Data UMKM</h1>
@@ -46,20 +52,17 @@ export default function UMKMListPage() {
 
       <div className="relative">
         <DataTable
-          data={loading ? [] : data}
+          data={loading ? [] : data["umkm"]}
           columns={columns}
           isLoading={loading}
+          error={error}
+          page={page}
+          setPage={setPage}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          length={data["length"]}
         />
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center ">
-            <div className="text-muted-foreground">Loading...</div>
-          </div>
-        )}
       </div>
-
-      {error && (
-        <div className="text-center text-red-500 mt-4">Error: {error}</div>
-      )}
     </div>
   );
 }

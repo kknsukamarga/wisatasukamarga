@@ -4,6 +4,9 @@
   "private": true,
   "author": "mmvergara",
   "description": "Template repository for building a Next.js application with MongoDB, Prisma, and Next Auth authentication",
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",

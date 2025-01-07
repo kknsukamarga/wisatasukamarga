@@ -7,7 +7,6 @@ const prisma = new PrismaClient();
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get("slug");
-
   try {
     if (slug) {
       // Fetch single blog by slug

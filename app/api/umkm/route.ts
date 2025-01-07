@@ -25,7 +25,9 @@ type UMKMParams = {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get("slug");
-
+  const page = searchParams.get("page");
+  const pageSize: any = searchParams.get("pagesize");
+  let umkms = await prisma.umkm.findMany();
   try {
     if (slug) {
       // Ambil UMKM berdasarkan slug
@@ -43,8 +45,23 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(umkm);
     }
 
+    if (page) {
+      const umkmsPage = await prisma.umkm.findMany({
+        skip: (parseInt(page) - 1) * (parseInt(pageSize) || 10),
+        take: parseInt(pageSize) || 10,
+      });
+
+      if (!umkmsPage) {
+        return NextResponse.json(
+          { error: "UMKM tidak ditemukan" },
+          { status: 404 }
+        );
+      }
+      const data = { umkm: umkmsPage, length: umkms.length };
+      return NextResponse.json(data);
+    }
+
     // Ambil semua data UMKM
-    const umkms = await prisma.umkm.findMany();
     return NextResponse.json(umkms);
   } catch (error: any) {
     console.error("Terjadi kesalahan saat mengambil data UMKM:", error);
