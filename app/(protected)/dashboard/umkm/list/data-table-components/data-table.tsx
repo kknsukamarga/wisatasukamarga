@@ -38,6 +38,8 @@ interface DataTableProps<TData, TValue> {
   pageSize: number;
   setPageSize: any;
   length: number;
+  search: string;
+  setSearch: any;
 }
 
 export function DataTable<TData, TValue>({
@@ -50,6 +52,8 @@ export function DataTable<TData, TValue>({
   length,
   pageSize,
   setPageSize,
+  search,
+  setSearch,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -83,7 +87,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar search={search} setSearch={setSearch} table={table} />
       <div className="overflow-y-auto rounded-md border">
         <Table>
           <TableHeader>

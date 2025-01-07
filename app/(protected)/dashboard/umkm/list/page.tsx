@@ -11,12 +11,15 @@ export default function UMKMListPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useState("");
 
   const fetchUMKM = async () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/umkm?page=${page}&pagesize=${pageSize}`,
+        `/api/umkm?page=${page}&pagesize=${pageSize}${
+          search ? `&search=${search}` : ""
+        }`,
         {
           method: "GET",
           headers: {
@@ -40,7 +43,7 @@ export default function UMKMListPage() {
   };
   useEffect(() => {
     fetchUMKM();
-  }, [page, pageSize]);
+  }, [page, pageSize, search]);
   return (
     <div className="h-full flex-1 flex-col space-y-2 px-8 md:flex">
       <h1>List Data UMKM</h1>
@@ -60,6 +63,8 @@ export default function UMKMListPage() {
           setPage={setPage}
           pageSize={pageSize}
           setPageSize={setPageSize}
+          search={search}
+          setSearch={setSearch}
           length={data["length"]}
         />
       </div>

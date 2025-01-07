@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
   const slug = searchParams.get("slug");
   const page = searchParams.get("page");
   const pageSize: any = searchParams.get("pagesize");
+  const search = searchParams.get("search");
   let umkms = await prisma.umkm.findMany();
   try {
     if (slug) {
@@ -46,6 +47,41 @@ export async function GET(req: NextRequest) {
     }
 
     if (page) {
+      if (search) {
+        const umkmsSearch = await prisma.umkm.findMany({
+          where: {
+            OR: [
+              { product_name: { contains: search, mode: "insensitive" } },
+              { description: { contains: search, mode: "insensitive" } },
+              { wanumber: { contains: search, mode: "insensitive" } },
+              { owner: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        });
+
+        const umkmsSearchPaginate = await prisma.umkm.findMany({
+          skip: (parseInt(page) - 1) * (parseInt(pageSize) || 10),
+          take: parseInt(pageSize) || 10,
+          where: {
+            OR: [
+              { product_name: { contains: search, mode: "insensitive" } },
+              { description: { contains: search, mode: "insensitive" } },
+              { wanumber: { contains: search, mode: "insensitive" } },
+              { owner: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        });
+
+        if (!umkmsSearch) {
+          return NextResponse.json(
+            { error: "UMKM tidak ditemukan" },
+            { status: 404 }
+          );
+        }
+        const data = { umkm: umkmsSearchPaginate, length: umkmsSearch.length };
+        return NextResponse.json(data);
+      }
+
       const umkmsPage = await prisma.umkm.findMany({
         skip: (parseInt(page) - 1) * (parseInt(pageSize) || 10),
         take: parseInt(pageSize) || 10,
