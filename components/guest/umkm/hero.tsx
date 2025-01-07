@@ -26,21 +26,30 @@ export default function Hero() {
       ref={ref}
       className="w-full min-h-screen overflow-hidden relative grid place-items-center"
     >
+      
       <div className="flex justify-center items-center flex-col">
         <motion.p
           style={{ y: textY }}
           className={`font-bold text-white text-lg relative z-10 ${Questa.className}`}
         >
-          Produk dan UMKM
+          Telusuri Wisata
         </motion.p>
 
-        <motion.h1
+        <motion.h6
           style={{ y: textY }}
-          className={`font-bold text-white text-7xl md:text-9xl relative z-10 ${Questa.className}`}
+          className={`font-bold text-white md:text-6xl sm:text-5xl text-4xl relative z-10 ${Questa.className}`}
         >
-          Suka Marga
-        </motion.h1>
+         UMKM Suka Marga
+        </motion.h6>
+
+        <motion.p
+          style={{ y: textY }}
+          className={`font-bold text-white text-lg relative z-10 ${Questa.className}`}
+        >
+          Desa Wisata Alam, Budaya, dan Pertanian yang Berwawasan Lingkungan
+        </motion.p>
       </div>
+
 
       <motion.div
         className="absolute inset-0 z-0 top-0 grayscale brightness-50"
@@ -61,5 +70,6 @@ export default function Hero() {
         }}
       />
     </div>
+    
   );
 }
