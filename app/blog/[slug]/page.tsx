@@ -52,14 +52,12 @@ export default async function BlogDetailPage({
             {blog.title}
           </h1>
           <p>
-            {" "}
-            {new Date(
-              blog.updatedAt || blog.createdAt
-            ).toLocaleDateString()}{" "}
+            {new Date(blog.updatedAt || blog.createdAt).toLocaleDateString()}
           </p>
         </div>
+
         {/* Gambar Cover */}
-        <div className="relative h-[400px] w-auto rounded-lg overflow-hidden">
+        <div className="relative h-[400px] w-auto rounded-lg overflow-auto">
           <img
             src={blog.coverImage}
             alt={blog.title}
@@ -68,48 +66,23 @@ export default async function BlogDetailPage({
         </div>
 
         {/* Judul dan Konten */}
-        <div>
-          <div className="sticky top">
-            <p>Bagikan</p>
+        <div className="relative flex gap-8">
+          {/* Sticky Bagikan Section */}
+          <div className="sticky top-0 flex-shrink-0">
+            <div className="p-4 w-48 shadow-md rounded-md">
+              <p className="font-bold text-lg mb-4">Bagikan</p>
+              <div className="flex flex-col gap-4">
+                <button className="text-green-500 text-2xl">WhatsApp</button>
+                <button className="text-blue-600 text-2xl">Facebook</button>
+                <button className="text-blue-400 text-2xl">Twitter</button>
+              </div>
+            </div>
           </div>
-          <div className="prose prose-lg text-gray-800 text-3xl mx-auto md:mx-20 mt-8">
+
+          {/* Main Content */}
+          <div className="prose prose-lg text-gray-800 text-xl flex-grow mt-5">
             {/* Konten */}
-            {/* <div dangerouslySetInnerHTML={{ __html: blog.content }} /> */}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Pellentesque nisi tellus, porttitor in tempor non, dictum eget nunc.
-            Vestibulum interdum felis a elit condimentum rutrum. Curabitur
-            suscipit lorem et augue consequat, in accumsan odio aliquet. Integer
-            congue nibh eu enim elementum tempor. Morbi nec malesuada massa.
-            Aliquam id arcu at justo lobortis dapibus et non neque. Orci varius
-            natoque penatibus et magnis dis parturient montes, nascetur
-            ridiculus mus. Phasellus sodales sapien ante, sodales commodo lectus
-            pulvinar sed. Nulla nunc ex, consectetur quis sodales eget, gravida
-            in metus. Donec ultrices rutrum tellus non tincidunt. Sed non
-            faucibus eros. Cras at sodales nulla. Donec lobortis sagittis
-            placerat. Ut aliquam aliquet enim. In lacinia faucibus sem ac
-            tristique. Vivamus tortor ante, mattis id feugiat ac, ultrices in
-            nisl. Donec sem nibh, rhoncus eget neque non, accumsan consequat
-            ante. Ut id dolor vel nisi rhoncus consectetur eget nec urna.
-            Suspendisse porta arcu ac finibus feugiat. Proin vitae libero
-            sagittis mi luctus mattis. Maecenas vulputate justo id erat euismod
-            vehicula. In congue, odio vel ullamcorper imperdiet, ex metus
-            vulputate felis, nec auctor metus dui in erat. Morbi eget
-            condimentum orci, at posuere eros. Duis auctor mauris nulla, eu
-            aliquet est sagittis nec. Praesent vestibulum mollis ornare.
-            Suspendisse potenti. Nunc a tincidunt sapien, sodales pretium quam.
-            Praesent consequat ex eget rhoncus scelerisque. Donec lobortis
-            vulputate sem ac pretium. Mauris pretium nisl ut rutrum volutpat.
-            Suspendisse ut magna erat. Proin ipsum ex, volutpat ut gravida eget,
-            sodales id sem. Vestibulum sed ligula leo. Cras eu volutpat dolor.
-            Morbi ornare gravida ipsum sed varius. Proin feugiat vestibulum
-            massa ac dictum. Phasellus ultricies auctor nulla. Aenean mattis
-            felis eget pharetra bibendum. Sed tempor, nibh facilisis facilisis
-            suscipit, purus dolor consectetur augue, sit amet suscipit velit
-            dolor a erat. Cras sit amet dolor dui. Nam ornare augue eu velit
-            sagittis consequat. Maecenas feugiat eros in lectus lacinia laoreet.
-            Sed ut congue odio, non faucibus nulla. Aenean posuere ligula risus.
-            Maecenas faucibus dolor ac semper semper. Fusce tincidunt elit eu
-            faucibus laoreet. Nulla facilisi.
+            <div dangerouslySetInnerHTML={{ __html: blog.content }} />
           </div>
         </div>
       </article>
