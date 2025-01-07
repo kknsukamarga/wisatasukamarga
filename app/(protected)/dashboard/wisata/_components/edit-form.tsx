@@ -38,10 +38,7 @@ const formSchema = z.object({
     .refine((file) => file?.length > 0, "Gambar cover wajib diunggah."),
   images: z
     .array(z.any())
-    .refine(
-      (files) => files?.length > 0,
-      "Setidaknya satu gambar wajib diunggah."
-    ),
+    .refine((files) => files?.length > 0, "Setidaknya satu gambar wajib diunggah."),
   description: z.string().min(50, {
     message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
