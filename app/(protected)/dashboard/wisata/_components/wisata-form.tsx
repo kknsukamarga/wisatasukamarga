@@ -24,12 +24,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Nama harus terdiri dari minimal 2 karakter.",
   }),
-  image: z.any().refine((files) => files?.length > 0, "Gambar wajib diunggah."),
+  imageCover: z.any().refine((file) => file?.length > 0, "Gambar cover wajib diunggah."),
+  images: z.array(z.any()).refine((files) => files?.length > 0, "Setidaknya satu gambar wajib diunggah."),
   description: z.string().min(50, {
     message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
@@ -65,13 +67,15 @@ export default function WisataForm({
 }) {
   const defaultValues = {
     name: initialData?.name || "",
-    image: initialData?.image || null,
+    imageCover: initialData?.imageCover || null,
+    images: initialData?.images || [],
     description: initialData?.description || "",
     price: initialData?.price || "",
     location: initialData?.location || "",
     status: initialData?.status || "",
   };
 
+  const { toast } = useToast(); // Menggunakan useToast
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -92,19 +96,17 @@ export default function WisataForm({
     setLoading(true);
 
     try {
-      let base64Image = "";
+      const base64Cover = await toBase64(values.imageCover[0]);
+      const base64Images = await Promise.all(
+        values.images.map((file: File) => toBase64(file))
+      );
 
-      if (values.image && values.image.length > 0) {
-        const file = values.image[0];
-        base64Image = await toBase64(file);
-      }
-
-      // Explicitly convert price to integer
       const formData = {
         name: values.name,
-        image: base64Image,
+        imageCover: base64Cover,
+        image: base64Images,
         description: values.description,
-        price: parseInt(values.price as unknown as string, 10), // Convert to Int
+        price: parseInt(values.price as unknown as string, 10),
         location: values.location,
         status: values.status,
         fasilitasWisata: null,
@@ -121,17 +123,35 @@ export default function WisataForm({
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Failed to submit wisata:", errorData);
-        alert(errorData.error || "Failed to submit wisata.");
+        toast({
+          title: "Gagal Mengirim Data",
+          description: `Error: ${errorData.message || "Terjadi kesalahan."}`,
+          variant: "destructive",
+        });
         return;
       }
 
       const data = await response.json();
       console.log("Wisata created successfully:", data);
-      alert("Wisata created successfully!");
+      toast({
+        title: "Berhasil",
+        description: "Wisata berhasil dibuat!",
+        variant: "default",
+      });
+
       form.reset();
+
+      // Opsional: Alihkan pengguna setelah 2 detik
+      setTimeout(() => {
+        window.location.replace("/dashboard/wisata/list");
+      }, 2000);
     } catch (error) {
       console.error("Error submitting wisata:", error);
-      alert("An error occurred while submitting the wisata.");
+      toast({
+        title: "Gagal Mengirim Data",
+        description: `Error: ${error}`,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -162,18 +182,38 @@ export default function WisataForm({
               )}
             />
 
-            {/* Image */}
+            {/* Image Cover */}
             <FormField
               control={form.control}
-              name="image"
+              name="imageCover"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gambar</FormLabel>
+                  <FormLabel>Gambar Cover</FormLabel>
                   <FormControl>
                     <FileUploader
                       value={field.value}
                       onValueChange={field.onChange}
                       maxFiles={1}
+                      maxSize={5 * 1024 * 1024} // 5MB
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Images */}
+            <FormField
+              control={form.control}
+              name="images"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gambar Galeri</FormLabel>
+                  <FormControl>
+                    <FileUploader
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      maxFiles={6}
                       maxSize={5 * 1024 * 1024} // 5MB
                     />
                   </FormControl>

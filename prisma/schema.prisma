@@ -58,11 +58,12 @@ model Blog {
 model Wisata {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
   name             String
-  image            String   
+  imageCover       String   
   description      String  
   price            Int
   location         String
   status           String
+  image            String[]
   fasilitasWisata  FasilitasWisata[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

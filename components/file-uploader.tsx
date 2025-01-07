@@ -1,6 +1,6 @@
 "use client";
 
-import { CrossIcon, UploadIcon } from "lucide-react";
+import { CrossIcon, TrashIcon, UploadIcon, X } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
 import Dropzone, {
@@ -245,8 +245,8 @@ export function FileUploader(props: FileUploaderProps) {
         )}
       </Dropzone>
       {files?.length ? (
-        <ScrollArea className="h-fit w-full px-3">
-          <div className="max-h-48 space-y-4">
+        <div className="h-full w-full px-3">
+          <div className="h-full space-y-4">
             {files?.map((file, index) => (
               <FileCard
                 key={index}
@@ -256,7 +256,7 @@ export function FileUploader(props: FileUploaderProps) {
               />
             ))}
           </div>
-        </ScrollArea>
+        </div>
       ) : null}
     </div>
   );
@@ -276,10 +276,11 @@ function FileCard({ file, progress, onRemove }: FileCardProps) {
           <Image
             src={file.preview}
             alt={file.name}
-            width={48}
-            height={48}
+            width={188}
+            height={188}
             loading="lazy"
-            className="aspect-square shrink-0 rounded-md object-cover"
+            className="aspect-square shrink-0 rounded-md object-cover border"
+            onClick={() => window.open(file.preview)}
           />
         ) : null}
         <div className="flex w-full flex-col gap-2">
@@ -294,15 +295,18 @@ function FileCard({ file, progress, onRemove }: FileCardProps) {
           {progress ? <Progress value={progress} /> : null}
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 absolute top-0 left-32">
         <Button
           type="button"
-          variant="outline"
+          variant="default"
           size="icon"
-          className="size-7"
+          className="bg-transparent size-10"
           onClick={onRemove}
         >
-          <CrossIcon className="size-4 " aria-hidden="true" />
+          <X
+            className="size-22 text-red-700 border rounded-full bg-[#ffffff]"
+            aria-hidden="true"
+          />
           <span className="sr-only">Remove file</span>
         </Button>
       </div>

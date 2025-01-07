@@ -45,20 +45,48 @@ export const columns: ColumnDef<Wisata>[] = [
     ),
   },
   {
+    accessorKey: "imageCover",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Image Cover" />
+    ),
+    cell: ({ row }) => {
+      const imageCover = row.getValue("imageCover");
+      return (
+        <div className="w-[48px] h-[48px]">
+          {imageCover && (
+            <Image
+              src={imageCover}
+              alt="Cover"
+              width={48}
+              height={48}
+              className="object-cover rounded"
+            />
+          )}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "image",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Image" />
     ),
-    cell: ({ row }) => (
-      <div className="w-[24px] h-[24px]">
-        <Image
-          src={row.getValue("image")}
-          alt={row.getValue("name")}
-          width={24}
-          height={24}
-        />
-      </div>
-    ),
+    cell: ({ row }) => {
+      const images = row.getValue("image");
+      return (
+        <div className="w-[48px] h-[48px]">
+          {images?.[0] && (
+            <Image
+              src={images[0]}
+              alt="Image"
+              width={48}
+              height={48}
+              className="object-cover rounded"
+            />
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "description",
@@ -78,7 +106,7 @@ export const columns: ColumnDef<Wisata>[] = [
     ),
     cell: ({ row }) => (
       <div className="w-[100px]">
-        {new Intl.NumberFormat("en-ID", {
+        {new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
         }).format(row.getValue("price"))}
@@ -100,15 +128,12 @@ export const columns: ColumnDef<Wisata>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      // Explicitly type `status`
-      const status: string = row.getValue("status") as string;
-
+      const status: string = row.getValue("status");
       const statusColors: Record<string, string> = {
-        Buka: "text-green",
+        Buka: "text-green-500",
         Tutup: "text-red-500",
         Pemeliharaan: "text-yellow-500",
       };
-
       return (
         <div className={cn("font-medium capitalize", statusColors[status])}>
           {status}
@@ -125,7 +150,7 @@ export const columns: ColumnDef<Wisata>[] = [
       const date = new Date(row.getValue("createdAt"));
       return (
         <div className="text-sm">
-          {date.toLocaleDateString("en-US", {
+          {date.toLocaleDateString("id-ID", {
             day: "2-digit",
             month: "short",
             year: "numeric",
@@ -143,7 +168,7 @@ export const columns: ColumnDef<Wisata>[] = [
       const date = new Date(row.getValue("updatedAt"));
       return (
         <div className="text-sm">
-          {date.toLocaleDateString("en-US", {
+          {date.toLocaleDateString("id-ID", {
             day: "2-digit",
             month: "short",
             year: "numeric",

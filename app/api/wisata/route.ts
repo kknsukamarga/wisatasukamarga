@@ -11,7 +11,7 @@ cloudinary.config({
 });
 
 // Handle all HTTP methods
-export async function GET(req: NextRequest) {
+export async function GET(req : NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
 
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(wisatas);
-  } catch (error: any) {
+  } catch (error : any) {
     console.error("Error during GET wisatas:", error);
     return NextResponse.json(
       { error: "Something went wrong", details: error.message },
@@ -52,16 +52,15 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req : NextRequest) {
   const body = await req.json();
-  // Upload new Base64 image to Cloudinary if provided
 
   try {
-    const { name, image, description, price, location, status } = body;
+    const { name, imageCover, description, price, location, status, image, fasilitasWisata } = body;
 
-    if (!name || !image || !description || !price || !location || !status) {
+    if (!name || !imageCover || !description || !price || !location || !status || !image || !image.length) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "All fields are required, including images" },
         { status: 400 }
       );
     }
@@ -72,26 +71,45 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const cloudinaryResponse = await cloudinary.uploader.upload(body.image, {
+
+    const cloudinaryResponse = await cloudinary.uploader.upload(imageCover, {
       folder: "wisata",
-      public_id: body.name.toLowerCase().replace(/\s+/g, "-"),
+      public_id: name.toLowerCase().replace(/\s+/g, "-"),
     });
 
-    const imageUrl = cloudinaryResponse.secure_url;
+    const imageCoverUrl = cloudinaryResponse.secure_url;
+
+    const imageUrls = await Promise.all(
+      image.map(async (img : any, index : any) => {
+        const response = await cloudinary.uploader.upload(img, {
+          folder: "wisata/images",
+          public_id: `${name.toLowerCase().replace(/\s+/g, "-")}-image-${index}`,
+        });
+        return response.secure_url;
+      })
+    );
 
     const newWisata = await prisma.wisata.create({
       data: {
         name,
-        image: imageUrl,
+        imageCover: imageCoverUrl,
         description,
-        price, // Price is now guaranteed to be an integer
+        price,
         location,
         status,
+        image: imageUrls,
+        fasilitasWisata: {
+          create: fasilitasWisata?.map((fasilitas : any) => ({
+            name: fasilitas.name,
+            image: fasilitas.image,
+            description: fasilitas.description,
+          })),
+        },
       },
     });
 
     return NextResponse.json(newWisata, { status: 201 });
-  } catch (error: any) {
+  } catch (error : any) {
     console.error("Error creating wisata:", error);
     return NextResponse.json(
       { error: "Failed to create wisata", details: error.message },
@@ -100,7 +118,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req : NextRequest) {
   const body = await req.json();
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
@@ -119,31 +137,40 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Wisata not found" }, { status: 404 });
     }
 
-    let imageUrl = existingWisata.image; // Default to existing image URL
+    let imageCoverUrl = existingWisata.imageCover;
 
-    // Upload new Base64 image to Cloudinary if provided
-    if (body.image && body.image !== imageUrl) {
-      const cloudinaryResponse = await cloudinary.uploader.upload(body.image, {
+    if (body.imageCover && body.imageCover !== imageCoverUrl) {
+      const cloudinaryResponse = await cloudinary.uploader.upload(body.imageCover, {
         folder: "wisata",
         public_id: body.name.toLowerCase().replace(/\s+/g, "-"),
       });
 
-      imageUrl = cloudinaryResponse.secure_url;
+      imageCoverUrl = cloudinaryResponse.secure_url;
     }
 
-    // Update Wisata and handle related FasilitasWisata
+    const imageUrls = body.image ? await Promise.all(
+      body.image.map(async (img : any, index : any) => {
+        const response = await cloudinary.uploader.upload(img, {
+          folder: "wisata/images",
+          public_id: `${body.name.toLowerCase().replace(/\s+/g, "-")}-image-${index}`,
+        });
+        return response.secure_url;
+      })
+    ) : existingWisata.image;
+
     const updatedWisata = await prisma.wisata.update({
       where: { id },
       data: {
         name: body.name,
-        image: imageUrl,
+        imageCover: imageCoverUrl,
         description: body.description,
         price: body.price,
         location: body.location,
         status: body.status,
+        image: imageUrls,
         fasilitasWisata: {
-          deleteMany: {}, // Delete existing fasilitas
-          create: body.fasilitasWisata?.map((fasilitas: any) => ({
+          deleteMany: {},
+          create: body.fasilitasWisata?.map((fasilitas : any) => ({
             name: fasilitas.name,
             image: fasilitas.image,
             description: fasilitas.description,
@@ -156,7 +183,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(updatedWisata);
-  } catch (error: any) {
+  } catch (error : any) {
     console.error("Error updating wisata:", error);
     return NextResponse.json(
       { error: "Failed to update wisata", details: error.message },
@@ -165,7 +192,7 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req : NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
 
@@ -174,13 +201,12 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    // Delete Wisata and its related FasilitasWisata
     await prisma.wisata.delete({
       where: { id },
     });
 
     return NextResponse.json({ message: "Wisata deleted successfully" });
-  } catch (error: any) {
+  } catch (error : any) {
     console.error("Error deleting wisata:", error);
     return NextResponse.json(
       { error: "Failed to delete wisata", details: error.message },

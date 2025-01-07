@@ -13,10 +13,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useToast } from "@/hooks/use-toast";
+import * as z from "zod";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -24,7 +33,15 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "Nama harus terdiri dari minimal 2 karakter.",
   }),
-  image: z.any().refine((files) => files?.length > 0, "Gambar wajib diunggah."),
+  imageCover: z
+    .any()
+    .refine((file) => file?.length > 0, "Gambar cover wajib diunggah."),
+  images: z
+    .array(z.any())
+    .refine(
+      (files) => files?.length > 0,
+      "Setidaknya satu gambar wajib diunggah."
+    ),
   description: z.string().min(50, {
     message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
@@ -51,7 +68,7 @@ const formSchema = z.object({
   }),
 });
 
-export default function EditForm({
+export default function WisataEditForm({
   initialData,
   pageTitle,
 }: {
@@ -60,13 +77,18 @@ export default function EditForm({
 }) {
   const router = useRouter();
   const { id } = useParams();
+  const { toast } = useToast(); // Menggunakan hook useToast
   const [loading, setLoading] = useState(false);
+
+  const [imageCoverFile, setImageCoverFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: initialData?.name || "",
-      image: [],
+      imageCover: initialData?.imageCover || null,
+      images: [],
       description: initialData?.description || "",
       price: initialData?.price || 0,
       location: initialData?.location || "",
@@ -74,20 +96,122 @@ export default function EditForm({
     },
   });
 
+  // useEffect(() => {
+  //   const convertAllImagesToFiles = async () => {
+  //     try {
+  //       if (initialData.imageCover) {
+  //         const response = await fetch(initialData.imageCover);
+  //         if (!response.ok) {
+  //           throw new Error(
+  //             `Failed to fetch imageCover: ${response.statusText}`
+  //           );
+  //         }
+  //         const blob = await response.blob();
+  //         const file = new File([blob], "cover.jpg", { type: blob.type });
+  //         setImageCoverFile(file);
+  //         form.setValue("imageCover", [file]);
+  //       }
+
+  //       if (initialData.image && Array.isArray(initialData.image)) {
+  //         const convertedFiles = await Promise.all(
+  //           initialData.image.map(async (imageUrl: string, index: number) => {
+  //             const response = await fetch(imageUrl);
+  //             if (!response.ok) {
+  //               throw new Error(
+  //                 `Failed to fetch image ${index + 1}: ${response.statusText}`
+  //               );
+  //             }
+  //             const blob = await response.blob();
+  //             const fileName = `image-${index + 1}.jpg`;
+  //             return new File([blob], fileName, { type: blob.type });
+  //           })
+  //         );
+  //         setImageFiles(convertedFiles);
+  //         form.setValue("images", convertedFiles);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error converting images to files:", error);
+  //     }
+  //   };
+
+  //   convertAllImagesToFiles();
+  // }, [initialData, form]);
+  useEffect(() => {
+    const convertAllImagesToFiles = async () => {
+      try {
+        if (initialData.imageCover) {
+          const response = await fetch(initialData.imageCover);
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch imageCover: ${response.statusText}`
+            );
+          }
+          const blob = await response.blob();
+          const file = Object.assign(
+            new File([blob], "cover.jpg", { type: blob.type }),
+            {
+              preview: initialData.imageCover,
+            }
+          );
+          setImageCoverFile(file);
+          form.setValue("imageCover", [file]);
+        }
+
+        if (initialData.image && Array.isArray(initialData.image)) {
+          const convertedFiles = await Promise.all(
+            initialData.image.map(async (imageUrl: string, index: number) => {
+              const response = await fetch(imageUrl);
+              if (!response.ok) {
+                throw new Error(
+                  `Failed to fetch image ${index + 1}: ${response.statusText}`
+                );
+              }
+              const blob = await response.blob();
+              const fileName = `image-${index + 1}.jpg`;
+              return Object.assign(
+                new File([blob], fileName, { type: blob.type }),
+                {
+                  preview: imageUrl,
+                }
+              );
+            })
+          );
+          setImageFiles(convertedFiles);
+          form.setValue("images", convertedFiles);
+        }
+      } catch (error) {
+        console.error("Error converting images to files:", error);
+      }
+    };
+
+    convertAllImagesToFiles();
+  }, [initialData, form]);
+
+  const toBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
     try {
-      let base64Image = initialData?.image || "";
+      const base64ImageCover = imageCoverFile
+        ? await toBase64(imageCoverFile)
+        : initialData.imageCover;
 
-      if (values.image && values.image.length > 0) {
-        const file = values.image[0];
-        base64Image = await toBase64(file);
-      }
+      const base64Images = await Promise.all(
+        imageFiles.map((file) => toBase64(file))
+      );
 
       const updatedData = {
         name: values.name,
-        image: base64Image,
+        imageCover: base64ImageCover,
+        image: base64Images,
         description: values.description,
         price: values.price,
         location: values.location,
@@ -102,27 +226,33 @@ export default function EditForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to update wisata.");
+        toast({
+          title: "Gagal Memperbarui Data",
+          description: errorData.error || "Terjadi kesalahan.",
+          variant: "destructive",
+        });
         return;
       }
 
-      alert("Wisata updated successfully!");
-      router.push("/dashboard/wisata/list");
+      toast({
+        title: "Berhasil",
+        description: "Wisata berhasil diperbarui!",
+        variant: "default",
+      });
+
+      setTimeout(() => {
+        router.push("/dashboard/wisata/list");
+      }, 2000);
     } catch (error) {
       console.error("Error updating wisata:", error);
-      alert("An error occurred while updating the wisata.");
+      toast({
+        title: "Gagal Memperbarui Data",
+        description: `Error: ${error}`,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
-  }
-
-  function toBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
   }
 
   return (
@@ -150,14 +280,17 @@ export default function EditForm({
             />
             <FormField
               control={form.control}
-              name="image"
+              name="imageCover"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image</FormLabel>
+                  <FormLabel>Image Cover</FormLabel>
                   <FormControl>
                     <FileUploader
-                      value={field.value}
-                      onValueChange={field.onChange}
+                      value={imageCoverFile ? [imageCoverFile] : []}
+                      onValueChange={(files: any) => {
+                        setImageCoverFile(files[0] || null);
+                        field.onChange(files);
+                      }}
                       maxFiles={1}
                       maxSize={MAX_FILE_SIZE}
                     />
@@ -168,17 +301,31 @@ export default function EditForm({
             />
             <FormField
               control={form.control}
-              name="description"
+              name="images"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Images</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter wisata description" {...field} />
+                    <FileUploader
+                      value={imageFiles}
+                      onValueChange={(files: unknown) => {
+                        if (Array.isArray(files)) {
+                          const validFiles = files.filter(
+                            (file) => file instanceof File
+                          ) as File[];
+                          setImageFiles(validFiles);
+                          field.onChange(validFiles);
+                        }
+                      }}
+                      maxFiles={6}
+                      maxSize={MAX_FILE_SIZE}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="price"
@@ -218,12 +365,21 @@ export default function EditForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter status (Buka, Tutup, Pemeliharaan)"
-                      {...field}
-                    />
-                  </FormControl>
+                  <Select
+                    onValueChange={(value) => field.onChange(value)}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Buka">Buka</SelectItem>
+                      <SelectItem value="Tutup">Tutup</SelectItem>
+                      <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
