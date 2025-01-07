@@ -16,7 +16,7 @@ const Kategori = () => {
           </h1>
           <p>Baca artikel disini</p>
         </div>
-        <div className="flex gap-4 md:gap-8">
+        <div className="flex gap-4 md:gap-8 flex-col md:flex-row">
           {/* Wisata Card */}
           <motion.div
             className="relative cursor-pointer"
