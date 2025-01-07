@@ -27,6 +27,7 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -70,7 +71,8 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} />
-      <div className="overflow-x-auto rounded-md border">
+      {/* <div className="overflow-x-auto rounded-md border"> */}
+      <ScrollArea className="max-w-[1400px] border rounded-md">
         <Table className="min-w-[200px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -121,7 +123,9 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+      {/* </div> */}
       <DataTablePagination table={table} />
     </div>
   );
