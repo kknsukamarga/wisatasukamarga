@@ -38,10 +38,7 @@ const formSchema = z.object({
     .refine((file) => file?.length > 0, "Gambar cover wajib diunggah."),
   images: z
     .array(z.any())
-    .refine(
-      (files) => files?.length > 0,
-      "Setidaknya satu gambar wajib diunggah."
-    ),
+    .refine((files) => files?.length > 0, "Setidaknya satu gambar wajib diunggah."),
   description: z.string().min(50, {
     message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
@@ -96,46 +93,6 @@ export default function WisataEditForm({
     },
   });
 
-  // useEffect(() => {
-  //   const convertAllImagesToFiles = async () => {
-  //     try {
-  //       if (initialData.imageCover) {
-  //         const response = await fetch(initialData.imageCover);
-  //         if (!response.ok) {
-  //           throw new Error(
-  //             `Failed to fetch imageCover: ${response.statusText}`
-  //           );
-  //         }
-  //         const blob = await response.blob();
-  //         const file = new File([blob], "cover.jpg", { type: blob.type });
-  //         setImageCoverFile(file);
-  //         form.setValue("imageCover", [file]);
-  //       }
-
-  //       if (initialData.image && Array.isArray(initialData.image)) {
-  //         const convertedFiles = await Promise.all(
-  //           initialData.image.map(async (imageUrl: string, index: number) => {
-  //             const response = await fetch(imageUrl);
-  //             if (!response.ok) {
-  //               throw new Error(
-  //                 `Failed to fetch image ${index + 1}: ${response.statusText}`
-  //               );
-  //             }
-  //             const blob = await response.blob();
-  //             const fileName = `image-${index + 1}.jpg`;
-  //             return new File([blob], fileName, { type: blob.type });
-  //           })
-  //         );
-  //         setImageFiles(convertedFiles);
-  //         form.setValue("images", convertedFiles);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error converting images to files:", error);
-  //     }
-  //   };
-
-  //   convertAllImagesToFiles();
-  // }, [initialData, form]);
   useEffect(() => {
     const convertAllImagesToFiles = async () => {
       try {
