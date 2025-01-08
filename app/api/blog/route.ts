@@ -1,54 +1,109 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { v2 as cloudinary } from "cloudinary";
 
 const prisma = new PrismaClient();
 
-// Handle all HTTP methods
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+type BlogParams = {
+  title: string;
+  coverImage: string; // Base64 encoded string
+  content: string;
+  author: string;
+  category: "TEMPAT_WISATA" | "KARYA_UMKM"; // Enum category
+};
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const slug = searchParams.get("slug");
+  const mode = searchParams.get("mode"); // Parameter untuk membedakan jenis GET
+  const cursor = searchParams.get("cursor");
+  const limit = parseInt(searchParams.get("limit") || "10");
 
   try {
-    if (slug) {
-      // Fetch single blog by slug
-      const blog = await prisma.blog.findUnique({
-        where: { slug },
-      });
+    if (mode === "single") {
+      // Endpoint untuk mendapatkan blog tunggal berdasarkan slug
+      const slug = searchParams.get("slug");
+      if (!slug) {
+        return NextResponse.json(
+          { error: "Slug is required" },
+          { status: 400 }
+        );
+      }
 
+      const blog = await prisma.blog.findUnique({ where: { slug } });
       if (!blog) {
         return NextResponse.json({ error: "Blog not found" }, { status: 404 });
       }
 
       return NextResponse.json(blog);
-    }
+    } else {
+      // Endpoint untuk mendapatkan semua blog dengan pagination
+      const blogs = await prisma.blog.findMany({
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        ...(cursor && { cursor: { id: cursor } }),
+        orderBy: { createdAt: "desc" },
+      });
 
-    // Fetch all blogs
-    const blogs = await prisma.blog.findMany();
-    return NextResponse.json(blogs);
-  } catch (error: any) {
-    console.error("Error during GET blogs:", error); // Log error ke console
+      const hasNextPage = blogs.length > limit;
+      const nextCursor = hasNextPage ? blogs[blogs.length - 1].id : null;
+      const trimmedBlogs = hasNextPage ? blogs.slice(0, -1) : blogs;
+
+      const categories = await prisma.blog.groupBy({
+        by: ["category"],
+      });
+
+      return NextResponse.json({
+        articles: trimmedBlogs,
+        categories: categories.map((cat) => cat.category),
+        next_cursor: nextCursor,
+      });
+    }
+  } catch (error) {
+    console.error("Error during GET:", error);
     return NextResponse.json(
-      { error: "Something went wrong", details: error.message },
+      { error: "Failed to fetch blogs", details: error.message },
       { status: 500 }
     );
   }
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  const body: BlogParams = await req.json();
 
   try {
-    const { title, coverImage, content, author } = body;
+    const { title, coverImage, content, author, category } = body;
 
-    // Validate input
-    if (!title || !coverImage || !content || !author) {
+    // Validate required fields
+    if (!title || !coverImage || !content || !author || !category) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "Semua field wajib diisi" },
         { status: 400 }
       );
     }
 
-    // Generate unique slug from title
+    // Validate category
+    if (!["TEMPAT_WISATA", "KARYA_UMKM"].includes(category)) {
+      return NextResponse.json(
+        { error: "Kategori tidak valid" },
+        { status: 400 }
+      );
+    }
+
+    // Upload Base64 image to Cloudinary
+    const cloudinaryResponse = await cloudinary.uploader.upload(coverImage, {
+      folder: "blogs",
+      public_id: title.toLowerCase().replace(/\s+/g, "-"),
+    });
+
+    const imageUrl = cloudinaryResponse.secure_url;
+
+    // Generate a unique slug
     let slug = title
       .toLowerCase()
       .replace(/\s+/g, "-")
@@ -63,28 +118,30 @@ export async function POST(req: NextRequest) {
       counter++;
     }
 
+    // Create a new blog entry
     const newBlog = await prisma.blog.create({
       data: {
         title,
         slug,
-        coverImage,
+        coverImage: imageUrl,
         content,
         author,
+        category,
       },
     });
 
     return NextResponse.json(newBlog, { status: 201 });
   } catch (error) {
-    console.error("Error creating blog:", error);
+    console.error("Terjadi kesalahan saat menambahkan blog:", error);
     return NextResponse.json(
-      { error: "Failed to create blog" },
+      { error: "Gagal menambahkan blog. Silakan coba lagi." },
       { status: 500 }
     );
   }
 }
 
 export async function PUT(req: NextRequest) {
-  const body = await req.json();
+  const body: BlogParams = await req.json();
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get("slug");
 
@@ -93,17 +150,74 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Slug is required" }, { status: 400 });
     }
 
-    // Validate input
-    if (!body.title && !body.coverImage && !body.content && !body.author) {
+    const existingBlog = await prisma.blog.findUnique({
+      where: { slug },
+    });
+
+    if (!existingBlog) {
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+    }
+
+    const { title, coverImage, content, author, category } = body;
+
+    // Validate required fields
+    if (!title || !coverImage || !content || !author || !category) {
       return NextResponse.json(
-        { error: "At least one field is required to update" },
+        { error: "Semua field wajib diisi" },
         { status: 400 }
       );
     }
 
+    // Validate category
+    if (!["TEMPAT_WISATA", "KARYA_UMKM"].includes(category)) {
+      return NextResponse.json(
+        { error: "Kategori tidak valid" },
+        { status: 400 }
+      );
+    }
+
+    let imageUrl = existingBlog.coverImage;
+
+    // Check if coverImage is a new Base64 image or an existing URL
+    const isBase64 = coverImage.startsWith("data:image/");
+    if (isBase64) {
+      const cloudinaryResponse = await cloudinary.uploader.upload(coverImage, {
+        folder: "blogs",
+        public_id: title.toLowerCase().replace(/\s+/g, "-"),
+      });
+
+      imageUrl = cloudinaryResponse.secure_url;
+    }
+
+    // Generate new slug
+    let newSlug = title
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+
+    // Ensure slug uniqueness
+    let existingSlug = await prisma.blog.findUnique({
+      where: { slug: newSlug },
+    });
+    let counter = 1;
+
+    while (existingSlug && existingSlug.id !== existingBlog.id) {
+      newSlug = `${newSlug}-${counter}`;
+      existingSlug = await prisma.blog.findUnique({ where: { slug: newSlug } });
+      counter++;
+    }
+
+    // Update the blog entry
     const updatedBlog = await prisma.blog.update({
       where: { slug },
-      data: body,
+      data: {
+        title,
+        slug: newSlug,
+        coverImage: imageUrl,
+        content,
+        author,
+        category,
+      },
     });
 
     return NextResponse.json(updatedBlog);

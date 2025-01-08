@@ -42,26 +42,33 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-model Blog {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  slug        String   @unique // Untuk URL unik berdasarkan judul
-  coverImage  String   // Link gambar sampul
-  content     String   // Content dari rich text editor akan disimpan dalam bentuk String (HTML/JSON)
-  author      String   // Author akan ditulis manual di dashboard
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+enum BlogCategory {
+  TEMPAT_WISATA
+  KARYA_UMKM
 }
+
+model Blog {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String        @unique // Untuk URL unik berdasarkan judul
+  coverImage  String        // Link gambar sampul
+  content     String        // Content dari rich text editor akan disimpan dalam bentuk String (HTML/JSON)
+  author      String        // Author akan ditulis manual di dashboard
+  category    BlogCategory  // Kategori menggunakan enum
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
 
 model Umkm {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   product_name String
   slug         String   @unique
-  image        String[]   
+  image        String[]
   price        Int
   description  String
   owner        String
-  category     umkmCategory @default(product)     
+  category     umkmCategory @default(product)
   wanumber     String
 }
 
