@@ -24,6 +24,16 @@ export function DataTableToolbar<TData>({
 
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
+  const handleDelete = () => {
+    const rows = table.getFilteredSelectedRowModel().rows;
+
+    const arrayOfId = rows.map((row) => {
+      // @ts-ignore
+      return row.original.slug;
+    });
+    console.log(arrayOfId);
+  };
+
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setSearch(value);
@@ -69,7 +79,7 @@ export function DataTableToolbar<TData>({
 
       <div className="flex items-center gap-2">
         {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-          <Button variant="outline" size="sm">
+          <Button onClick={handleDelete} variant="outline" size="sm">
             <TrashIcon className="mr-2 size-4" aria-hidden="true" />
             Delete ({table.getFilteredSelectedRowModel().rows.length})
           </Button>

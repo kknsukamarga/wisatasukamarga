@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -111,7 +112,20 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              Array.from({ length: 10 }).map((_, rowIndex) => (
+                <TableRow key={`skeleton-${rowIndex}`}>
+                  {columns.map((_, colIndex) => (
+                    <TableCell
+                      key={`skeleton-${rowIndex}-${colIndex}`}
+                      className="px-4 py-2"
+                    >
+                      <Skeleton className=" h-8 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -133,11 +147,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className={`h-24 text-center ${error ? "text-red-500" : ""}`}
                 >
-                  {isLoading
-                    ? "Loading..."
-                    : error
-                    ? `Error ${error}`
-                    : "No Results."}
+                  {error ? `Error ${error}` : "No Results."}
                 </TableCell>
               </TableRow>
             )}
