@@ -14,15 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import useInView from "@/hooks/useInView";
 
-// Komponen Artikel
 interface Artikel {
   title: string;
   coverImage: string;
   category: string;
-  content: string; // Content dalam format HTML
+  content: string;
   createdAt: string;
-  slug: string; // Untuk navigasi
+  slug: string;
 }
 
 const SemuaArtikel: React.FC = () => {
@@ -30,26 +30,22 @@ const SemuaArtikel: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const { ref, inView } = useInView();
+
   useEffect(() => {
-    // Fetch articles and categories from API
     const fetchData = async () => {
       try {
         const response = await fetch("/api/blog");
-        const data: Artikel[] = await response.json();
+        const data = await response.json();
+        const { articles, categories, next_cursor } = data;
 
-        const sortedData = data.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-
-        const uniqueCategories = Array.from(
-          new Set(data.map((artikel) => artikel.category))
-        );
-
-        setArtikels(sortedData);
-        setCategories(uniqueCategories);
+        setArtikels(articles || []);
+        setCategories(categories || []);
+        setNextCursor(next_cursor || null);
       } catch (error) {
         console.error("Gagal mengambil data artikel", error);
       }
@@ -58,7 +54,33 @@ const SemuaArtikel: React.FC = () => {
     fetchData();
   }, []);
 
-  // Filter articles based on search term and selected category
+  useEffect(() => {
+    console.log("In view:", inView);
+    console.log("Next cursor:", nextCursor);
+    console.log("Loading:", loading);
+    if (inView && nextCursor && !loading) {
+      handleLoadMore();
+    }
+  }, [inView, nextCursor, loading]);
+
+  const handleLoadMore = async () => {
+    if (!nextCursor || loading) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/blog?cursor=${nextCursor}`);
+      const data = await response.json();
+      const { articles, next_cursor } = data;
+
+      setArtikels((prev) => [...prev, ...articles]);
+      setNextCursor(next_cursor || null);
+    } catch (error) {
+      console.error("Gagal memuat lebih banyak artikel", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredArtikels = artikels.filter(
     (artikel) =>
       artikel.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -67,7 +89,6 @@ const SemuaArtikel: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center w-full gap-8 container mx-auto py-10">
-      {/* Search Bar */}
       <div className="relative w-11/12 md:w-1/3">
         <Input
           type="text"
@@ -81,7 +102,6 @@ const SemuaArtikel: React.FC = () => {
         </span>
       </div>
 
-      {/* Filters and Results Header */}
       <div className="w-full flex flex-row justify-between items-center px-4 md:px-0">
         {searchTerm && (
           <p className="text-gray-600 text-lg font-bold flex-grow">
@@ -114,7 +134,6 @@ const SemuaArtikel: React.FC = () => {
         </div>
       </div>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4">
         {filteredArtikels.map((artikel, index) => (
           <motion.div
@@ -155,6 +174,14 @@ const SemuaArtikel: React.FC = () => {
             </div>
           </motion.div>
         ))}
+      </div>
+
+      <div ref={ref} className="w-full flex justify-center mt-6">
+        {loading ? (
+          <p className="text-gray-500">Loading more articles...</p>
+        ) : !nextCursor && artikels.length ? (
+          <p className="text-gray-500">No more articles.</p>
+        ) : null}
       </div>
     </div>
   );

@@ -18,32 +18,56 @@ type BlogParams = {
   category: "TEMPAT_WISATA" | "KARYA_UMKM"; // Enum category
 };
 
-// Handle all HTTP methods
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const slug = searchParams.get("slug");
+  const mode = searchParams.get("mode"); // Parameter untuk membedakan jenis GET
+  const cursor = searchParams.get("cursor");
+  const limit = parseInt(searchParams.get("limit") || "10");
 
   try {
-    if (slug) {
-      // Fetch single blog by slug
-      const blog = await prisma.blog.findUnique({
-        where: { slug },
-      });
+    if (mode === "single") {
+      // Endpoint untuk mendapatkan blog tunggal berdasarkan slug
+      const slug = searchParams.get("slug");
+      if (!slug) {
+        return NextResponse.json(
+          { error: "Slug is required" },
+          { status: 400 }
+        );
+      }
 
+      const blog = await prisma.blog.findUnique({ where: { slug } });
       if (!blog) {
         return NextResponse.json({ error: "Blog not found" }, { status: 404 });
       }
 
       return NextResponse.json(blog);
-    }
+    } else {
+      // Endpoint untuk mendapatkan semua blog dengan pagination
+      const blogs = await prisma.blog.findMany({
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        ...(cursor && { cursor: { id: cursor } }),
+        orderBy: { createdAt: "desc" },
+      });
 
-    // Fetch all blogs
-    const blogs = await prisma.blog.findMany();
-    return NextResponse.json(blogs);
-  } catch (error: any) {
-    console.error("Error during GET blogs:", error);
+      const hasNextPage = blogs.length > limit;
+      const nextCursor = hasNextPage ? blogs[blogs.length - 1].id : null;
+      const trimmedBlogs = hasNextPage ? blogs.slice(0, -1) : blogs;
+
+      const categories = await prisma.blog.groupBy({
+        by: ["category"],
+      });
+
+      return NextResponse.json({
+        articles: trimmedBlogs,
+        categories: categories.map((cat) => cat.category),
+        next_cursor: nextCursor,
+      });
+    }
+  } catch (error) {
+    console.error("Error during GET:", error);
     return NextResponse.json(
-      { error: "Something went wrong", details: error.message },
+      { error: "Failed to fetch blogs", details: error.message },
       { status: 500 }
     );
   }

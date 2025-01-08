@@ -21,8 +21,6 @@ const Kategori = () => {
           <motion.div
             className="relative cursor-pointer"
             whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => router.push(`/kategori/wisata`)}
           >
             <Image
               src={
@@ -42,8 +40,6 @@ const Kategori = () => {
           <motion.div
             className="relative cursor-pointer"
             whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => router.push(`/kategori/umkm`)}
           >
             <Image
               src={

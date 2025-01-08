@@ -22,13 +22,12 @@ const ArtikelTerbaru: React.FC = () => {
     // Fetch data dari API
     const fetchArtikels = async () => {
       try {
-        const response = await fetch("/api/blog"); // Ubah ke endpoint API Anda
+        const response = await fetch("/api/blog?mode=all&limit=3"); // Gunakan parameter mode dan limit
         const data = await response.json();
-        const sortedData = data.sort(
-          (a: Artikel, b: Artikel) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        setArtikels(sortedData.slice(0, 3)); // Ambil 3 artikel teratas
+
+        if (data.articles) {
+          setArtikels(data.articles); // Pastikan Anda mengambil `articles` dari response API
+        }
       } catch (error) {
         console.error("Gagal mengambil data artikel", error);
       }

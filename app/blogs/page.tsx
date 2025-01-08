@@ -14,7 +14,6 @@ export default async function Page() {
     <main className="bg-white">
       <Navbar isLoggedIn={isLoggedIn} />
       {/* <Hero /> */}
-      {/* <div className="flex flex-col items-center justify-center"> */}
       <ArtikelTerbaru />
       <Kategori />
       <SemuaArtikel />
