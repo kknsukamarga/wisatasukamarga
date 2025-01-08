@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { v2 as cloudinary } from "cloudinary";
+import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
@@ -108,6 +109,16 @@ export async function GET(req: NextRequest) {
   }
 }
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  const isLoggedIn = !!session?.user?.email;
+
+  if (!isLoggedIn) {
+    return NextResponse.json(
+      { error: "Anda harus login terlebih dahulu" },
+      { status: 401 }
+    );
+  }
+
   const body = await req.json();
   try {
     const {
@@ -190,6 +201,15 @@ export async function PUT(req: NextRequest) {
   const body = await req.json();
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get("slug");
+  const session = await auth();
+  const isLoggedIn = !!session?.user?.email;
+
+  if (!isLoggedIn) {
+    return NextResponse.json(
+      { error: "Anda harus login terlebih dahulu" },
+      { status: 401 }
+    );
+  }
 
   try {
     if (!slug) {
@@ -281,11 +301,20 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  try {
-    const formData = await req.formData();
-    const slugsString = formData.get("slugs") as string;
-    const slug = formData.get("slug") as string; // Get single slug from query params
+  const formData = await req.formData();
+  const slugsString = formData.get("slugs") as string;
+  const slug = formData.get("slug") as string;
+  const session = await auth();
+  const isLoggedIn = !!session?.user?.email;
 
+  if (!isLoggedIn) {
+    return NextResponse.json(
+      { error: "Anda harus login terlebih dahulu" },
+      { status: 401 }
+    );
+  }
+
+  try {
     if (slug) {
       const umkm = await prisma.umkm.findUnique({ where: { slug } });
 
@@ -335,16 +364,16 @@ export async function DELETE(req: NextRequest) {
         );
       }
 
-      if (umkms[0].image.length > 0) {
-        await Promise.all(
-          umkms[0].image.map(async (imageUrl: any) => {
+      umkms.forEach((umkm) => {
+        if (umkm.image.length > 0) {
+          umkm.image.forEach(async (imageUrl: any) => {
             const publicId = "umkm/" + imageUrl.split("/").pop()?.split(".")[0];
             if (publicId) {
               await cloudinary.uploader.destroy(publicId);
             }
-          })
-        );
-      }
+          });
+        }
+      });
 
       await prisma.umkm.deleteMany({
         where: { slug: { in: slugs } },

@@ -95,7 +95,6 @@ export default function UMKMEditForm({
   }, [initialData.image]);
 
   useEffect(() => {
-    console.log("files", files);
     if (files) {
       form.setValue("image", files);
     }
