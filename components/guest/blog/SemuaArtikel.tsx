@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -92,7 +92,7 @@ const SemuaArtikel: React.FC = () => {
       <div className="relative w-11/12 md:w-1/3">
         <Input
           type="text"
-          className="rounded-full bg-white border border-black text-gray-800 w-full shadow-sm focus:ring-2 focus:ring-orange-400"
+          className="rounded-full bg-white border border-black text-gray-800 w-full"
           placeholder="Cari Artikel"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -115,7 +115,7 @@ const SemuaArtikel: React.FC = () => {
                 placeholder={
                   selectedCategory === "all"
                     ? "Filter by Category"
-                    : selectedCategory
+                    : selectedCategory.replace("_", " ") // Ganti "_" dengan " "
                 }
               />
             </SelectTrigger>
@@ -125,7 +125,7 @@ const SemuaArtikel: React.FC = () => {
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>
-                    {category}
+                    {category.replace("_", " ")} {/* Ganti "_" dengan " " */}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -149,8 +149,9 @@ const SemuaArtikel: React.FC = () => {
               className="w-full h-48 object-cover rounded-t-lg"
             />
             <div className="p-4">
-              <span className="text-sm text-orange-600 font-semibold uppercase bg-orange-100 rounded-full px-3 py-1 shadow">
-                {artikel.category}
+              <span className="text-sm text-[#C27026] font-semibold uppercase bg-orange-200 rounded-lg px-2 py-1 shadow-md">
+                {artikel.category.replace("_", " ")}{" "}
+                {/* Ganti "_" dengan " " */}
               </span>
               <p className="text-xs text-gray-400 mt-2">
                 {new Date(artikel.createdAt).toLocaleDateString("id-ID", {
@@ -178,7 +179,10 @@ const SemuaArtikel: React.FC = () => {
 
       <div ref={ref} className="w-full flex justify-center mt-6">
         {loading ? (
-          <p className="text-gray-500">Loading more articles...</p>
+          <p className="text-gray-500 flex items-center gap-2">
+            <Loader2 className="animate-spin" />
+            Loading more ...
+          </p>
         ) : !nextCursor && artikels.length ? (
           <p className="text-gray-500">No more articles.</p>
         ) : null}

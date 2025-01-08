@@ -57,12 +57,13 @@ const ArtikelTerbaru: React.FC = () => {
             <img
               src={artikels[0].coverImage}
               alt={artikels[0].title}
-              className="w-full h-100 object-cover rounded-2xl p-2 my-2"
+              className="w-full h-[70%] object-cover rounded-2xl p-2 my-2"
             />
             <div className="p-4">
-              <span className="text-sm text-[#C27026] font-semibold uppercase bg-orange-200 rounded-lg px-2 py-1 shadow-md">
-                {artikels[0].category}
+              <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-lg px-2 py-1 shadow-md">
+                {artikels[0].category.replace("_", " ")}
               </span>
+
               <p className="text-xs text-gray-400 mt-2">
                 {new Date(artikels[0].createdAt).toLocaleDateString("id-ID", {
                   weekday: "long",
@@ -102,9 +103,10 @@ const ArtikelTerbaru: React.FC = () => {
                 className="w-full h-40 object-cover rounded-2xl p-2 my-2"
               />
               <div className="p-4">
-                <span className="text-sm text-[#C27026] font-semibold uppercase bg-orange-200 rounded-lg px-2 py-1 shadow-md">
-                  {artikel.category}
+                <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-lg px-2 py-1 shadow-md">
+                  {artikel.category.replace("_", " ")}
                 </span>
+
                 <p className="text-xs text-gray-400 mt-2">
                   {new Date(artikel.createdAt).toLocaleDateString("id-ID", {
                     weekday: "long",

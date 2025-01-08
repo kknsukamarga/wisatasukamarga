@@ -8,7 +8,7 @@ const Kategori = () => {
   const router = useRouter(); // Use Next.js router for navigation
 
   return (
-    <div className="bg-orange-400 w-full">
+    <div className="bg-orange-primary w-full">
       <div className="p-8 flex flex-col items-center md:flex-row justify-between container mx-auto gap-1">
         <div>
           <h1 className="text-2xl font-bold text-center md:text-left">

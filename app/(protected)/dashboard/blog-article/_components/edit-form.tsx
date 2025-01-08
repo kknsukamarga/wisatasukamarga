@@ -72,12 +72,13 @@ export default function EditForm() {
     },
   });
 
+  // Fetch existing blog data
   useEffect(() => {
     async function fetchBlogData() {
       if (!slug) return;
 
       try {
-        const response = await fetch(`/api/blog?slug=${slug}`);
+        const response = await fetch(`/api/blog?mode=single&slug=${slug}`);
         if (!response.ok) {
           console.error("Failed to fetch blog data");
           return;
@@ -85,7 +86,7 @@ export default function EditForm() {
 
         const data = await response.json();
         setInitialData(data);
-        setGeneratedSlug(data.slug); // Set initial slug
+        setGeneratedSlug(data.slug);
 
         form.reset({
           title: data.title,
@@ -102,16 +103,15 @@ export default function EditForm() {
     fetchBlogData();
   }, [slug, form]);
 
-  // Function to generate slug
+  // Generate slug based on title
   const generateSlug = (title: string) =>
     title
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
-      .slice(0, 50); // Limit slug length to 50 characters
+      .slice(0, 50);
 
-  // Watch for changes to the title and update slug
   useEffect(() => {
     const subscription = form.watch((value) => {
       if (value.title) {
