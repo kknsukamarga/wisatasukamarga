@@ -11,13 +11,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast"; // Import the custom useToast hook
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { redirect } from "next/navigation";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -31,7 +32,8 @@ const formSchema = z.object({
     .refine(
       (files) => files?.[0]?.size <= MAX_FILE_SIZE,
       `Ukuran file maksimal adalah 5MB.`
-    ),
+    )
+    .optional(), // Optional since the user may not want to update the image
   price: z.preprocess(
     (value) => Number(value),
     z.number().int().positive({
@@ -52,20 +54,59 @@ const formSchema = z.object({
   }),
 });
 
-interface UMKMFormProps {
-  initialData?: Partial<z.infer<typeof formSchema>>;
-  pageTitle: string;
+interface UMKMEditFormProps {
+  initialData: Partial<z.infer<typeof formSchema>>; // Required initial data for editing
+  pageTitle: string; // Page title for the form
+  slug: string; // Unique identifier for the UMKM entry
 }
 
-export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
-  const { toast } = useToast();
+export default function UMKMEditForm({
+  initialData,
+  pageTitle,
+  slug,
+}: UMKMEditFormProps) {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const [files, setFiles] = useState<File[] | null>(null);
+  useEffect(() => {
+    const convertAllImagesToFiles = async () => {
+      if (initialData.image && Array.isArray(initialData.image)) {
+        try {
+          const convertedFiles = await Promise.all(
+            initialData.image.map(async (imageUrl: string) => {
+              const response = await fetch(imageUrl);
+              if (!response.ok) {
+                throw new Error(
+                  `Failed to fetch image: ${response.statusText}`
+                );
+              }
+              const blob = await response.blob();
+              const fileName = imageUrl.split("/").pop() || "image.jpg";
+              return new File([blob], fileName, { type: blob.type });
+            })
+          );
+          setFiles(convertedFiles); // Update state only once with all files
+          form.setValue("image", convertedFiles); // Set form value with converted files
+        } catch (error) {
+          console.error("Error converting images to files:", error);
+        }
+      }
+    };
 
+    convertAllImagesToFiles();
+  }, [initialData.image]);
+
+  useEffect(() => {
+    console.log("files", files);
+    if (files) {
+      form.setValue("image", files);
+    }
+  }, [files]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       product_name: initialData?.product_name || "",
-      image: initialData?.image || null,
+      image: files ? files : [], // Default undefined for FileUploader compatibility
       price: initialData?.price || 0,
       description: initialData?.description || "",
       wanumber: initialData?.wanumber || "",
@@ -78,16 +119,20 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
     setLoading(true);
 
     try {
-      let base64Images = [];
+      let base64Images = initialData.image || []; // Use existing images if no new ones are uploaded
+
+      // Convert new images to Base64 if provided
       if (values.image && values.image.length > 0) {
-        base64Images = await Promise.all(
-          values.image.map(async (file: any) => await toBase64(file))
+        const files = Array.from(values.image); // Ensure it's an array
+        const newBase64Images = await Promise.all(
+          files.map((file: any) => toBase64(file))
         );
+        base64Images = [...newBase64Images]; // Append new images to existing ones
       }
 
       const formData = {
         product_name: values.product_name,
-        images: base64Images, // Send an array of Base64 strings
+        image: base64Images, // Send array of Base64 strings
         price: values.price,
         description: values.description,
         wanumber: values.wanumber,
@@ -95,8 +140,8 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
         category: values.category,
       };
 
-      const response = await fetch("/api/umkm", {
-        method: "POST",
+      const response = await fetch(`/api/umkm?slug=${slug}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -105,42 +150,41 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Gagal mengirim UMKM:", errorData);
         toast({
-          title: "Gagal",
-          description: errorData.error || "Gagal mengirim data UMKM.",
-          variant: "destructive",
+          title: "Terjadi kesalahan saat memperbarui data UMKM.",
+          description: "Error: " + errorData.message,
+          variant: "default",
         });
         return;
       }
 
       const data = await response.json();
-      console.log("UMKM berhasil dibuat:", data);
-
-      // Show success toast
       toast({
-        title: "Berhasil",
-        description: "UMKM berhasil ditambahkan!",
+        title: "UMKM berhasil diperbarui.",
+        description: "Data UMKM berhasil diperbarui.",
+        variant: "default",
       });
 
-      form.reset();
+      setTimeout(() => {
+        window.location.replace("/dashboard/umkm/list");
+      }, 2000);
     } catch (error) {
-      console.error("Terjadi kesalahan saat mengirim data UMKM:", error);
       toast({
-        title: "Gagal",
-        description: "Terjadi kesalahan saat mengirim data UMKM.",
-        variant: "destructive",
+        title: "Terjadi kesalahan saat memperbarui data UMKM.",
+        description: "Error: " + error,
+        variant: "default",
       });
     } finally {
       setLoading(false);
     }
   }
 
-  function toBase64(file: any) {
+  // Helper function to convert a file to Base64
+  function toBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
+      reader.onload = () => resolve(reader.result as string);
       reader.onerror = (error) => reject(error);
     });
   }
@@ -270,7 +314,7 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
             />
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
-                {loading ? "Mengirim..." : "Tambah UMKM"}
+                {loading ? "Mengirim..." : "Simpan Perubahan"}
               </Button>
             </div>
           </form>
