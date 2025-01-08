@@ -4,6 +4,7 @@ import { Columns, Copy, FileBadge, Signature } from "lucide-react";
 import { TangoSansBold } from "@/app/fonts";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import Image from "next/image";
 
 const Skeleton = () => (
   <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl   dark:bg-dot-white/[0.2] bg-dot-black/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]  border border-transparent dark:border-white/[0.2] bg-neutral-100 dark:bg-black"></div>
@@ -12,8 +13,17 @@ const Skeleton = () => (
 const items = [
   {
     title: "The Dawn of Innovation",
-    description: "Explore the birth of groundbreaking ideas and inventions.",
-    header: <Skeleton />,
+    description:
+      "Kopi Suoh adalah jenis kopi yang berasal dari Suoh, sebuah daerah di Kabupaten Lampung Barat, Provinsi Lampung. Suoh terkenal sebagai salah satu kawasan penghasil kopi di Indonesia, dengan kualitas kopi yang khas karena kondisi geografis dan lingkungan yang mendukung.",
+    header: (
+      <Image
+        src="https://picsum.photos/200/300"
+        alt="The Dawn of Innovation"
+        width={300}
+        height={200}
+        className="w-full h-full object-cover rounded-xl"
+      />
+    ),
     className: "md:col-span-2",
     author: "John Doe",
     icon: <Copy className="h-4 w-4 text-neutral-500" />,
@@ -47,7 +57,7 @@ const items = [
 
 export function BentoGridBlog() {
   return (
-    <BentoGrid className="max-w-4xl mx-auto md:auto-rows-[20rem] mt-10">
+    <BentoGrid className="max-w-4xl mx-auto md:mx-5 mt-10">
       {items.map((item, i) => (
         <BentoGridItem
           key={i}
