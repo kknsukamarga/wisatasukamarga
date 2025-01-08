@@ -147,7 +147,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className={`h-24 text-center ${error ? "text-red-500" : ""}`}
                 >
-                  {error ? `Error ${error}` : "No Results."}
+                  {error ? `Error ${error}` : "Data Tidak Ada."}
                 </TableCell>
               </TableRow>
             )}

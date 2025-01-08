@@ -28,7 +28,6 @@ export async function GET(req: NextRequest) {
   const page = searchParams.get("page");
   const pageSize: any = searchParams.get("pagesize");
   const search = searchParams.get("search");
-  let umkms = await prisma.umkm.findMany();
   try {
     if (slug) {
       // Ambil UMKM berdasarkan slug
@@ -48,7 +47,7 @@ export async function GET(req: NextRequest) {
 
     if (page) {
       if (search) {
-        const umkmsSearch = await prisma.umkm.findMany({
+        const umkmsSearchCount = await prisma.umkm.count({
           where: {
             OR: [
               { product_name: { contains: search, mode: "insensitive" } },
@@ -72,13 +71,13 @@ export async function GET(req: NextRequest) {
           },
         });
 
-        if (!umkmsSearch) {
+        if (!umkmsSearchPaginate) {
           return NextResponse.json(
             { error: "UMKM tidak ditemukan" },
             { status: 404 }
           );
         }
-        const data = { umkm: umkmsSearchPaginate, length: umkmsSearch.length };
+        const data = { umkm: umkmsSearchPaginate, length: umkmsSearchCount };
         return NextResponse.json(data);
       }
 
@@ -93,14 +92,15 @@ export async function GET(req: NextRequest) {
           { status: 404 }
         );
       }
-      const data = { umkm: umkmsPage, length: umkms.length };
+      const totalCount = await prisma.umkm.count();
+      const data = { umkm: umkmsPage, length: totalCount };
       return NextResponse.json(data);
     }
 
+    let umkms = await prisma.umkm.findMany();
     // Ambil semua data UMKM
     return NextResponse.json(umkms);
   } catch (error: any) {
-    console.error("Terjadi kesalahan saat mengambil data UMKM:", error);
     return NextResponse.json(
       { error: "Terjadi kesalahan pada server", details: error.message },
       { status: 500 }
@@ -180,7 +180,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(newUmkm, { status: 201 });
   } catch (error: any) {
-    console.error("Terjadi kesalahan saat menambahkan UMKM:", error);
     return NextResponse.json(
       { error: "Gagal menambahkan UMKM", details: error.message },
       { status: 500 }
@@ -274,7 +273,6 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(updatedUmkm, { status: 200 });
   } catch (error: any) {
-    console.error("Terjadi kesalahan saat memperbarui UMKM:", error);
     return NextResponse.json(
       { error: "Gagal memperbarui UMKM", details: error.message },
       { status: 500 }
@@ -363,7 +361,6 @@ export async function DELETE(req: NextRequest) {
       );
     }
   } catch (error: any) {
-    console.error("Terjadi kesalahan saat menghapus UMKM:", error);
     return NextResponse.json(
       { error: "Gagal menghapus UMKM", details: error.message },
       { status: 500 }

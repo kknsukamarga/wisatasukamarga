@@ -45,7 +45,10 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
   const handleDelete = async () => {
     if (!slug) {
-      console.error("Error: Slug not found for this row.");
+      toast({
+        title: "Gagal!",
+        description: "Data Tidak Ditemukan!",
+      });
       return;
     }
 
@@ -63,7 +66,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData?.details || "Failed to delete UMKM.");
+        throw new Error(errorData?.details || "Gagal menghapus data UMKM.");
       }
 
       setDialogOpen(false);
@@ -77,7 +80,6 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         window.location.reload();
       }, 2000);
     } catch (error) {
-      console.error("Error deleting UMKM:", error);
       toast({
         title: "Gagal!",
         description: "Gagal menghapus UMKM. Silakan coba lagi.",

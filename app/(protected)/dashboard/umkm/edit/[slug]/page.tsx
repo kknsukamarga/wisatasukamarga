@@ -78,7 +78,7 @@ export default function UMKMEditPage({ params }: { params: { slug: string } }) {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
-          <h1 className="text-red-500">Error: {error}</h1>
+          <h1 className="text-red-500">Terjadi Kesalahan!</h1>
         </CardHeader>
       </Card>
     );

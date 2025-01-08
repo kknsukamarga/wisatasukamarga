@@ -71,7 +71,7 @@ export function DataTableToolbar<TData>({
         const error = await response.json();
         toast({
           title: "Gagal",
-          description: `Gagal menghapus: ${error.message}`,
+          description: `Terjadi kesalahan saat menghapus item.`,
           variant: "destructive",
         });
         return;
@@ -87,7 +87,6 @@ export function DataTableToolbar<TData>({
         window.location.reload();
       }, 2000);
     } catch (error) {
-      console.error("Error deleting items:", error);
       toast({
         title: "Gagal",
         description: "Terjadi kesalahan saat menghapus item.",

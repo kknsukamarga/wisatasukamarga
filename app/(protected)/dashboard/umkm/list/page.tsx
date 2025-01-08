@@ -29,7 +29,7 @@ export default function UMKMListPage() {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch UMKM data");
+        throw new Error("Gagal mengambil data UMKM");
       }
 
       const fetchedData = await response.json();

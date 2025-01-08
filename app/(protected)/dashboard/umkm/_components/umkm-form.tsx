@@ -105,17 +105,15 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Gagal mengirim UMKM:", errorData);
         toast({
           title: "Gagal",
-          description: errorData.error || "Gagal mengirim data UMKM.",
+          description: `Gagal mengirim data UMKM : ${errorData?.error}`,
           variant: "destructive",
         });
         return;
       }
 
       const data = await response.json();
-      console.log("UMKM berhasil dibuat:", data);
 
       // Show success toast
       toast({
@@ -125,7 +123,6 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
 
       form.reset();
     } catch (error) {
-      console.error("Terjadi kesalahan saat mengirim data UMKM:", error);
       toast({
         title: "Gagal",
         description: "Terjadi kesalahan saat mengirim data UMKM.",

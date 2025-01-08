@@ -77,7 +77,7 @@ export default function UMKMEditForm({
               const response = await fetch(imageUrl);
               if (!response.ok) {
                 throw new Error(
-                  `Failed to fetch image: ${response.statusText}`
+                  `Gagal mengambil gambar: ${response.statusText}`
                 );
               }
               const blob = await response.blob();
@@ -87,9 +87,7 @@ export default function UMKMEditForm({
           );
           setFiles(convertedFiles); // Update state only once with all files
           form.setValue("image", convertedFiles); // Set form value with converted files
-        } catch (error) {
-          console.error("Error converting images to files:", error);
-        }
+        } catch (error) {}
       }
     };
 
@@ -151,8 +149,8 @@ export default function UMKMEditForm({
       if (!response.ok) {
         const errorData = await response.json();
         toast({
-          title: "Terjadi kesalahan saat memperbarui data UMKM.",
-          description: "Error: " + errorData.message,
+          title: "Error!",
+          description: "Terjadi kesalahan saat memperbarui data UMKM.",
           variant: "default",
         });
         return;
@@ -160,7 +158,7 @@ export default function UMKMEditForm({
 
       const data = await response.json();
       toast({
-        title: "UMKM berhasil diperbarui.",
+        title: "Berhasil!",
         description: "Data UMKM berhasil diperbarui.",
         variant: "default",
       });
@@ -170,8 +168,8 @@ export default function UMKMEditForm({
       }, 2000);
     } catch (error) {
       toast({
-        title: "Terjadi kesalahan saat memperbarui data UMKM.",
-        description: "Error: " + error,
+        title: "Error!",
+        description: "Terjadi kesalahan saat memperbarui data UMKM.",
         variant: "default",
       });
     } finally {
