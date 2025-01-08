@@ -20,13 +20,12 @@ type BlogParams = {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const mode = searchParams.get("mode"); // Parameter untuk membedakan jenis GET
+  const mode = searchParams.get("mode");
   const cursor = searchParams.get("cursor");
   const limit = parseInt(searchParams.get("limit") || "10");
 
   try {
     if (mode === "single") {
-      // Endpoint untuk mendapatkan blog tunggal berdasarkan slug
       const slug = searchParams.get("slug");
       if (!slug) {
         return NextResponse.json(
@@ -42,7 +41,6 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(blog);
     } else {
-      // Endpoint untuk mendapatkan semua blog dengan pagination
       const blogs = await prisma.blog.findMany({
         take: limit + 1,
         skip: cursor ? 1 : 0,
@@ -66,8 +64,16 @@ export async function GET(req: NextRequest) {
     }
   } catch (error) {
     console.error("Error during GET:", error);
+
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: "Failed to fetch blogs", details: error.message },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Failed to fetch blogs", details: error.message },
+      { error: "Failed to fetch blogs", details: "Unknown error occurred" },
       { status: 500 }
     );
   }
@@ -79,23 +85,17 @@ export async function POST(req: NextRequest) {
   try {
     const { title, coverImage, content, author, category } = body;
 
-    // Validate required fields
     if (!title || !coverImage || !content || !author || !category) {
       return NextResponse.json(
-        { error: "Semua field wajib diisi" },
+        { error: "All fields are required." },
         { status: 400 }
       );
     }
 
-    // Validate category
     if (!["TEMPAT_WISATA", "KARYA_UMKM"].includes(category)) {
-      return NextResponse.json(
-        { error: "Kategori tidak valid" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid category." }, { status: 400 });
     }
 
-    // Upload Base64 image to Cloudinary
     const cloudinaryResponse = await cloudinary.uploader.upload(coverImage, {
       folder: "blogs",
       public_id: title.toLowerCase().replace(/\s+/g, "-"),
@@ -103,7 +103,6 @@ export async function POST(req: NextRequest) {
 
     const imageUrl = cloudinaryResponse.secure_url;
 
-    // Generate a unique slug
     let slug = title
       .toLowerCase()
       .replace(/\s+/g, "-")
@@ -118,7 +117,6 @@ export async function POST(req: NextRequest) {
       counter++;
     }
 
-    // Create a new blog entry
     const newBlog = await prisma.blog.create({
       data: {
         title,
@@ -132,9 +130,17 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(newBlog, { status: 201 });
   } catch (error) {
-    console.error("Terjadi kesalahan saat menambahkan blog:", error);
+    console.error("Error adding blog:", error);
+
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: "Failed to add blog", details: error.message },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Gagal menambahkan blog. Silakan coba lagi." },
+      { error: "Failed to add blog", details: "Unknown error occurred" },
       { status: 500 }
     );
   }
@@ -160,25 +166,19 @@ export async function PUT(req: NextRequest) {
 
     const { title, coverImage, content, author, category } = body;
 
-    // Validate required fields
     if (!title || !coverImage || !content || !author || !category) {
       return NextResponse.json(
-        { error: "Semua field wajib diisi" },
+        { error: "All fields are required." },
         { status: 400 }
       );
     }
 
-    // Validate category
     if (!["TEMPAT_WISATA", "KARYA_UMKM"].includes(category)) {
-      return NextResponse.json(
-        { error: "Kategori tidak valid" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid category." }, { status: 400 });
     }
 
     let imageUrl = existingBlog.coverImage;
 
-    // Check if coverImage is a new Base64 image or an existing URL
     const isBase64 = coverImage.startsWith("data:image/");
     if (isBase64) {
       const cloudinaryResponse = await cloudinary.uploader.upload(coverImage, {
@@ -189,13 +189,11 @@ export async function PUT(req: NextRequest) {
       imageUrl = cloudinaryResponse.secure_url;
     }
 
-    // Generate new slug
     let newSlug = title
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
 
-    // Ensure slug uniqueness
     let existingSlug = await prisma.blog.findUnique({
       where: { slug: newSlug },
     });
@@ -207,7 +205,6 @@ export async function PUT(req: NextRequest) {
       counter++;
     }
 
-    // Update the blog entry
     const updatedBlog = await prisma.blog.update({
       where: { slug },
       data: {
@@ -223,8 +220,16 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(updatedBlog);
   } catch (error) {
     console.error("Error updating blog:", error);
+
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: "Failed to update blog", details: error.message },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Failed to update blog" },
+      { error: "Failed to update blog", details: "Unknown error occurred" },
       { status: 500 }
     );
   }
@@ -246,8 +251,16 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ message: "Blog deleted successfully" });
   } catch (error) {
     console.error("Error deleting blog:", error);
+
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: "Failed to delete blog", details: error.message },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Failed to delete blog" },
+      { error: "Failed to delete blog", details: "Unknown error occurred" },
       { status: 500 }
     );
   }

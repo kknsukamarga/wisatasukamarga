@@ -81,7 +81,7 @@ export const columns: ColumnDef<Blog>[] = [
     ),
     cell: ({ row }) => (
       <div className="capitalize">
-        {row.getValue("category").replace("_", " ")}
+        {(row.getValue("category") as string).replace("_", " ")}
       </div>
     ),
   },

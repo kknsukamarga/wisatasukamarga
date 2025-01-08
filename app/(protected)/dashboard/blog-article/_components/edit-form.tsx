@@ -68,7 +68,7 @@ export default function EditForm() {
       coverImage: "",
       content: "",
       author: "",
-      category: "",
+      category: undefined,
     },
   });
 
@@ -217,11 +217,6 @@ export default function EditForm() {
                       onValueChange={field.onChange}
                       maxFiles={1}
                       maxSize={MAX_FILE_SIZE}
-                      initialUrl={
-                        typeof field.value === "string"
-                          ? field.value
-                          : undefined
-                      }
                     />
                   </FormControl>
                   <FormMessage />

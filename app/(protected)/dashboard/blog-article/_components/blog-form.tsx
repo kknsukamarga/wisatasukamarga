@@ -18,14 +18,16 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"; // Import for dropdown
+} from "@/components/ui/select";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+// Gunakan dynamic import untuk ReactQuill
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
 
 const MAX_FILE_SIZE = 5000000;
 
