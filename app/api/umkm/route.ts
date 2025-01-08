@@ -257,26 +257,51 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const slug = searchParams.get("slug");
-
   try {
-    if (!slug) {
+    const { searchParams } = new URL(req.url);
+    const slug = searchParams.get("slug"); // Get single slug from query params
+    const formData = await req.formData();
+    const slugsString = formData.get("slugs") as string; // Get 'slugs' from formData
+
+    if (slug) {
+      // Handle single slug deletion
+      await prisma.umkm.delete({
+        where: { slug },
+      });
+
       return NextResponse.json(
-        { error: "Slug wajib disertakan" },
+        { message: "UMKM berhasil dihapus" },
+        { status: 200 }
+      );
+    } else if (slugsString) {
+      // Handle multiple slugs deletion
+      const slugs = JSON.parse(slugsString); // Parse JSON string to array
+
+      if (!Array.isArray(slugs) || slugs.length === 0) {
+        return NextResponse.json(
+          { error: "Daftar slug tidak valid atau kosong" },
+          { status: 400 }
+        );
+      }
+
+      await prisma.umkm.deleteMany({
+        where: { slug: { in: slugs } }, // Delete entries matching slugs array
+      });
+
+      return NextResponse.json(
+        { message: "UMKM berhasil dihapus" },
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json(
+        { error: "Slug atau daftar slug wajib disertakan" },
         { status: 400 }
       );
     }
-
-    await prisma.umkm.delete({
-      where: { slug },
-    });
-
-    return NextResponse.json({ message: "UMKM berhasil dihapus" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Terjadi kesalahan saat menghapus UMKM:", error);
     return NextResponse.json(
-      { error: "Gagal menghapus UMKM" },
+      { error: "Gagal menghapus UMKM", details: error.message },
       { status: 500 }
     );
   }

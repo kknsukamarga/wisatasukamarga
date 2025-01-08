@@ -8,6 +8,17 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { TrashIcon } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -20,18 +31,71 @@ export function DataTableToolbar<TData>({
   search,
   setSearch,
 }: DataTableToolbarProps<TData>) {
+  const { toast } = useToast();
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const handleDelete = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
     const rows = table.getFilteredSelectedRowModel().rows;
 
-    const arrayOfId = rows.map((row) => {
+    const arrayOfSlug = rows.map((row) => {
       // @ts-ignore
       return row.original.slug;
     });
-    console.log(arrayOfId);
+
+    if (arrayOfSlug.length === 0) {
+      toast({
+        title: "Gagal",
+        description: "Tidak ada item yang dipilih untuk dihapus.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsDeleting(true);
+
+    const formData = new FormData();
+    formData.append("slugs", JSON.stringify(arrayOfSlug));
+
+    try {
+      const response = await fetch("/api/umkm", {
+        method: "DELETE",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        toast({
+          title: "Gagal",
+          description: `Gagal menghapus: ${error.message}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Berhasil",
+        description: "Item berhasil dihapus.",
+      });
+      setIsDialogOpen(false);
+      table.resetRowSelection();
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      console.error("Error deleting items:", error);
+      toast({
+        title: "Gagal",
+        description: "Terjadi kesalahan saat menghapus item.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +111,10 @@ export function DataTableToolbar<TData>({
     }, 3000);
   };
 
-  // Cleanup timeout when component unmounts
+  const openDeleteDialog = () => {
+    setIsDialogOpen(true);
+  };
+
   useEffect(() => {
     return () => {
       if (debounceTimeout.current) {
@@ -79,13 +146,31 @@ export function DataTableToolbar<TData>({
 
       <div className="flex items-center gap-2">
         {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-          <Button onClick={handleDelete} variant="outline" size="sm">
+          <Button onClick={openDeleteDialog} variant="outline" size="sm">
             <TrashIcon className="mr-2 size-4" aria-hidden="true" />
             Delete ({table.getFilteredSelectedRowModel().rows.length})
           </Button>
         ) : null}
         <DataTableViewOptions table={table} />
       </div>
+
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Penghapusan</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus item yang dipilih? Tindakan ini
+              tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
