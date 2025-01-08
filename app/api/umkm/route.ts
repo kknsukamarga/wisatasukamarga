@@ -218,6 +218,22 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Generate a new slug based on updated product_name
+    let newSlug = product_name
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+    let existingSlug = await prisma.umkm.findUnique({
+      where: { slug: newSlug },
+    });
+    let counter = 1;
+
+    while (existingSlug && existingSlug.slug !== existingUmkm.slug) {
+      newSlug = `${newSlug}-${counter}`;
+      existingSlug = await prisma.umkm.findUnique({ where: { slug: newSlug } });
+      counter++;
+    }
+
     const updatedImageUrl = await Promise.all(
       image.map(async (image: any, index: any) => {
         const cloudinaryResponse = await cloudinary.uploader.upload(image, {
@@ -232,6 +248,7 @@ export async function PUT(req: NextRequest) {
 
     const updatedData = {
       product_name: product_name || existingUmkm.product_name,
+      slug: newSlug,
       image: updatedImageUrl,
       price: price || existingUmkm.price,
       description: description || existingUmkm.description,
