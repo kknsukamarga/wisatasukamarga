@@ -100,7 +100,7 @@ const projects: Project[] = [
     description:
       "Air Terjun Cibatuan menawarkan lanskap alam yang indah dengan hamparan pasir kuning dan panorama air terjun alami yang memukau.",
     src: "https://picsum.photos/200/300",
-    link: "https://maps.app.goo.gl/kcuX9Tyy46tCuDsQ9",
+    link: "/wisata/air-terjun-cibatuan",
     color: "#1F3D3B",
     icon_url: "/icon-waterfall.png",
   },

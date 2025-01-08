@@ -13,7 +13,8 @@ const Skeleton = () => (
 const items = [
   {
     title: "The Dawn of Innovation",
-    description: "Explore the birth of groundbreaking ideas and inventions.",
+    description:
+      "Kopi Suoh adalah jenis kopi yang berasal dari Suoh, sebuah daerah di Kabupaten Lampung Barat, Provinsi Lampung. Suoh terkenal sebagai salah satu kawasan penghasil kopi di Indonesia, dengan kualitas kopi yang khas karena kondisi geografis dan lingkungan yang mendukung.",
     header: (
       <Image
         src="https://picsum.photos/200/300"
@@ -80,7 +81,7 @@ const items = [
 
 export function BentoGridBlog() {
   return (
-    <BentoGrid className="max-w-4xl mx-auto md:auto-rows-[20rem] mt-10">
+    <BentoGrid className="max-w-4xl mx-auto md:mx-5 mt-10">
       {items.map((item, i) => (
         <BentoGridItem
           key={i}
