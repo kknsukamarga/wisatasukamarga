@@ -218,6 +218,15 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    await Promise.all(
+      existingUmkm.image.map(async (imageUrl: any) => {
+        const publicId = "umkm/" + imageUrl.split("/").pop()?.split(".")[0];
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId);
+        }
+      })
+    );
+
     // Generate a new slug based on updated product_name
     let newSlug = product_name
       .toLowerCase()
@@ -275,12 +284,28 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const slug = searchParams.get("slug"); // Get single slug from query params
     const formData = await req.formData();
     const slugsString = formData.get("slugs") as string;
+    const slug = formData.get("slug") as string; // Get single slug from query params
 
     if (slug) {
+      const umkm = await prisma.umkm.findUnique({ where: { slug } });
+
+      if (!umkm) {
+        return NextResponse.json({ error: "Tidak ada data umkm" });
+      }
+
+      if (umkm.image.length > 0) {
+        await Promise.all(
+          umkm.image.map(async (imageUrl: any) => {
+            const publicId = "umkm/" + imageUrl.split("/").pop()?.split(".")[0];
+            if (publicId) {
+              await cloudinary.uploader.destroy(publicId);
+            }
+          })
+        );
+      }
+
       // Handle single slug deletion
       await prisma.umkm.delete({
         where: { slug },
@@ -301,8 +326,30 @@ export async function DELETE(req: NextRequest) {
         );
       }
 
+      const umkms = await prisma.umkm.findMany({
+        where: { slug: { in: slugs } },
+      });
+
+      if (umkms.length !== slugs.length) {
+        return NextResponse.json(
+          { error: "Tidak ada data umkm" },
+          { status: 404 }
+        );
+      }
+
+      if (umkms[0].image.length > 0) {
+        await Promise.all(
+          umkms[0].image.map(async (imageUrl: any) => {
+            const publicId = "umkm/" + imageUrl.split("/").pop()?.split(".")[0];
+            if (publicId) {
+              await cloudinary.uploader.destroy(publicId);
+            }
+          })
+        );
+      }
+
       await prisma.umkm.deleteMany({
-        where: { slug: { in: slugs } }, // Delete entries matching slugs array
+        where: { slug: { in: slugs } },
       });
 
       return NextResponse.json(

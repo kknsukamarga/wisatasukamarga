@@ -52,12 +52,18 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
     setIsDeleting(true);
 
     try {
-      const response = await fetch(`/api/umkm?slug=${slug}`, {
+      // Create FormData object
+      const formData = new FormData();
+      formData.append("slug", slug);
+
+      const response = await fetch(`/api/umkm`, {
         method: "DELETE",
+        body: formData, // Pass the FormData as the request body
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete UMKM.");
+        const errorData = await response.json();
+        throw new Error(errorData?.details || "Failed to delete UMKM.");
       }
 
       setDialogOpen(false);
@@ -72,6 +78,10 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       }, 2000);
     } catch (error) {
       console.error("Error deleting UMKM:", error);
+      toast({
+        title: "Gagal!",
+        description: "Gagal menghapus UMKM. Silakan coba lagi.",
+      });
     } finally {
       setIsDeleting(false);
     }
