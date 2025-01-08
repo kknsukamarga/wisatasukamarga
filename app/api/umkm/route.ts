@@ -120,7 +120,6 @@ export async function POST(req: NextRequest) {
       category,
     } = body;
 
-    // Validate required fields
     if (
       !product_name ||
       !images ||
