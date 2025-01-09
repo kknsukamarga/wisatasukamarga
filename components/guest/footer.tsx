@@ -15,7 +15,6 @@ export default function Footer() {
               height={250}
               className="h-16 w-24"
             />
-            {/* <span className="text-lg font-semibold">Suka Marga</span> */}
           </Link>
 
           <p className="text-muted-foreground md:max-w-[60%]">
@@ -73,6 +72,7 @@ export default function Footer() {
                   />
                 </svg>
               </Link>
+
               <Link
                 href="https://www.tiktok.com/@kkn.sukamarga"
                 target="_blank"
@@ -95,6 +95,7 @@ export default function Footer() {
                   <path d="M21 7.917v4.034a9.948 9.948 0 0 1 -5 -1.951v4.5a6.5 6.5 0 1 1 -8 -6.326v4.326a2.5 2.5 0 1 0 4 2v-11.5h4.083a6.005 6.005 0 0 0 4.917 4.917z" />
                 </svg>
               </Link>
+
               <Link
                 href="https://suka-marga.desa.id/pages/home/home.aspx"
                 target="_blank"
@@ -125,6 +126,7 @@ export default function Footer() {
                   <path d="M9.5 10l1 4l1.5 -4l1.5 4l1 -4" />
                 </svg>
               </Link>
+
               <Link
                 href="https://wa.me/yourphonenumber"
                 target="_blank"
