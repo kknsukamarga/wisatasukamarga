@@ -11,6 +11,7 @@ interface Artikel {
   category: string;
   content: string; // Content dalam format HTML
   createdAt: string;
+  updatedAt: string;
   slug: string; // Tambahkan slug untuk navigasi
 }
 
@@ -118,7 +119,7 @@ const ArtikelTerbaru: React.FC = () => {
               </span>
 
               <p className="text-xs text-gray-400 mt-2">
-                {new Date(artikels[0].createdAt).toLocaleDateString("id-ID", {
+                {new Date(artikels[0].updatedAt).toLocaleDateString("id-ID", {
                   weekday: "long",
                   year: "numeric",
                   month: "long",
@@ -163,7 +164,7 @@ const ArtikelTerbaru: React.FC = () => {
                 </span>
 
                 <p className="text-xs text-gray-400 mt-2">
-                  {new Date(artikel.createdAt).toLocaleDateString("id-ID", {
+                  {new Date(artikel.updatedAt).toLocaleDateString("id-ID", {
                     weekday: "long",
                     year: "numeric",
                     month: "long",

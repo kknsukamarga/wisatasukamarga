@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Questa,
-  TangoSansBold,
-  TangoSans,
-  TangoSansBoldItalic,
-  TangoSansItalic,
-} from "@/app/fonts";
+import { Questa } from "@/app/fonts";
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import React, { useRef } from "react";

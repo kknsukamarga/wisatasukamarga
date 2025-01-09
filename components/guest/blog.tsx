@@ -41,7 +41,7 @@ export function BentoGridBlog({ articles }: { articles: Artikel[] }) {
           icon={<Copy className="h-4 w-4 text-neutral-500" />} // Gunakan icon default
           author={article.category} // Gunakan category sebagai author
           category={article.category}
-          date={new Date(article.createdAt).toLocaleDateString("id-ID", {
+          date={new Date(article.updatedAt).toLocaleDateString("id-ID", {
             weekday: "long",
             year: "numeric",
             month: "long",
@@ -59,6 +59,7 @@ interface Artikel {
   category: string;
   content: string;
   createdAt: string;
+  updatedAt: string;
   slug: string;
 }
 
@@ -127,12 +128,12 @@ function Blog() {
         <h2
           className={`${TangoSansBold.className} mt-5 w-fit rounded-md text-2xl text-gray text-center`}
         >
-          Blog & Artikel
+          Blog, Artikel, Berita
         </h2>
 
         <p className="md:w-[50%] w-[90%] mx-auto mt-2">
-          Spot Wisata Suka Marga menawarkan keindahan alam yang memukau dengan
-          hamparan perbukitan hijau dan udara sejuk yang menyegarkan.
+          Dapatkan informasi terbaru tentang wisata, umkm, dan hal lainnya di
+          Desa Suka Marga
         </p>
       </div>
 

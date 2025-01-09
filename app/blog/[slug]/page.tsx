@@ -1,17 +1,38 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/guest/navbar";
 import Footer from "@/components/guest/footer";
-import {
-  Questa,
-  TangoSansBold,
-  TangoSans,
-  TangoSansBoldItalic,
-  TangoSansItalic,
-} from "@/app/fonts";
+import { Questa } from "@/app/fonts";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
+function BreadcrumbBlog({ slug }: { slug: string }) {
+  return (
+    <Breadcrumb className="max-w-6xl mx-auto mt-10">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Beranda</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/blogs">Artikel</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>{slug}</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
 
 // Fungsi untuk mendapatkan blog berdasarkan slug
 async function getBlogBySlug(slug: string) {
@@ -44,11 +65,12 @@ export default async function BlogDetailPage({
   return (
     <>
       <Navbar isLoggedIn={true} />
-      <main className="container mx-auto px-3 py-12">
+      <main className="mx-auto px-3 py-12 bg-white">
+        {params.slug && <BreadcrumbBlog slug={params.slug} />}
         {/* Detail Blog */}
         <article className="max-w-6xl mx-auto">
           <div className="space-y-6 my-5 flex flex-col items-center justify-center">
-            <Badge className="rounded-md bg-orange-100 text-orange-400">
+            <Badge className="rounded-md bg-orange-secondary/70 text-gray">
               WISATA
             </Badge>
             {/* Judul */}
@@ -58,7 +80,12 @@ export default async function BlogDetailPage({
               {blog.title}
             </h1>
             <p className="text-sm">
-              {new Date(blog.updatedAt || blog.createdAt).toLocaleDateString()}
+              {new Date(blog.updatedAt).toLocaleDateString("id-ID", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </p>
           </div>
 
@@ -124,7 +151,10 @@ export default async function BlogDetailPage({
             {/* Main Content */}
             <div className="prose prose-lg text-gray-800 flex-grow my-5">
               {/* Konten */}
-              <div dangerouslySetInnerHTML={{ __html: blog.content }} className="text-justify" />
+              <div
+                dangerouslySetInnerHTML={{ __html: blog.content }}
+                className="text-justify"
+              />
             </div>
           </div>
         </article>
