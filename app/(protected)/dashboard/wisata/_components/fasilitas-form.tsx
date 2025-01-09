@@ -24,10 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: "Nama fasilitas harus terdiri dari minimal 2 karakter.",
+    message: "Nama daya tarik harus terdiri dari minimal 2 karakter.",
   }),
   FasilitasImage: z
     .any()
@@ -84,6 +85,7 @@ export default function FasilitasForm({
     wisataId: initialData?.wisataId || "",
   };
 
+  const { toast } = useToast(); // Menggunakan useToast
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -128,13 +130,20 @@ export default function FasilitasForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to submit fasilitas wisata.");
+        toast({
+          title: "Gagal Mengirim Data",
+          description: `Error: ${errorData.message || "Terjadi kesalahan."}`,
+          variant: "destructive",
+        });
         return;
       }
 
       const data = await response.json();
-      console.log("Fasilitas wisata created successfully:", data);
-      alert("Fasilitas wisata created successfully!");
+      toast({
+        title: "Berhasil",
+        description: "Daya Tarik berhasil dibuat!",
+        variant: "default",
+      });
       form.reset();
     } catch (error) {
       alert("An error occurred while submitting the fasilitas wisata.");
@@ -159,10 +168,10 @@ export default function FasilitasForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Fasilitas</FormLabel>
+                  <FormLabel>Nama Daya Tarik</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Masukkan Nama Fasilitas..."
+                      placeholder="Masukkan Daya Tarik..."
                       {...field}
                     />
                   </FormControl>

@@ -28,7 +28,7 @@ import Link from "next/link";
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: "Nama fasilitas harus terdiri dari minimal 2 karakter.",
+    message: "Nama daya tarik harus terdiri dari minimal 2 karakter.",
   }),
   image: z.any().refine((files) => files?.length > 0, "Gambar wajib diunggah."),
   description: z.string().min(20, {
@@ -132,7 +132,7 @@ export default function FasilitasCard({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Link href={`/dashboard/wisata/create-fasilitas/${wisata.id}`}>
+                <Link href={`/dashboard/wisata/create-dayatarik/${wisata.id}`}>
                   <Button
                     variant="outline"
                     className="w-full"
