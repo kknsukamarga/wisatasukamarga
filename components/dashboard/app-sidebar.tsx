@@ -70,6 +70,10 @@ const data = {
           url: "/dashboard/wisata/create",
         },
         {
+          title: "Tambah Daya Tarik",
+          url: "/dashboard/wisata/create-fasilitas",
+        },
+        {
           title: "Data Wisata",
           url: "/dashboard/wisata/list",
         },
