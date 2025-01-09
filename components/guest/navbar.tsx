@@ -3,6 +3,7 @@ import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import MorphNav from "../ui/morph-menu/morph-nav";
 import { TangoSans } from "@/app/fonts";
+import Image from "next/image";
 
 const defaultLinks = [
   { href: "#about", label: "About" },
@@ -63,30 +64,22 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   ];
 
   return (
-    <header className="flex h-20 w-full shrink-0 fixed items-center px-4 md:px-6 z-[1000] text-white">
-      {/* <NavbarMobile isLoggedIn={isLoggedIn} /> */}
+    <header className="flex h-20 w-full shrink-0 fixed items-center pl-4 md:px-6 z-[1000] text-white">
       <Link
         href="/"
-        className="mr-6 gap-4 flex items-center bg-gray px-4 py-2.5 shadow-md rounded-full text-white"
+        className="gap-4 flex items-center bg-gray px-4 py-2.5 shadow-md rounded-full text-white"
         prefetch={false}
       >
-        <MountainIcon className="h-6 w-6" />
-        <p>Suka Marga</p>
+        <Image
+          src="/logo-putih.png"
+          alt="logo-putih"
+          width={1201}
+          height={936}
+          className="h-8 w-16"
+        />
       </Link>
-      {/* <nav className="ml-auto hidden lg:flex gap-6">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-            prefetch={false}
-          >
-            {link.label}
-          </Link>
-        ))}
-      </nav> */}
 
-      <MorphNav />
+      <MorphNav isLoggedIn={isLoggedIn} />
     </header>
   );
 }

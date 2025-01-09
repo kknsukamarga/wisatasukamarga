@@ -8,8 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
   id            String         @id @default(auto()) @map("_id") @db.ObjectId
   username      String
@@ -44,14 +42,62 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-model Blog {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  slug        String   @unique // Untuk URL unik berdasarkan judul
-  coverImage  String   // Link gambar sampul
-  content     String   // Content dari rich text editor akan disimpan dalam bentuk String (HTML/JSON)
-  author      String   // Author akan ditulis manual di dashboard
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+enum BlogCategory {
+  TEMPAT_WISATA
+  KARYA_UMKM
 }
 
+model Blog {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String        @unique // Untuk URL unik berdasarkan judul
+  coverImage  String        // Link gambar sampul
+  content     String        // Content dari rich text editor akan disimpan dalam bentuk String (HTML/JSON)
+  author      String        // Author akan ditulis manual di dashboard
+  category    BlogCategory  // Kategori menggunakan enum
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+
+model Umkm {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  product_name String
+  slug         String   @unique
+  image        String[]
+  price        Int
+  description  String
+  owner        String
+  category     umkmCategory @default(product)
+  wanumber     String
+}
+
+enum umkmCategory {
+  service
+  product
+}
+
+model Wisata {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  imageCover       String   
+  description      String  
+  price            Int
+  location         String
+  status           String
+  image            String[]
+  fasilitasWisata  FasilitasWisata[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model FasilitasWisata {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  image            String
+  description      String
+  wisataId         String   @db.ObjectId
+  wisata           Wisata   @relation(fields: [wisataId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

@@ -16,7 +16,7 @@ export const columns: ColumnDef<Umkm>[] = [
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Pilih semua"
         className="translate-y-0.5"
       />
     ),
@@ -24,7 +24,7 @@ export const columns: ColumnDef<Umkm>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label="Pilih baris"
         className="translate-y-0.5"
       />
     ),
@@ -34,30 +34,43 @@ export const columns: ColumnDef<Umkm>[] = [
   {
     accessorKey: "product_name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Product Name" />
+      <DataTableColumnHeader column={column} title="Nama Produk" />
     ),
     cell: ({ row }) => (
-      <div className="w-[150px] font-medium truncate">
+      <div className="max-w-[120px] font-medium truncate">
         {row.getValue("product_name")}
       </div>
     ),
   },
   {
-    accessorKey: "slug",
+    accessorKey: "owner",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Slug" />
+      <DataTableColumnHeader column={column} title="Nama Pemilik" />
     ),
     cell: ({ row }) => (
-      <div className="text-gray-500 truncate">{row.getValue("slug")}</div>
+      <div className="max-w-[120px] font-medium truncate">
+        {row.getValue("owner")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "category",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Kategori" />
+    ),
+    cell: ({ row }) => (
+      <div className="max-w-[120px] font-medium capitalize truncate">
+        {row.getValue("category")}
+      </div>
     ),
   },
   {
     accessorKey: "description",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Description" />
+      <DataTableColumnHeader column={column} title="Deskripsi" />
     ),
     cell: ({ row }) => (
-      <div className="text-gray-700 truncate max-w-[300px]">
+      <div className="max-w-[300px] text-gray-700 truncate">
         {row.getValue("description")}
       </div>
     ),
@@ -65,10 +78,10 @@ export const columns: ColumnDef<Umkm>[] = [
   {
     accessorKey: "price",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Price" />
+      <DataTableColumnHeader column={column} title="Harga" />
     ),
     cell: ({ row }) => (
-      <div className="text-green-500 font-semibold">
+      <div className="max-w-[120px] text-green-500 font-semibold truncate">
         {new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -77,18 +90,18 @@ export const columns: ColumnDef<Umkm>[] = [
     ),
   },
   {
-    accessorKey: "whatsapp_number",
+    accessorKey: "wanumber",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="WhatsApp Number" />
+      <DataTableColumnHeader column={column} title="Nomor WhatsApp" />
     ),
     cell: ({ row }) => (
-      <div className="text-blue-500">
+      <div className="max-w-[120px] text-blue-500 truncate">
         <a
-          href={`https://wa.me/${row.getValue("whatsapp_number")}`}
+          href={`https://wa.me/${row.getValue("wanumber")}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {row.getValue("whatsapp_number")}
+          {row.getValue("wanumber")}
         </a>
       </div>
     ),

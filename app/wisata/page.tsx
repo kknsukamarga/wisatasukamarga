@@ -15,11 +15,9 @@ export default async function Page() {
       <Hero />
 
       <ScrollWisata />
+      <ScrollWisata />
+      <ScrollWisata />
 
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">Wisata</h1>
-        <p className="text-lg text-gray-500">Coming soon...</p>
-      </div>
       <Footer />
     </main>
   );

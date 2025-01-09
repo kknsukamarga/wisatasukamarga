@@ -1,36 +1,68 @@
-import { Metadata } from "next";
-import fs from "fs";
-import path from "path";
+"use client";
+
 import { DataTable } from "./data-table-components/data-table";
 import { columns } from "./data-table-components/columns";
+import { useState, useEffect } from "react";
 
-export const metadata: Metadata = {
-  title: "Expenses",
-  description: "A Expense tracker build using Tanstack Table.",
-};
+export default function WisataListPage() {
+  const [data, setData] = useState([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useState("");
+  const [totalLength, setTotalLength] = useState(0);
 
-async function getData() {
-  const filePath = path.join(
-    process.cwd(),
-    "/app/(protected)/dashboard/umkm/list/data-table-components",
-    "data.json"
-  );
-  const data = fs.readFileSync(filePath, "utf8");
-  return JSON.parse(data);
-}
+  useEffect(() => {
+    const fetchWisata = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(
+          `/api/wisata?page=${page}&pageSize=${pageSize}&search=${search}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-export default async function WisataListPage() {
-  const data = await getData();
+        if (!response.ok) {
+          throw new Error("Failed to fetch Wisata data");
+        }
+
+        const result = await response.json();
+
+        if (!result || result.length === 0) {
+          throw new Error("No Wisata data available.");
+        }
+        setData(result.wisata);
+        setTotalLength(result.totalLength);
+      } catch (err) {
+        setError((err as Error).message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWisata();
+  }, [page, pageSize, search]);
+
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div className="h-full flex-1 flex-col space-y-2 px-8 md:flex">
-      <h1>List Data WISATA</h1>
+      <h1>List Data Wisata</h1>
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground">
-          Here&apos;s a list of your expenses for this month!
+          Berikut adalah daftar data Wisata yang tersedia!
         </p>
       </div>
-      <DataTable data={data} columns={columns} />
+
+      <DataTable data={data} columns={columns} isLoading={loading} />
     </div>
   );
 }

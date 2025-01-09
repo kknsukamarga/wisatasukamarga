@@ -4,10 +4,11 @@ import { useRef, useEffect } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import { TangoSansBold } from "@/app/fonts";
-import { Dot, Minus } from "lucide-react";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
 const phrase =
-  "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters.";
+  "Mari berkenalan dengan Desa Sukamarga!. Desa wisata pekon sukamarga adalah desa yang mempunyai aneka ragam destinasi wisata alamnya dan kaya akan keindahannya, diantaranya terdapat ribuan kawah yang berwarna yang disitu terdapat kawah keramikan, kawah nirwana, kawah hitam, kawah merah, 4 danau Padang Savana, hamparan pasir kuning. Air terjun dll. desa ini berjarak 40km dari kantor Pemda Lampung Barat dan dapat di tempuh selama 2 jam dari Liwa ibukota Lampung barat. Desa wisata pekon sukamarga adalah desa yang di kelilingi oleh hutan taman nasional yang Sehingga kesejukanya dan kelestarian nya harus selalu terjaga dengan baik.";
 
 export default function About(): JSX.Element {
   const refs = useRef<HTMLSpanElement[]>([]);
@@ -23,13 +24,13 @@ export default function About(): JSX.Element {
     gsap.to(refs.current, {
       scrollTrigger: {
         trigger: container.current,
-        scrub: true,
+        scrub: 0.5, // Reduced scrub value for faster animation
         start: `top`,
-        end: `+=${window.innerHeight / 1.5}`,
+        end: `+=${window.innerHeight / 2}`,
       },
       opacity: 1,
       ease: "none",
-      stagger: 0.1,
+      stagger: 0.05, // Reduced stagger value for faster animation
     });
   };
 
@@ -39,7 +40,7 @@ export default function About(): JSX.Element {
       const letters = splitLetters(word);
       body.push(
         <p
-          className="text-[3.5vw] font-bold m-0 mr-[1.5vw]"
+          className="text-[4vw] md:text-[2vw] text-center m-0 mr-[0.5vw]"
           key={`${word}_${i}`}
         >
           {letters}
@@ -70,17 +71,32 @@ export default function About(): JSX.Element {
   return (
     <main
       ref={container}
-      className="flex min-h-screen items-center justify-center bg-gray text-white pb-12 flex-col"
+      className="flex min-h-screen items-center justify-center bg-gray text-white flex-col relative"
     >
+      <motion.div
+        className="absolute inset-0 z-[10] rotate-180 scale-x-[-1] opacity-10"
+        style={{
+          backgroundImage: `url(/image-bottom.png)`,
+          backgroundPosition: "bottom",
+          backgroundSize: "cover",
+        }}
+      />
+
+      <div className="p-2 rounded-full bg-orange-primary z-20">
+        <Image src="/icon-lake.png" alt="icon-lake" width={32} height={32} />
+      </div>
+
       <h2
-        className={`${TangoSansBold.className} flex items-center mx-auto text-2xl text-white text-center`}
+        className={`${TangoSansBold.className} mx-auto text-2xl text-white text-center gap-2 mt-5`}
       >
-        <Minus /> <Dot /> Tentang <Dot /> <Minus />
+        Tak Kenal,
+        <br />
+        Maka Tak <span className="bg-orange-primary px-4 py-1">Kagum</span>
       </h2>
 
       <div
         ref={body}
-        className="w-[90%] mt-10 flex flex-wrap text-lg leading-[3rem]"
+        className="md:w-[70%] w-full px-2 md:px-0 mx-auto mt-5 flex flex-wrap text-lg leading-[1.3rem] md:leading-[2rem] justify-center items-center"
       >
         {splitWords(phrase)}
       </div>

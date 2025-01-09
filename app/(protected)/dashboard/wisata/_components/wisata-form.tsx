@@ -12,6 +12,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Select,
   SelectContent,
@@ -20,38 +24,44 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Product } from "./mock-api";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-
-const MAX_FILE_SIZE = 5000000;
-const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-];
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  image: z
-    .any()
-    .refine((files) => files?.length == 1, "Image is required.")
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Max file size is 5MB.`
-    )
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      ".jpg, .jpeg, .png and .webp files are accepted."
-    ),
   name: z.string().min(2, {
-    message: "Product name must be at least 2 characters.",
+    message: "Nama harus terdiri dari minimal 2 karakter.",
   }),
-  category: z.string(),
-  price: z.number(),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
+  imageCover: z
+    .any()
+    .refine((file) => file?.length > 0, "Gambar cover wajib diunggah."),
+  images: z
+    .array(z.any())
+    .refine(
+      (files) => files?.length > 0,
+      "Setidaknya satu gambar wajib diunggah."
+    ),
+  description: z.string().min(50, {
+    message: "Deskripsi harus terdiri dari minimal 50 karakter.",
+  }),
+  price: z.number().min(1, {
+    message: "Harga wajib diisi dan harus lebih besar dari 0.",
+  }),
+  location: z
+    .string()
+    .min(2, {
+      message: "Lokasi harus berupa tautan Google Maps yang valid.",
+    })
+    .refine(
+      (value) => {
+        const googleMapsRegex =
+          /^https?:\/\/(www\.)?(google\.com\/maps|maps\.app\.goo\.gl)\/.*$/;
+        return googleMapsRegex.test(value);
+      },
+      {
+        message: "Lokasi harus berupa tautan Google Maps yang valid.",
+      }
+    ),
+  status: z.enum(["Buka", "Tutup", "Pemeliharaan"]).refine((value) => !!value, {
+    message: "Status harus dipilih.",
   }),
 });
 
@@ -59,23 +69,97 @@ export default function WisataForm({
   initialData,
   pageTitle,
 }: {
-  initialData: Product | null;
+  initialData: any | null;
   pageTitle: string;
 }) {
   const defaultValues = {
     name: initialData?.name || "",
-    category: initialData?.category || "",
-    price: initialData?.price || 0,
+    imageCover: initialData?.imageCover || null,
+    images: initialData?.images || [],
     description: initialData?.description || "",
+    price: initialData?.price || "",
+    location: initialData?.location || "",
+    status: initialData?.status || "",
   };
+
+  const { toast } = useToast(); // Menggunakan useToast
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    values: defaultValues,
+    defaultValues,
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  const toBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
+
+    try {
+      const base64Cover = await toBase64(values.imageCover[0]);
+      const base64Images = await Promise.all(
+        values.images.map((file: File) => toBase64(file))
+      );
+
+      const formData = {
+        name: values.name,
+        imageCover: base64Cover,
+        image: base64Images,
+        description: values.description,
+        price: parseInt(values.price as unknown as string, 10),
+        location: values.location,
+        status: values.status,
+        fasilitasWisata: null,
+      };
+
+      const response = await fetch("/api/wisata", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast({
+          title: "Gagal Mengirim Data",
+          description: `Error: ${errorData.message || "Terjadi kesalahan."}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Wisata created successfully:", data);
+      toast({
+        title: "Berhasil",
+        description: "Wisata berhasil dibuat!",
+        variant: "default",
+      });
+
+      form.reset();
+
+      // Opsional: Alihkan pengguna setelah 2 detik
+      setTimeout(() => {
+        window.location.replace("/dashboard/wisata/list");
+      }, 2000);
+    } catch (error) {
+      toast({
+        title: "Gagal Mengirim Data",
+        description: `Error: ${error}`,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -88,104 +172,108 @@ export default function WisataForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Name */}
             <FormField
               control={form.control}
-              name="image"
+              name="name"
               render={({ field }) => (
-                <div className="space-y-6">
-                  <FormItem className="w-full">
-                    <FormLabel>Images</FormLabel>
-                    <FormControl>
-                      <FileUploader
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        maxFiles={4}
-                        maxSize={4 * 1024 * 1024}
-                        // disabled={loading}
-                        // progresses={progresses}
-                        // pass the onUpload function here for direct upload
-                        // onUpload={uploadFiles}
-                        // disabled={isUploading}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                </div>
+                <FormItem>
+                  <FormLabel>Nama</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Masukkan Nama Wisata..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter product name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(value)}
-                      value={field.value[field.value.length - 1]}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select categories" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beauty">Beauty Products</SelectItem>
-                        <SelectItem value="electronics">Electronics</SelectItem>
-                        <SelectItem value="clothing">Clothing</SelectItem>
-                        <SelectItem value="home">Home & Garden</SelectItem>
-                        <SelectItem value="sports">
-                          Sports & Outdoors
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="Enter price"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/* Image Cover */}
+            <FormField
+              control={form.control}
+              name="imageCover"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gambar Cover</FormLabel>
+                  <FormControl>
+                    <FileUploader
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      maxFiles={1}
+                      maxSize={5 * 1024 * 1024} // 5MB
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Images */}
+            <FormField
+              control={form.control}
+              name="images"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gambar Galeri</FormLabel>
+                  <FormControl>
+                    <FileUploader
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      maxFiles={6}
+                      maxSize={5 * 1024 * 1024} // 5MB
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Description */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Deskripsi</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Enter product description"
-                      className="resize-none"
+                    <Textarea placeholder="Masukkan Deskripsi..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Price */}
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Harga</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Masukkan Harga Tiket Masuk Wisata..."
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value, 10))
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Location */}
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Lokasi</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Masukkan Link Lokasi Google Maps..."
                       {...field}
                     />
                   </FormControl>
@@ -193,8 +281,39 @@ export default function WisataForm({
                 </FormItem>
               )}
             />
+
+            {/* Status */}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(value)}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Status Wisata Sekarang..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Buka">Buka</SelectItem>
+                      <SelectItem value="Tutup">Tutup</SelectItem>
+                      <SelectItem value="Pemeliharaan">Pemeliharaan</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Submit Button */}
             <div className="flex justify-end w-full">
-              <Button type="submit">Tambah Spot Wisata</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Mengirimkan..." : "Simpan Wisata"}
+              </Button>
             </div>
           </form>
         </Form>

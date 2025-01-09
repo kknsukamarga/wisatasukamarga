@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation"; // Gunakan useRouter dari next/navigation
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Row } from "@tanstack/react-table";
 
@@ -15,7 +16,7 @@ import {
 
 interface BlogData {
   slug: string;
-  // Add other fields of your data structure if necessary.
+  // Tambahkan field lainnya jika diperlukan
 }
 
 interface DataTableRowActionsProps<TData extends BlogData> {
@@ -25,6 +26,21 @@ interface DataTableRowActionsProps<TData extends BlogData> {
 export function DataTableRowActions<TData extends BlogData>({
   row,
 }: DataTableRowActionsProps<TData>) {
+  const router = useRouter(); // Inisialisasi useRouter
+
+  // Fungsi untuk navigasi ke halaman edit
+  const handleEdit = () => {
+    const slug = row.original.slug;
+    if (!slug) {
+      alert("Slug is missing, cannot edit blog.");
+      return;
+    }
+
+    // Navigasi ke halaman edit berdasarkan slug
+    router.push(`/dashboard/blog-article/edit/${slug}`);
+  };
+
+  // Fungsi untuk menghapus blog
   const handleDelete = async () => {
     const slug = row.original.slug;
     if (!slug) {
@@ -70,9 +86,8 @@ export function DataTableRowActions<TData extends BlogData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem>Make a copy</DropdownMenuItem>
-        <DropdownMenuItem>Favorite</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>{" "}
+        {/* Tambahkan onClick */}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleDelete}>
           Delete

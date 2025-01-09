@@ -7,7 +7,6 @@ import HighlightUMKM from "@/components/guest/highlight-umkm";
 import Testimonials from "@/components/guest/testimonials";
 import InteractiveMap from "@/components/guest/interactive-map";
 import Blog from "@/components/guest/blog";
-import Contact from "@/components/guest/contact";
 import { ReactLenis } from "@/lib/lenis";
 
 function LandingPage() {
@@ -20,7 +19,6 @@ function LandingPage() {
       <Testimonials />
       <InteractiveMap />
       <Blog />
-      <Contact />
     </ReactLenis>
   );
 }
