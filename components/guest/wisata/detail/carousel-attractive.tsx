@@ -68,8 +68,8 @@ export default function CarouselAttractions() {
   return (
     <div className="flex items-center justify-center w-full h-full">
       <div className="w-[320px] md:w-[700px] lg:w-[1400px] max-w-full">
-        <p className="mb-5 text-center text-white md:hidden mt-10">
-          Scroll to see another projects
+        <p className="mb-5 text-center md:hidden mt-10">
+          Scroll ke kanan untuk melihat lebih banyak
         </p>
 
         <ul
@@ -108,29 +108,29 @@ export default function CarouselAttractions() {
 
                 <div
                   className={cn(
-                    "w-[300px] md:w-full top-8 border border-red-500 p-4 transition-[transform,opacity] md:absolute md:p-0 text-white flex justify-center md:justify-start pl-0 md:pl-4 xl:pl-8",
+                    "w-[300px] md:w-full top-8 p-4 transition-[transform,opacity] md:absolute md:p-0 flex justify-center md:justify-start pl-0 md:pl-4 xl:pl-8 z-20",
                     activeItem === index
                       ? "md:translate-x-0 md:opacity-100"
                       : "md:translate-x-4 md:opacity-0"
                   )}
                 >
-                  <p className="text-2xl font-extrabold textGradient md:text-4xl">
+                  <p className="text-2xl font-extrabold md:text-4xl z-20 text-gray">
                     {item.name}
                   </p>
                 </div>
 
                 <div
                   className={cn(
-                    "md:left-4 xl:left-8 bottom-2 md:bottom-[15%] w-full p-4 transition-[transform,opacity] absolute md:p-0",
+                    "md:left-4 xl:left-8 bottom-2 md:bottom-[15%] w-full p-4 transition-[transform,opacity] absolute md:p-0 z-20",
                     activeItem === index
                       ? "md:translate-x-0 md:opacity-100"
                       : "md:translate-x-4 md:opacity-0"
                   )}
                 >
-                  <p className="text-[10px] w-[60%] md:w-[80%] font-bold text-black md:text-xl">
+                  <p className="text-[10px] w-[60%] md:w-[80%] font-bold text-gray md:text-xl z-20">
                     <Link
                       href={`projects/${item.name.toLowerCase()}`}
-                      className="flex items-center gap-2 text-[10px] md:text-sm text-white"
+                      className="flex items-center gap-2 text-[10px] md:text-sm"
                     >
                       <ExternalLink /> {item.name} Detail
                     </Link>

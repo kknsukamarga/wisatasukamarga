@@ -4,7 +4,6 @@ import { useRef, useEffect } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import { TangoSansBold } from "@/app/fonts";
-import { Dot, Minus } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
@@ -41,7 +40,7 @@ export default function About(): JSX.Element {
       const letters = splitLetters(word);
       body.push(
         <p
-          className="text-[3vw] md:text-[2vw] text-center m-0 mr-[0.5vw]"
+          className="text-[4vw] md:text-[2vw] text-center m-0 mr-[0.5vw]"
           key={`${word}_${i}`}
         >
           {letters}
@@ -88,15 +87,16 @@ export default function About(): JSX.Element {
       </div>
 
       <h2
-        className={`${TangoSansBold.className} flex items-center mx-auto text-2xl text-white text-center gap-2 mt-5`}
+        className={`${TangoSansBold.className} mx-auto text-2xl text-white text-center gap-2 mt-5`}
       >
-        Tak Kenal, Maka Tak
-        <span className="bg-orange-primary px-4 py-1">Kagum</span>
+        Tak Kenal,
+        <br />
+        Maka Tak <span className="bg-orange-primary px-4 py-1">Kagum</span>
       </h2>
 
       <div
         ref={body}
-        className="w-[70%] mx-auto mt-5 flex flex-wrap text-lg leading-[1rem] md:leading-[2rem] justify-center items-center"
+        className="md:w-[70%] w-full px-2 md:px-0 mx-auto mt-5 flex flex-wrap text-lg leading-[1.3rem] md:leading-[2rem] justify-center items-center"
       >
         {splitWords(phrase)}
       </div>

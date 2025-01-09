@@ -14,13 +14,60 @@ interface Artikel {
   slug: string; // Tambahkan slug untuk navigasi
 }
 
+const ArtikelSkeleton: React.FC = () => (
+  <div className="max-w-screen-lg mx-auto py-10 px-4">
+    <h1 className="text-2xl font-bold text-gray-800 mb-4">Artikel Terbaru</h1>
+    <p className="text-gray-600 mb-8">
+      Untuk mendapatkan informasi yang lebih lengkap, mendalam, dan menarik
+      seputar topik ini, jangan ragu untuk membaca seluruh artikel yang telah
+      kami sajikan secara detail di sini!
+    </p>
+
+    <div className="flex flex-col md:flex-row gap-6">
+      {/* Skeleton Kiri */}
+      <div className="flex-1 p-2 rounded-lg shadow-md overflow-hidden bg-gray-200 animate-pulse">
+        <div className="w-full h-[70%] bg-black/10 rounded-2xl p-2 my-2"></div>
+        <div className="p-4">
+          <div className="h-4 w-32 bg-black/10 rounded-full mb-2"></div>
+          <div className="h-3 w-24 bg-black/10 rounded-full mb-2"></div>
+          <div className="h-6 w-3/4 bg-black/10 rounded mb-4"></div>
+          <div className="h-4 w-full bg-black/10 rounded mb-2"></div>
+          <div className="h-4 w-5/6 bg-black/10 rounded"></div>
+        </div>
+      </div>
+
+      {/* Skeleton Kanan */}
+      <div className="flex flex-col gap-6 flex-1">
+        {[...Array(2)].map((_, index) => (
+          <div
+            key={index}
+            className="flex-1 p-2 rounded-lg shadow-md overflow-hidden bg-gray-200 animate-pulse"
+          >
+            <div className="w-full h-40 bg-black/10 rounded-2xl p-2 my-2"></div>
+            <div className="p-4">
+              <div className="h-4 w-32 bg-black/10 rounded-full mb-2"></div>
+              <div className="h-3 w-24 bg-black/10 rounded-full mb-2"></div>
+              <div className="h-5 w-2/3 bg-black/10 rounded mb-4"></div>
+              <div className="h-4 w-full bg-black/10 rounded mb-2"></div>
+              <div className="h-4 w-3/4 bg-black/10 rounded"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 const ArtikelTerbaru: React.FC = () => {
   const [artikels, setArtikels] = useState<Artikel[]>([]);
   const router = useRouter(); // Router untuk navigasi
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch data dari API
     const fetchArtikels = async () => {
+      setLoading(true);
+
       try {
         const response = await fetch("/api/blog?mode=all&limit=3"); // Gunakan parameter mode dan limit
         const data = await response.json();
@@ -30,11 +77,17 @@ const ArtikelTerbaru: React.FC = () => {
         }
       } catch (error) {
         console.error("Gagal mengambil data artikel", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchArtikels();
   }, []);
+
+  if (loading) {
+    return <ArtikelSkeleton />;
+  }
 
   return (
     <div className="max-w-screen-lg mx-auto py-10 px-4">
@@ -49,8 +102,8 @@ const ArtikelTerbaru: React.FC = () => {
         {/* Bagian Kiri */}
         {artikels[0] && (
           <motion.div
-            className="flex-1 rounded-lg shadow-md overflow-hidden bg-white justify-between border border-black border-opacity-10 cursor-pointer"
-            whileHover={{ scale: 1.03 }}
+            className="flex-1 rounded-lg shadow-md overflow-hidden bg-white justify-between border border-black border-opacity-10 cursor-pointer transition-all duration-200"
+            whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => router.push(`/blog/${artikels[0].slug}`)}
           >
@@ -60,7 +113,7 @@ const ArtikelTerbaru: React.FC = () => {
               className="w-full h-[70%] object-cover rounded-2xl p-2 my-2"
             />
             <div className="p-4">
-              <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-lg px-2 py-1 shadow-md">
+              <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray px-2 py-1 shadow-md rounded-full">
                 {artikels[0].category.replace("_", " ")}
               </span>
 
@@ -72,9 +125,11 @@ const ArtikelTerbaru: React.FC = () => {
                   day: "numeric",
                 })}
               </p>
+
               <h2 className="text-xl font-bold text-gray-800 mt-2">
                 {artikels[0].title}
               </h2>
+
               <div
                 className="text-sm text-gray-600 mt-2"
                 dangerouslySetInnerHTML={{
@@ -92,8 +147,8 @@ const ArtikelTerbaru: React.FC = () => {
           {artikels.slice(1, 3).map((artikel, index) => (
             <motion.div
               key={index}
-              className="flex-1 rounded-lg shadow-md overflow-hidden bg-white border border-black border-opacity-10 cursor-pointer"
-              whileHover={{ scale: 1.03 }}
+              className="flex-1 rounded-lg shadow-md overflow-hidden bg-white border border-black border-opacity-10 cursor-pointer transition-all duration-200"
+              whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => router.push(`/blog/${artikel.slug}`)}
             >
@@ -103,7 +158,7 @@ const ArtikelTerbaru: React.FC = () => {
                 className="w-full h-40 object-cover rounded-2xl p-2 my-2"
               />
               <div className="p-4">
-                <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-lg px-2 py-1 shadow-md">
+                <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-full px-2 py-1 shadow-md">
                   {artikel.category.replace("_", " ")}
                 </span>
 

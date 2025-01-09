@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="bg-white py-8 md:py-12">
       <div className="container mx-auto flex justify-between gap-8 px-4 md:px-6 lg:max-w-7xl">
         <div className="flex flex-col items-start gap-4">
-          <Link href="#" className="flex items-center gap-2" prefetch={false}>
+          <Link href="/" className="flex items-center gap-2" prefetch={false}>
             <Image
               src="/logo-hijau.png"
               alt="logo-putih"
@@ -39,7 +39,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <h4 className="text-sm font-bold">Found us on</h4>
+            <h4 className="text-sm font-bold">Temukan kami di</h4>
 
             <div className="flex gap-4 h-fit">
               <Link

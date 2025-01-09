@@ -11,6 +11,19 @@ import "swiper/css/pagination";
 
 // import required modules
 import { EffectCoverflow, Pagination } from "swiper/modules";
+import Image from "next/image";
+
+const images = [
+  "https://swiperjs.com/demos/images/nature-1.jpg",
+  "https://swiperjs.com/demos/images/nature-2.jpg",
+  "https://swiperjs.com/demos/images/nature-3.jpg",
+  "https://swiperjs.com/demos/images/nature-4.jpg",
+  "https://swiperjs.com/demos/images/nature-5.jpg",
+  "https://swiperjs.com/demos/images/nature-6.jpg",
+  "https://swiperjs.com/demos/images/nature-7.jpg",
+  "https://swiperjs.com/demos/images/nature-8.jpg",
+  "https://swiperjs.com/demos/images/nature-9.jpg",
+];
 
 export default function Gallery() {
   return (
@@ -32,60 +45,18 @@ export default function Gallery() {
         modules={[EffectCoverflow, Pagination]}
         className="mySwiper py-10"
       >
-        <SwiperSlide className="my-10">
-          <img
-            src="https://swiperjs.com/demos/images/nature-1.jpg"
-            className="rounded-md"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="my-10">
-          <img
-            src="https://swiperjs.com/demos/images/nature-2.jpg"
-            className="rounded-md"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="my-10">
-          <img
-            src="https://swiperjs.com/demos/images/nature-3.jpg"
-            className="rounded-md"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="my-10">
-          <img
-            src="https://swiperjs.com/demos/images/nature-4.jpg"
-            className="rounded-md"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="my-10">
-          <img
-            src="https://swiperjs.com/demos/images/nature-5.jpg"
-            className="rounded-md"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="my-10">
-          <img
-            src="https://swiperjs.com/demos/images/nature-6.jpg"
-            className="rounded-md"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="my-10">
-          <img
-            src="https://swiperjs.com/demos/images/nature-7.jpg"
-            className="rounded-md"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="my-10">
-          <img
-            src="https://swiperjs.com/demos/images/nature-8.jpg"
-            className="rounded-md"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="my-10">
-          <img
-            src="https://swiperjs.com/demos/images/nature-9.jpg"
-            className="rounded-md"
-          />
-        </SwiperSlide>
+        {images.map((src, index) => (
+          <SwiperSlide key={index} className="my-10">
+            <Image
+              src={src}
+              alt={`Nature Image ${index + 1}`}
+              width={300}
+              height={200}
+              className="rounded-md"
+              priority
+            />
+          </SwiperSlide>
+        ))}
       </Swiper>
     </div>
   );

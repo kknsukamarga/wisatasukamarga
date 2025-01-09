@@ -25,6 +25,18 @@ interface Artikel {
   slug: string;
 }
 
+const SkeletonCard = () => (
+  <div className="rounded-lg shadow-md bg-white overflow-hidden p-2">
+    <div className="w-full h-48 bg-black/10 animate-pulse"></div>
+    <div className="p-4">
+      <div className="w-24 h-6 bg-black/10 rounded-full animate-pulse"></div>
+      <div className="w-32 h-4 bg-black/10 mt-2 rounded animate-pulse"></div>
+      <div className="w-full h-6 bg-black/10 mt-4 rounded animate-pulse"></div>
+      <div className="w-3/4 h-4 bg-black/10 mt-2 rounded animate-pulse"></div>
+    </div>
+  </div>
+);
+
 const SemuaArtikel: React.FC = () => {
   const [artikels, setArtikels] = useState<Artikel[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -32,12 +44,15 @@ const SemuaArtikel: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const router = useRouter();
 
   const { ref, inView } = useInView();
 
   useEffect(() => {
     const fetchData = async () => {
+      setInitialLoading(true);
+
       try {
         const response = await fetch("/api/blog");
         const data = await response.json();
@@ -48,6 +63,8 @@ const SemuaArtikel: React.FC = () => {
         setNextCursor(next_cursor || null);
       } catch (error) {
         console.error("Gagal mengambil data artikel", error);
+      } finally {
+        setInitialLoading(false);
       }
     };
 
@@ -55,9 +72,6 @@ const SemuaArtikel: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log("In view:", inView);
-    console.log("Next cursor:", nextCursor);
-    console.log("Loading:", loading);
     if (inView && nextCursor && !loading) {
       handleLoadMore();
     }
@@ -67,6 +81,7 @@ const SemuaArtikel: React.FC = () => {
     if (!nextCursor || loading) return;
 
     setLoading(true);
+
     try {
       const response = await fetch(`/api/blog?cursor=${nextCursor}`);
       const data = await response.json();
@@ -135,56 +150,59 @@ const SemuaArtikel: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4">
-        {filteredArtikels.map((artikel, index) => (
-          <motion.div
-            key={index}
-            className="rounded-lg shadow-md overflow-hidden bg-white cursor-pointer transition-transform"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => router.push(`/blog/${artikel.slug}`)}
-          >
-            <img
-              src={artikel.coverImage}
-              alt={artikel.title}
-              className="w-full h-48 object-cover rounded-t-lg"
-            />
-            <div className="p-4">
-              <span className="text-sm text-[#C27026] font-semibold uppercase bg-orange-200 rounded-lg px-2 py-1 shadow-md">
-                {artikel.category.replace("_", " ")}{" "}
-                {/* Ganti "_" dengan " " */}
-              </span>
-              <p className="text-xs text-gray-400 mt-2">
-                {new Date(artikel.createdAt).toLocaleDateString("id-ID", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-              <h2 className="text-lg font-bold text-gray-800 mt-2">
-                {artikel.title}
-              </h2>
-              <div
-                className="text-sm text-gray-600 mt-2"
-                dangerouslySetInnerHTML={{
-                  __html:
-                    artikel.content.slice(0, 150) +
-                    (artikel.content.length > 150 ? "..." : ""),
-                }}
-              />
-            </div>
-          </motion.div>
-        ))}
+        {initialLoading
+          ? Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))
+          : filteredArtikels.map((artikel, index) => (
+              <motion.div
+                key={index}
+                className="rounded-lg shadow-md overflow-hidden bg-white cursor-pointer transition-transform duration-200"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => router.push(`/blog/${artikel.slug}`)}
+              >
+                <img
+                  src={artikel.coverImage}
+                  alt={artikel.title}
+                  className="w-full h-48 object-cover rounded-t-lg"
+                />
+                <div className="p-4">
+                  <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-full px-2 py-1 shadow-md">
+                    {artikel.category.replace("_", " ")}
+                  </span>
+                  <p className="text-xs text-gray-400 mt-2">
+                    {new Date(artikel.createdAt).toLocaleDateString("id-ID", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                  <h2 className="text-lg font-bold text-gray-800 mt-2">
+                    {artikel.title}
+                  </h2>
+                  <div
+                    className="text-sm text-gray-600 mt-2"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        artikel.content.slice(0, 150) +
+                        (artikel.content.length > 150 ? "..." : ""),
+                    }}
+                  />
+                </div>
+              </motion.div>
+            ))}
       </div>
 
       <div ref={ref} className="w-full flex justify-center mt-6">
         {loading ? (
           <p className="text-gray-500 flex items-center gap-2">
             <Loader2 className="animate-spin" />
-            Loading more ...
+            Memuat artikel lainnya...
           </p>
         ) : !nextCursor && artikels.length ? (
-          <p className="text-gray-500">No more articles.</p>
+          <p className="text-gray-500">Tidak ada artikel lagi.</p>
         ) : null}
       </div>
     </div>

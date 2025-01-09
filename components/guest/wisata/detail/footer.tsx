@@ -1,7 +1,6 @@
 "use client";
 
 import { TangoSansBold } from "@/app/fonts";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -25,18 +24,36 @@ export default function FooterDetailWisata({ link }: FooterDetailWisataProps) {
     <div className="py-10">
       <div className="flex mx-auto justify-center items-center flex-col text-center w-fit">
         <div className="p-2 rounded-full w-fit bg-orange-primary z-20">
-          <Image src="/icon-lake.png" alt="icon-lake" width={32} height={32} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="icon icon-tabler icons-tabler-outline icon-tabler-share"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+            <path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+            <path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+            <path d="M8.7 10.7l6.6 -3.4" />
+            <path d="M8.7 13.3l6.6 3.4" />
+          </svg>
         </div>
 
         <h2
-          className={`${TangoSansBold.className} mt-5 w-fit rounded-md text-2xl text-white text-center`}
+          className={`${TangoSansBold.className} mt-5 w-fit rounded-md text-2xl text-center`}
         >
           Share Wisata {`Tes`}
         </h2>
 
         <p className="md:w-[50%] w-[90%] mx-auto mt-2">
-          Spot Wisata Suka Marga menawarkan keindahan alam yang memukau dengan
-          hamparan perbukitan hijau dan udara sejuk yang menyegarkan.
+          Bagikan ke teman-temanmu agar mereka juga bisa menikmati keindahan
+          alam di Sukamarga.
         </p>
 
         <div className="flex flex-col gap-4 mt-10 relative">
@@ -114,7 +131,7 @@ export default function FooterDetailWisata({ link }: FooterDetailWisataProps) {
             {/* Icon to copy link di page komponen ini dirender */}
 
             {copySuccess && (
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-sm px-3 py-1 rounded-md shadow-md">
+              <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-green-500 text-sm px-3 py-1 rounded-md shadow-md">
                 Link Disalin!
               </div>
             )}
@@ -140,29 +157,6 @@ export default function FooterDetailWisata({ link }: FooterDetailWisataProps) {
                 <path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463" />
               </svg>
             </button>
-            {/* <Link
-              href=""
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white p-2 bg-green rounded-full"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M9 15l6 -6" />
-                <path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464" />
-                <path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463" />
-              </svg>
-            </Link> */}
           </div>
         </div>
       </div>

@@ -308,3 +308,9 @@ html.lenis body {
 .swiper-pagination-bullet-active {
   background-color: #606c38 !important;
 }
+
+.imgContainer {
+  position: relative;
+  width: 100%;
+  height: 300px; /* Atur tinggi sesuai kebutuhan */
+}

@@ -7,7 +7,6 @@ import { motion, MotionValue, useScroll, useTransform } from "framer-motion";
 import Lenis from "@studio-freight/lenis";
 import { TangoSansBold } from "@/app/fonts";
 import { Button } from "../ui/button";
-import { MountainIcon } from "./navbar";
 
 export interface Project {
   title: string;
@@ -134,10 +133,10 @@ const Card = ({
   return (
     <div
       ref={container}
-      className="cardContainer h-[70svh] flex items-center justify-center sticky top-0"
+      className="cardContainer h-[90vh] md:h-[70svh] flex items-center justify-center sticky top-0"
     >
       <motion.div
-        className="card flex flex-col relative w-[1000px] rounded-3xl p-12"
+        className="card flex flex-col relative w-[1000px] rounded-3xl p-4 md:p-12"
         style={{
           scale,
           backgroundColor: color,
@@ -149,7 +148,13 @@ const Card = ({
             className={`desc w-full justify-around md:w-[40%] relative flex flex-col gap-4 ${textColor}`}
           >
             <div className="p-2 rounded-full bg-orange-primary z-20 w-fit">
-              <Image src={icon} alt="icon-lake" width={32} height={32} />
+              <Image
+                src={icon}
+                alt="icon-lake"
+                width={32}
+                height={32}
+                className="w-full h-full"
+              />
             </div>
 
             <h2 className={`m-0 text-xl ${TangoSansBold.className}`}>
@@ -187,7 +192,12 @@ const Card = ({
 
           <div className="imgContainer relative w-full md:w-[60%] rounded-xl md:rounded-3xl overflow-hidden">
             <motion.div style={{ scale: imageScale }} className="w-full h-full">
-              <Image fill src={`${src}`} alt="image" className="object-cover" />
+              <Image
+                fill
+                src={`${src}`}
+                alt="image"
+                className="object-cover w-full h-full"
+              />
             </motion.div>
           </div>
         </div>
@@ -238,7 +248,7 @@ const HighlightWisata: React.FC = () => {
         </p>
       </div>
 
-      <div className="relative">
+      <div className="relative px-2 md:px-0 mt-20 md:mt-0">
         {projects.map((project, index) => {
           const targetScale = 1 - (projects.length - index) * 0.015;
 
@@ -256,7 +266,7 @@ const HighlightWisata: React.FC = () => {
         })}
       </div>
 
-      <div className="w-full flex justify-center items-center">
+      <div className="w-full flex justify-center items-center mt-20 md:mt-0">
         <Link href="/wisata" className="mx-auto">
           <Button className="mt-12">Lihat semua wisata</Button>
         </Link>
