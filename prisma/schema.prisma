@@ -76,3 +76,28 @@ enum umkmCategory {
   service
   product
 }
+
+model Wisata {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  imageCover       String   
+  description      String  
+  price            Int
+  location         String
+  status           String
+  image            String[]
+  fasilitasWisata  FasilitasWisata[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model FasilitasWisata {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  image            String
+  description      String
+  wisataId         String   @db.ObjectId
+  wisata           Wisata   @relation(fields: [wisataId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

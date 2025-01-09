@@ -1,149 +1,158 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Expense } from "./schema";
+import { Wisata } from "./schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import Image from "next/image";
 
-export const columns: ColumnDef<Expense>[] = [
+export const columns: ColumnDef<Wisata>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-0.5"
-      />
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nama wisata" />
     ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-0.5"
-      />
+      <div className="w-[150px] font-medium capitalize">
+        {row.getValue("name")}
+      </div>
     ),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
-    accessorKey: "label",
+    accessorKey: "imageCover",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Label" />
-    ),
-    cell: ({ row }) => (
-      <div className="w-[150px] capitalize">{row.getValue("label")}</div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "note",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Note" />
+      <DataTableColumnHeader column={column} title="Gambar Cover" />
     ),
     cell: ({ row }) => {
+      const imageCover = row.getValue("imageCover") as string;
+
       return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium capitalize">
-            {row.getValue("note")}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "category",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Category" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex w-[100px] items-center">
-          <span className="capitalize"> {row.getValue("category")}</span>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "type",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Type" />
-    ),
-    cell: ({ row }) => {
-      const type = row.getValue("type");
-      return (
-        <div className="flex w-[100px] items-center">
-          {type === "income" ? (
-            <TrendingUp size={20} className="mr-2 text-green-500" />
-          ) : (
-            <TrendingDown size={20} className="mr-2 text-red-500" />
+        <div className="w-[48px] h-[48px]">
+          {imageCover && (
+            <Image
+              src={imageCover}
+              alt="Cover"
+              width={48}
+              height={48}
+              className="object-cover rounded"
+            />
           )}
-          <span className="capitalize"> {row.getValue("type")}</span>
         </div>
       );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
     },
   },
   {
-    accessorKey: "amount",
+    accessorKey: "image",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Amount" />
+      <DataTableColumnHeader column={column} title="Galeri" />
     ),
     cell: ({ row }) => {
-      const type = row.getValue("type");
+      const images = row.getValue("image") as string[];
+
       return (
-        <div className="flex w-[100px] items-center">
-          <span
-            className={cn(
-              "capitalize",
-              type === "income" ? "text-green-500" : "text-red-500"
-            )}
-          >
-            {" "}
-            {row.getValue("amount")}
-          </span>
+        <div className="w-[48px] h-[48px]">
+          {images && (
+            <Image
+              src={images[0]}
+              alt="Image"
+              width={48}
+              height={48}
+              className="object-cover rounded"
+            />
+          )}
         </div>
       );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
     },
   },
   {
-    accessorKey: "date",
+    accessorKey: "description",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date" />
+      <DataTableColumnHeader column={column} title="Deskripsi" />
+    ),
+    cell: ({ row }) => (
+      <div className="max-w-[300px] truncate">
+        {row.getValue("description")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "price",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Harga" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[100px]">
+        {new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+        }).format(row.getValue("price"))}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "location",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Lokasi" />
+    ),
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("location")}</div>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const date = new Date(row.getValue("date"));
-      const formattedDate = date.toLocaleDateString("en-US", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
+      const status: string = row.getValue("status");
+      const statusColors: Record<string, string> = {
+        Buka: "text-green-500",
+        Tutup: "text-red-500",
+        Pemeliharaan: "text-yellow-500",
+      };
       return (
-        <div className="flex w-[100px] items-center">
-          <span className="capitalize">{formattedDate}</span>
+        <div className={cn("font-medium capitalize", statusColors[status])}>
+          {status}
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      const rowDate = new Date(row.getValue(id));
-      const [startDate, endDate] = value;
-      return rowDate >= startDate && rowDate <= endDate;
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created At" />
+    ),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("createdAt"));
+      return (
+        <div className="text-sm">
+          {date.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "updatedAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Updated At" />
+    ),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("updatedAt"));
+      return (
+        <div className="text-sm">
+          {date.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+        </div>
+      );
     },
   },
   {
