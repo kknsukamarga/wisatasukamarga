@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { v2 as cloudinary } from "cloudinary";
+import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
@@ -28,7 +29,6 @@ export async function GET(req: NextRequest) {
   const page = searchParams.get("page");
   const pageSize: any = searchParams.get("pagesize");
   const search = searchParams.get("search");
-  let umkms = await prisma.umkm.findMany();
   try {
     if (slug) {
       // Ambil UMKM berdasarkan slug
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
 
     if (page) {
       if (search) {
-        const umkmsSearch = await prisma.umkm.findMany({
+        const umkmsSearchCount = await prisma.umkm.count({
           where: {
             OR: [
               { product_name: { contains: search, mode: "insensitive" } },
@@ -72,13 +72,13 @@ export async function GET(req: NextRequest) {
           },
         });
 
-        if (!umkmsSearch) {
+        if (!umkmsSearchPaginate) {
           return NextResponse.json(
             { error: "UMKM tidak ditemukan" },
             { status: 404 }
           );
         }
-        const data = { umkm: umkmsSearchPaginate, length: umkmsSearch.length };
+        const data = { umkm: umkmsSearchPaginate, length: umkmsSearchCount };
         return NextResponse.json(data);
       }
 
@@ -93,14 +93,15 @@ export async function GET(req: NextRequest) {
           { status: 404 }
         );
       }
-      const data = { umkm: umkmsPage, length: umkms.length };
+      const totalCount = await prisma.umkm.count();
+      const data = { umkm: umkmsPage, length: totalCount };
       return NextResponse.json(data);
     }
 
+    let umkms = await prisma.umkm.findMany();
     // Ambil semua data UMKM
     return NextResponse.json(umkms);
   } catch (error: any) {
-    console.error("Terjadi kesalahan saat mengambil data UMKM:", error);
     return NextResponse.json(
       { error: "Terjadi kesalahan pada server", details: error.message },
       { status: 500 }
@@ -108,6 +109,16 @@ export async function GET(req: NextRequest) {
   }
 }
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  const isLoggedIn = !!session?.user?.email;
+
+  if (!isLoggedIn) {
+    return NextResponse.json(
+      { error: "Anda harus login terlebih dahulu" },
+      { status: 401 }
+    );
+  }
+
   const body = await req.json();
   try {
     const {
@@ -180,7 +191,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(newUmkm, { status: 201 });
   } catch (error: any) {
-    console.error("Terjadi kesalahan saat menambahkan UMKM:", error);
     return NextResponse.json(
       { error: "Gagal menambahkan UMKM", details: error.message },
       { status: 500 }
@@ -191,6 +201,15 @@ export async function PUT(req: NextRequest) {
   const body = await req.json();
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get("slug");
+  const session = await auth();
+  const isLoggedIn = !!session?.user?.email;
+
+  if (!isLoggedIn) {
+    return NextResponse.json(
+      { error: "Anda harus login terlebih dahulu" },
+      { status: 401 }
+    );
+  }
 
   try {
     if (!slug) {
@@ -217,6 +236,15 @@ export async function PUT(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    await Promise.all(
+      existingUmkm.image.map(async (imageUrl: any) => {
+        const publicId = "umkm/" + imageUrl.split("/").pop()?.split(".")[0];
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId);
+        }
+      })
+    );
 
     // Generate a new slug based on updated product_name
     let newSlug = product_name
@@ -265,7 +293,6 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(updatedUmkm, { status: 200 });
   } catch (error: any) {
-    console.error("Terjadi kesalahan saat memperbarui UMKM:", error);
     return NextResponse.json(
       { error: "Gagal memperbarui UMKM", details: error.message },
       { status: 500 }
@@ -274,13 +301,38 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const slug = searchParams.get("slug"); // Get single slug from query params
-    const formData = await req.formData();
-    const slugsString = formData.get("slugs") as string;
+  const formData = await req.formData();
+  const slugsString = formData.get("slugs") as string;
+  const slug = formData.get("slug") as string;
+  const session = await auth();
+  const isLoggedIn = !!session?.user?.email;
 
+  if (!isLoggedIn) {
+    return NextResponse.json(
+      { error: "Anda harus login terlebih dahulu" },
+      { status: 401 }
+    );
+  }
+
+  try {
     if (slug) {
+      const umkm = await prisma.umkm.findUnique({ where: { slug } });
+
+      if (!umkm) {
+        return NextResponse.json({ error: "Tidak ada data umkm" });
+      }
+
+      if (umkm.image.length > 0) {
+        await Promise.all(
+          umkm.image.map(async (imageUrl: any) => {
+            const publicId = "umkm/" + imageUrl.split("/").pop()?.split(".")[0];
+            if (publicId) {
+              await cloudinary.uploader.destroy(publicId);
+            }
+          })
+        );
+      }
+
       // Handle single slug deletion
       await prisma.umkm.delete({
         where: { slug },
@@ -301,8 +353,30 @@ export async function DELETE(req: NextRequest) {
         );
       }
 
+      const umkms = await prisma.umkm.findMany({
+        where: { slug: { in: slugs } },
+      });
+
+      if (umkms.length !== slugs.length) {
+        return NextResponse.json(
+          { error: "Tidak ada data umkm" },
+          { status: 404 }
+        );
+      }
+
+      umkms.forEach((umkm) => {
+        if (umkm.image.length > 0) {
+          umkm.image.forEach(async (imageUrl: any) => {
+            const publicId = "umkm/" + imageUrl.split("/").pop()?.split(".")[0];
+            if (publicId) {
+              await cloudinary.uploader.destroy(publicId);
+            }
+          });
+        }
+      });
+
       await prisma.umkm.deleteMany({
-        where: { slug: { in: slugs } }, // Delete entries matching slugs array
+        where: { slug: { in: slugs } },
       });
 
       return NextResponse.json(
@@ -316,7 +390,6 @@ export async function DELETE(req: NextRequest) {
       );
     }
   } catch (error: any) {
-    console.error("Terjadi kesalahan saat menghapus UMKM:", error);
     return NextResponse.json(
       { error: "Gagal menghapus UMKM", details: error.message },
       { status: 500 }

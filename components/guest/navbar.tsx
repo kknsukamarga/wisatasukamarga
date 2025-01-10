@@ -54,15 +54,7 @@ function NavbarMobile({ isLoggedIn }: { isLoggedIn: boolean }) {
   );
 }
 
-function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const links = [
-    ...defaultLinks,
-    {
-      href: isLoggedIn ? "/dashboard" : "/sign-in",
-      label: isLoggedIn ? "Dashboard" : "Sign-In",
-    },
-  ];
-
+function Navbar() {
   return (
     <header className="flex h-20 w-full shrink-0 fixed items-center pl-4 md:px-6 z-[1000] text-white">
       <Link
@@ -79,7 +71,7 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         />
       </Link>
 
-      <MorphNav isLoggedIn={isLoggedIn} />
+      <MorphNav />
     </header>
   );
 }

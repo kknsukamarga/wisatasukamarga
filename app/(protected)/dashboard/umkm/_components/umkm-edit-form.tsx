@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { FileUploader } from "@/components/file-uploader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +19,15 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -33,7 +42,7 @@ const formSchema = z.object({
       (files) => files?.[0]?.size <= MAX_FILE_SIZE,
       `Ukuran file maksimal adalah 5MB.`
     )
-    .optional(), // Optional since the user may not want to update the image
+    .optional(),
   price: z.preprocess(
     (value) => Number(value),
     z.number().int().positive({
@@ -55,9 +64,9 @@ const formSchema = z.object({
 });
 
 interface UMKMEditFormProps {
-  initialData: Partial<z.infer<typeof formSchema>>; // Required initial data for editing
-  pageTitle: string; // Page title for the form
-  slug: string; // Unique identifier for the UMKM entry
+  initialData: Partial<z.infer<typeof formSchema>>;
+  pageTitle: string;
+  slug: string;
 }
 
 export default function UMKMEditForm({
@@ -65,9 +74,23 @@ export default function UMKMEditForm({
   pageTitle,
   slug,
 }: UMKMEditFormProps) {
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const { toast } = useToast();
   const [files, setFiles] = useState<File[] | null>(null);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      product_name: initialData?.product_name || "",
+      image: files ? files : [],
+      price: initialData?.price || 0,
+      description: initialData?.description || "",
+      wanumber: initialData?.wanumber || "",
+      owner: initialData?.owner || "",
+      category: initialData?.category || "product",
+    },
+  });
+
   useEffect(() => {
     const convertAllImagesToFiles = async () => {
       if (initialData.image && Array.isArray(initialData.image)) {
@@ -77,18 +100,23 @@ export default function UMKMEditForm({
               const response = await fetch(imageUrl);
               if (!response.ok) {
                 throw new Error(
-                  `Failed to fetch image: ${response.statusText}`
+                  `Gagal mengambil gambar: ${response.statusText}`
                 );
               }
               const blob = await response.blob();
               const fileName = imageUrl.split("/").pop() || "image.jpg";
-              return new File([blob], fileName, { type: blob.type });
+              const file = Object.assign(
+                new File([blob], fileName, { type: blob.type }),
+                {
+                  preview: imageUrl,
+                }
+              );
+              return file;
             })
           );
-          setFiles(convertedFiles); // Update state only once with all files
-          form.setValue("image", convertedFiles); // Set form value with converted files
+          setFiles(convertedFiles);
         } catch (error) {
-          console.error("Error converting images to files:", error);
+          console.error("Error converting images:", error);
         }
       }
     };
@@ -97,42 +125,26 @@ export default function UMKMEditForm({
   }, [initialData.image]);
 
   useEffect(() => {
-    console.log("files", files);
     if (files) {
       form.setValue("image", files);
     }
   }, [files]);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      product_name: initialData?.product_name || "",
-      image: files ? files : [], // Default undefined for FileUploader compatibility
-      price: initialData?.price || 0,
-      description: initialData?.description || "",
-      wanumber: initialData?.wanumber || "",
-      owner: initialData?.owner || "",
-      category: initialData?.category || "product",
-    },
-  });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      let base64Images = initialData.image || [];
 
-    try {
-      let base64Images = initialData.image || []; // Use existing images if no new ones are uploaded
-
-      // Convert new images to Base64 if provided
       if (values.image && values.image.length > 0) {
-        const files = Array.from(values.image); // Ensure it's an array
+        const files = Array.from(values.image);
         const newBase64Images = await Promise.all(
           files.map((file: any) => toBase64(file))
         );
-        base64Images = [...newBase64Images]; // Append new images to existing ones
+        base64Images = [...newBase64Images];
       }
 
       const formData = {
         product_name: values.product_name,
-        image: base64Images, // Send array of Base64 strings
+        image: base64Images,
         price: values.price,
         description: values.description,
         wanumber: values.wanumber,
@@ -149,37 +161,34 @@ export default function UMKMEditForm({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        toast({
-          title: "Terjadi kesalahan saat memperbarui data UMKM.",
-          description: "Error: " + errorData.message,
-          variant: "default",
-        });
-        return;
+        throw new Error("Terjadi kesalahan saat memperbarui data UMKM.");
       }
 
-      const data = await response.json();
+      return response.json();
+    },
+    onSuccess: () => {
       toast({
-        title: "UMKM berhasil diperbarui.",
+        title: "Berhasil!",
         description: "Data UMKM berhasil diperbarui.",
         variant: "default",
       });
-
       setTimeout(() => {
-        window.location.replace("/dashboard/umkm/list");
+        router.push("/dashboard/umkm/list");
       }, 2000);
-    } catch (error) {
+    },
+    onError: () => {
       toast({
-        title: "Terjadi kesalahan saat memperbarui data UMKM.",
-        description: "Error: " + error,
+        title: "Error!",
+        description: "Terjadi kesalahan saat memperbarui data UMKM.",
         variant: "default",
       });
-    } finally {
-      setLoading(false);
-    }
-  }
+    },
+  });
 
-  // Helper function to convert a file to Base64
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    mutate(values);
+  };
+
   function toBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -199,6 +208,7 @@ export default function UMKMEditForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Product Name */}
             <FormField
               control={form.control}
               name="product_name"
@@ -212,6 +222,7 @@ export default function UMKMEditForm({
                 </FormItem>
               )}
             />
+            {/* Owner */}
             <FormField
               control={form.control}
               name="owner"
@@ -225,6 +236,7 @@ export default function UMKMEditForm({
                 </FormItem>
               )}
             />
+            {/* Category */}
             <FormField
               control={form.control}
               name="category"
@@ -232,18 +244,26 @@ export default function UMKMEditForm({
                 <FormItem>
                   <FormLabel>Kategori</FormLabel>
                   <FormControl>
-                    <select
-                      {...field}
-                      className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring focus:ring-opacity-50"
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
                     >
-                      <option value="product">Product</option>
-                      <option value="service">Service</option>
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Pilih kategori" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="product">Produk</SelectItem>
+                          <SelectItem value="service">Jasa</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            {/* Image */}
             <FormField
               control={form.control}
               name="image"
@@ -262,6 +282,7 @@ export default function UMKMEditForm({
                 </FormItem>
               )}
             />
+            {/* Price */}
             <FormField
               control={form.control}
               name="price"
@@ -279,6 +300,7 @@ export default function UMKMEditForm({
                 </FormItem>
               )}
             />
+            {/* Description */}
             <FormField
               control={form.control}
               name="description"
@@ -295,6 +317,7 @@ export default function UMKMEditForm({
                 </FormItem>
               )}
             />
+            {/* WhatsApp Number */}
             <FormField
               control={form.control}
               name="wanumber"
@@ -304,7 +327,7 @@ export default function UMKMEditForm({
                   <FormControl>
                     <Input
                       type="text"
-                      placeholder="Masukkan nomor WhatsApp"
+                      placeholder="Masukkan nomor WhatsApp contoh : 0851125399812"
                       {...field}
                     />
                   </FormControl>
@@ -312,9 +335,10 @@ export default function UMKMEditForm({
                 </FormItem>
               )}
             />
+            {/* Submit Button */}
             <div className="flex justify-end w-full">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Mengirim..." : "Simpan Perubahan"}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Mengirim..." : "Simpan Perubahan"}
               </Button>
             </div>
           </form>

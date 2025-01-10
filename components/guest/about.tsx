@@ -26,7 +26,7 @@ export default function About(): JSX.Element {
         trigger: container.current,
         scrub: 0.5, // Reduced scrub value for faster animation
         start: `top`,
-        end: `+=${window.innerHeight / 2}`,
+        end: `+=${window.innerHeight / 5}`,
       },
       opacity: 1,
       ease: "none",
