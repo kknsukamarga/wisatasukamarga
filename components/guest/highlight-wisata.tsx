@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 
 export interface Project {
   title: string;
+  slug: string;
   description: string;
   src: string;
   link: string;
@@ -20,6 +21,7 @@ export interface Project {
 interface CardProps {
   i: number;
   title: string;
+  slug: string;
   description: string;
   src: string;
   icon: string;
@@ -33,72 +35,80 @@ interface CardProps {
 const projects: Project[] = [
   {
     title: "Kawah Nirwana",
+    slug: "kawah-nirwana",
     description:
       "Kawah Nirwana adalah kaldera yang terletak di Desa Sukamarga, Kecamatan Suoh. Terkenal dengan danau vulkanik kecil berwarna biru muda dan aktivitas vulkanik yang aktif seperti gas belerang dan uap air panas setiap hari.",
-    src: "https://picsum.photos/200/300",
+    src: "/wisata/kawah-nirwana.png",
     link: "https://maps.app.goo.gl/pSykaLfhUkRRLXZv8",
     color: "#CFCBBA",
     icon_url: "/icon-lake.png",
   },
   {
     title: "Kawah Keramikan",
+    slug: "kawah-keramikan",
     description:
       "Kawah Keramikan menawarkan pemandangan tanah berlapis yang mengkilap akibat pengaruh belerang dan material vulkanik. Mirip lanskap Yellowstone di Amerika Serikat, kawah ini juga memiliki fumarol aktif.",
-    src: "https://picsum.photos/200/300",
+    src: "/wisata/kawah-nirwana.png",
     link: "https://maps.app.goo.gl/1LucuFWJaEfEDi9G8",
     color: "#1F3D3B",
     icon_url: "/icon-mountain.png",
   },
   {
     title: "Kawah Merah",
+    slug: "kawah-merah",
     description:
       "Kawah Merah adalah danau vulkanik kecil yang berwarna merah karena kandungan besi teroksidasi. Kawah ini memiliki aktivitas vulkanik lebih rendah dibandingkan kawah lainnya.",
-    src: "https://picsum.photos/200/300",
+    src: "/wisata/kawah-nirwana.png",
     link: "https://maps.app.goo.gl/9PQDxtC2zmJBcFoG7",
     color: "#CFCBBA",
     icon_url: "/icon-mountain.png",
   },
   {
     title: "Danau Asam",
+    slug: "danau-asam",
     description:
       "Danau Asam adalah danau dengan air yang memiliki pH rendah karena material vulkanik dari kawah sekitarnya. Terbentuk akibat gempa pada tahun 1933 dengan kekuatan 7.7 Ms.",
-    src: "https://picsum.photos/200/300",
+    src: "/wisata/kawah-nirwana.png",
     link: "https://maps.app.goo.gl/EU6ByrZ9hxk2Cqm98",
     color: "#1F3D3B",
     icon_url: "/icon-lake.png",
   },
   {
     title: "Danau Lebar",
+    slug: "danau-lebar",
     description:
       "Terletak di selatan Danau Asam, Danau Lebar memiliki luas sekitar 0.6 km² dan akses mudah dari Jalan Lintas Suoh. Danau ini memberikan pemandangan indah dan mudah diakses.",
-    src: "https://picsum.photos/200/300",
+    src: "/wisata/kawah-nirwana.png",
     link: "https://maps.app.goo.gl/KreKGLuTbJ7qfDtGA",
     color: "#CFCBBA",
     icon_url: "/icon-lake.png",
   },
   {
     title: "Danau Minyak",
+    slug: "danau-minyak",
     description:
       "Danau Minyak memiliki siluet air yang menyerupai minyak. Tempat ini menjadi favorit kawanan gajah untuk berendam, terutama pada sore hari.",
-    src: "https://picsum.photos/200/300",
+    src: "/wisata/kawah-nirwana.png",
     link: "https://maps.app.goo.gl/vrpL4vkTYo3PctK79",
     color: "#1F3D3B",
     icon_url: "/icon-lake.png",
   },
   {
     title: "Pasir Kuning",
+    slug: "pasir-minyak",
     description:
       "Pasir Kuning adalah hamparan pasir vulkanik berwarna kuning dengan luas 52.000 m². Warna kuning berasal dari kuarsa dan sulfur dari Kawah Keramikan dan Kawah Nirwana.",
-    src: "https://picsum.photos/200/300",
+    src: "/wisata/kawah-nirwana.png",
     link: "https://maps.app.goo.gl/YZVHy2yE8dTVe6Yz9",
     color: "#CFCBBA",
     icon_url: "/icon-mountain.png",
   },
   {
     title: "Air Terjun Cibatuan",
+    slug: "air-terjun-cibatuan",
     description:
       "Air Terjun Cibatuan menawarkan lanskap alam yang indah dengan hamparan pasir kuning dan panorama air terjun alami yang memukau.",
-    src: "https://picsum.photos/200/300",
+    src: "/wisata/kawah-nirwana.png",
     link: "/wisata/air-terjun-cibatuan",
     color: "#1F3D3B",
     icon_url: "/icon-waterfall.png",
@@ -108,6 +118,7 @@ const projects: Project[] = [
 const Card = ({
   i,
   title,
+  slug,
   description,
   src,
   link,
@@ -133,7 +144,7 @@ const Card = ({
   return (
     <div
       ref={container}
-      className="cardContainer h-[90vh] md:h-[70svh] flex items-center justify-center sticky top-0"
+      className="cardContainer h-[100vh] md:h-[70svh] flex items-center justify-center sticky top-0"
     >
       <motion.div
         className="card flex flex-col relative w-[1000px] rounded-3xl p-4 md:p-12"
@@ -164,7 +175,7 @@ const Card = ({
             <p className="text-base first-letter:text-2xl">{description}</p>
 
             <span>
-              <Link href={link} target="_blank">
+              <Link href={`/wisata/${slug}`} target="_blank">
                 <Button
                   className={`text-xs flex items-center gap-1 cursor-pointer ${
                     color === "#1F3D3B"

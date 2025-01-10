@@ -17,7 +17,7 @@ export function TeamSwitcher({
   return (
     <SidebarMenu>
       <Link
-        href={"/"}
+        href="/"
         className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-sidebar-primary-foreground p-2"
       >
         <Image

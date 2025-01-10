@@ -21,7 +21,7 @@ const MorphNav = ({ isLoggedIn }: NavProps): JSX.Element => {
   useEffect(() => {
     const calculateResponsiveSize = () => {
       const width = window.innerWidth > 768 ? "40vw" : "80vw";
-      const height = window.innerWidth > 768 ? "70vh" : "90vh";
+      const height = window.innerWidth > 768 ? "70vh" : "70vh";
       setResponsiveSize({ width, height });
     };
 
