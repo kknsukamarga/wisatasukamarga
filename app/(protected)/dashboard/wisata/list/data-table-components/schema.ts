@@ -2,11 +2,13 @@ import { z } from "zod";
 
 // Schema for FasilitasWisata (nested model)
 export const fasilitasWisataSchema = z.object({
-  id: z.string().optional(), // Optional for new records
-  name: z.string().min(1, "Fasilitas name is required"),
-  image: z.string().url("Image must be a valid URL"),
-  description: z.string().min(1, "Description is required"),
+  id: z.string(), // Optional for new records
+  name: z.string(),
+  image: z.string(),
+  description: z.string(),
 });
+
+export type FasilitasWisata = z.infer<typeof fasilitasWisataSchema>;
 
 // Schema for Wisata
 export const wisataSchema = z.object({

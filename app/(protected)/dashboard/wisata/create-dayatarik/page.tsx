@@ -13,7 +13,7 @@ export default function WisataCreatePage() {
   useEffect(() => {
     const fetchWisata = async () => {
       try {
-        const response = await fetch("/api/fasilitas-wisata", {
+        const response = await fetch("/api/fasilitas-wisata/change", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

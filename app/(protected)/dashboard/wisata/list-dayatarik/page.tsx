@@ -19,7 +19,7 @@ export default function WisataListPage() {
       setError(null);
       try {
         const response = await fetch(
-          `/api/wisata?page=${page}&pageSize=${pageSize}&search=${search}`,
+          `/api/fasilitas-wisata/`,
           {
             method: "GET",
             headers: {
@@ -37,9 +37,9 @@ export default function WisataListPage() {
         if (!result || result.length === 0) {
           throw new Error("No Wisata data available.");
         }
-        setData(result.wisata);
+        setData(result);
         setTotalLength(result.totalLength);
-      } catch (err) {
+      } catch (err) { 
         setError((err as Error).message || "Unknown error");
       } finally {
         setLoading(false);

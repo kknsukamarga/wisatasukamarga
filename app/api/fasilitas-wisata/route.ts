@@ -5,38 +5,37 @@ const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+  const id = searchParams.get("id"); // Optional: filter by wisata ID
 
   try {
     if (id) {
-      // Fetch single wisata by id, including related fasilitas
-      const wisata = await prisma.wisata.findUnique({
+      // Fetch fasilitasWisata related to a specific wisataId
+      const fasilitasWisata = await prisma.fasilitasWisata.findMany({
         where: { id },
         include: {
-          fasilitasWisata: true,
+          wisata: true, // Include the related Wisata data
         },
       });
 
-      if (!wisata) {
+      if (fasilitasWisata.length === 0) {
         return NextResponse.json(
-          { error: "Wisata not found" },
+          { error: "No fasilitasWisata found for the given wisataId" },
           { status: 404 }
         );
       }
 
-      return NextResponse.json(wisata);
+      return NextResponse.json(fasilitasWisata);
     }
 
-    // Fetch all wisata records, including related fasilitas
-    const wisatas = await prisma.wisata.findMany({
+    // Fetch all fasilitasWisata records
+    const allFasilitasWisata = await prisma.fasilitasWisata.findMany({
       include: {
-        fasilitasWisata: true,
-      },
-    });
+        wisata: true, // Include the related Wisata data
+      }});
 
-    return NextResponse.json(wisatas);
+    return NextResponse.json(allFasilitasWisata);
   } catch (error: any) {
-    console.error("Error during GET wisatas:", error);
+    console.error("Error during GET fasilitasWisata:", error);
     return NextResponse.json(
       { error: "Something went wrong", details: error.message },
       { status: 500 }

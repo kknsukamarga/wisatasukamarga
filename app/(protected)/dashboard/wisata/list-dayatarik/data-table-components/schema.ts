@@ -8,6 +8,8 @@ export const fasilitasWisataSchema = z.object({
   description: z.string(),
 });
 
+export type FasilitasWisata = z.infer<typeof fasilitasWisataSchema>;
+
 // Schema for Wisata
 export const wisataSchema = z.object({
   id: z.string(),

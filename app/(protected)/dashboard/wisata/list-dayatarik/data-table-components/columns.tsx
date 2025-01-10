@@ -54,6 +54,21 @@ export const columns: ColumnDef<FasilitasWisata>[] = [
       </div>
     ),
   },
+
+  {
+    accessorKey: "wisataId",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Wisata Terkait" />
+    ),
+    cell: ({ row }) => {
+      return (
+      <div className="w-[150px] font-medium capitalize">
+        {row.original.wisata.name}
+      </div>
+      )
+    },
+  },
+
   {
     accessorKey: "createdAt",
     header: ({ column }) => (

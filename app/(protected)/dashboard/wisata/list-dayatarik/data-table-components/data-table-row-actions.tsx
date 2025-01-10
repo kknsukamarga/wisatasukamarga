@@ -49,7 +49,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
     setLoading(true); // Start loading state
 
     try {
-      const response = await fetch(`/api/wisata?id=${id}`, {
+      const response = await fetch(`/api/fasilitas-wisata?id=${id}`, {
         method: "DELETE",
       });
 
@@ -58,7 +58,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       }
 
       alert("Wisata deleted successfully.");
-      revalidatePath("/dashboard/wisata/list");
+      revalidatePath("/dashboard/wisata/list-dayatarik");
       // Optionally refresh data or perform navigation
       onClose();
     } catch (error) {
@@ -81,7 +81,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       return;
     }
 
-    router.push(`/dashboard/wisata/edit/${id}`);
+    router.push(`/dashboard/wisata/edit-dayatarik/${id}`);
   };
 
   return (
