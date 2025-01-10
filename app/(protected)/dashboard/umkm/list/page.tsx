@@ -2,7 +2,7 @@
 
 import { DataTable } from "./data-table-components/data-table";
 import { columns } from "./data-table-components/columns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 const fetchUMKM = async ({
@@ -40,6 +40,10 @@ export default function UMKMListPage() {
     queryKey: ["umkm", { page, pageSize, search }],
     queryFn: fetchUMKM,
   });
+
+  useEffect(() => {
+    setPage(1);
+  }, [pageSize, search]);
 
   return (
     <div className="h-full flex-1 flex-col space-y-2 px-8 md:flex">
