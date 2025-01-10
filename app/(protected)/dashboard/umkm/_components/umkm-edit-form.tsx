@@ -97,7 +97,13 @@ export default function UMKMEditForm({
               }
               const blob = await response.blob();
               const fileName = imageUrl.split("/").pop() || "image.jpg";
-              return new File([blob], fileName, { type: blob.type });
+              const file = Object.assign(
+                new File([blob], fileName, { type: blob.type }),
+                {
+                  preview: imageUrl,
+                }
+              );
+              return file;
             })
           );
           setFiles(convertedFiles);
