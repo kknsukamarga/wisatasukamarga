@@ -89,10 +89,10 @@ export default function UMKMPage({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <img
                     src={item.image}
                     alt={item.product_name}
-                    className="rounded-t-lg mb-4"
+                    className="w-full h-48 object-cover rounded-lg"
                   />
                   <h2 className="text-xl font-bold mb-2">{item.product_name}</h2>
-                  <p className="text-gray-600 mb-4">{item.description}</p>
+                  <p className="text-gray-600 mb-4 line-clamp-2">{item.description}</p>
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold">
                       Rp{
@@ -130,10 +130,10 @@ export default function UMKMPage({ isLoggedIn }: { isLoggedIn: boolean }) {
                   currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                Previous
+                Sebelumnya
               </button>
               <span>
-                Page {currentPage} of {totalPages}
+                Halaman {currentPage} of {totalPages}
               </span>
               <button
                 onClick={handleNextPage}
@@ -142,7 +142,7 @@ export default function UMKMPage({ isLoggedIn }: { isLoggedIn: boolean }) {
                   currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                Next
+                Selanjutnya
               </button>
             </div>
           </>
