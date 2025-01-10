@@ -22,6 +22,7 @@ interface Artikel {
   category: string;
   content: string;
   createdAt: string;
+  updatedAt: string;
   slug: string;
 }
 
@@ -129,18 +130,18 @@ const SemuaArtikel: React.FC = () => {
               <SelectValue
                 placeholder={
                   selectedCategory === "all"
-                    ? "Filter by Category"
+                    ? "Filter kategori"
                     : selectedCategory.replace("_", " ") // Ganti "_" dengan " "
                 }
               />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>Categories</SelectLabel>
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectLabel>Kategori</SelectLabel>
+                <SelectItem value="all">Semua</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>
-                    {category.replace("_", " ")} {/* Ganti "_" dengan " " */}
+                    {category.replace("_", " ")}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -172,7 +173,7 @@ const SemuaArtikel: React.FC = () => {
                     {artikel.category.replace("_", " ")}
                   </span>
                   <p className="text-xs text-gray-400 mt-2">
-                    {new Date(artikel.createdAt).toLocaleDateString("id-ID", {
+                    {new Date(artikel.updatedAt).toLocaleDateString("id-ID", {
                       weekday: "long",
                       year: "numeric",
                       month: "long",

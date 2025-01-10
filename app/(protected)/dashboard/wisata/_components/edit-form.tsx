@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { FileUploader } from "@/components/file-uploader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,11 +13,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import {
   Select,
   SelectContent,
@@ -23,8 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
+import * as z from "zod";
+
+const MAX_FILE_SIZE = 5000000;
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -60,35 +63,87 @@ const formSchema = z.object({
         message: "Lokasi harus berupa tautan Google Maps yang valid.",
       }
     ),
-  status: z.enum(["Buka", "Tutup", "Pemeliharaan"]).refine((value) => !!value, {
+  status: z.enum(["Buka", "Tutup", "Pemeliharaan"], {
     message: "Status harus dipilih.",
   }),
 });
 
-export default function WisataForm({
+export default function WisataEditForm({
   initialData,
   pageTitle,
 }: {
-  initialData: any | null;
+  initialData: any;
   pageTitle: string;
 }) {
-  const defaultValues = {
-    name: initialData?.name || "",
-    imageCover: initialData?.imageCover || null,
-    images: initialData?.images || [],
-    description: initialData?.description || "",
-    price: initialData?.price || "",
-    location: initialData?.location || "",
-    status: initialData?.status || "",
-  };
-
-  const { toast } = useToast(); // Menggunakan useToast
+  const router = useRouter();
+  const { id } = useParams();
+  const { toast } = useToast(); // Menggunakan hook useToast
   const [loading, setLoading] = useState(false);
+
+  const [imageCoverFile, setImageCoverFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      name: initialData?.name || "",
+      imageCover: initialData?.imageCover || null,
+      images: [],
+      description: initialData?.description || "",
+      price: initialData?.price || 0,
+      location: initialData?.location || "",
+      status: initialData?.status || "Buka",
+    },
   });
+
+  useEffect(() => {
+    const convertAllImagesToFiles = async () => {
+      try {
+        if (initialData.imageCover) {
+          const response = await fetch(initialData.imageCover);
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch imageCover: ${response.statusText}`
+            );
+          }
+          const blob = await response.blob();
+          const file = Object.assign(
+            new File([blob], "cover.jpg", { type: blob.type }),
+            {
+              preview: initialData.imageCover,
+            }
+          );
+          setImageCoverFile(file);
+          form.setValue("imageCover", [file]);
+        }
+
+        if (initialData.image && Array.isArray(initialData.image)) {
+          const convertedFiles = await Promise.all(
+            initialData.image.map(async (imageUrl: string, index: number) => {
+              const response = await fetch(imageUrl);
+              if (!response.ok) {
+                throw new Error(
+                  `Failed to fetch image ${index + 1}: ${response.statusText}`
+                );
+              }
+              const blob = await response.blob();
+              const fileName = `image-${index + 1}.jpg`;
+              return Object.assign(
+                new File([blob], fileName, { type: blob.type }),
+                {
+                  preview: imageUrl,
+                }
+              );
+            })
+          );
+          setImageFiles(convertedFiles);
+          form.setValue("images", convertedFiles);
+        }
+      } catch (error) {}
+    };
+
+    convertAllImagesToFiles();
+  }, [initialData, form]);
 
   const toBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -103,57 +158,52 @@ export default function WisataForm({
     setLoading(true);
 
     try {
-      const base64Cover = await toBase64(values.imageCover[0]);
+      const base64ImageCover = imageCoverFile
+        ? await toBase64(imageCoverFile)
+        : initialData.imageCover;
+
       const base64Images = await Promise.all(
-        values.images.map((file: File) => toBase64(file))
+        imageFiles.map((file) => toBase64(file))
       );
 
-      const formData = {
+      const updatedData = {
         name: values.name,
-        imageCover: base64Cover,
+        imageCover: base64ImageCover,
         image: base64Images,
         description: values.description,
-        price: parseInt(values.price as unknown as string, 10),
+        price: values.price,
         location: values.location,
         status: values.status,
-        fasilitasWisata: null,
       };
 
-      const response = await fetch("/api/wisata", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      const response = await fetch(`/api/wisata?id=${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         toast({
-          title: "Gagal Mengirim Data",
-          description: `Error: ${errorData.message || "Terjadi kesalahan."}`,
+          title: "Gagal Memperbarui Data",
+          description: errorData.error || "Terjadi kesalahan.",
           variant: "destructive",
         });
         return;
       }
 
-      const data = await response.json();
-      console.log("Wisata created successfully:", data);
       toast({
         title: "Berhasil",
-        description: "Wisata berhasil dibuat!",
+        description: "Wisata berhasil diperbarui!",
         variant: "default",
       });
 
-      form.reset();
-
-      // Opsional: Alihkan pengguna setelah 2 detik
       setTimeout(() => {
-        window.location.replace("/dashboard/wisata/list");
+        router.push("/dashboard/wisata/list");
       }, 2000);
     } catch (error) {
       toast({
-        title: "Gagal Mengirim Data",
+        title: "Gagal Memperbarui Data",
         description: `Error: ${error}`,
         variant: "destructive",
       });
@@ -172,13 +222,12 @@ export default function WisataForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Name */}
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Masukkan Nama Wisata..." {...field} />
                   </FormControl>
@@ -186,40 +235,47 @@ export default function WisataForm({
                 </FormItem>
               )}
             />
-
-            {/* Image Cover */}
             <FormField
               control={form.control}
               name="imageCover"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gambar Cover</FormLabel>
+                  <FormLabel>Image Cover</FormLabel>
                   <FormControl>
                     <FileUploader
-                      value={field.value}
-                      onValueChange={field.onChange}
+                      value={imageCoverFile ? [imageCoverFile] : []}
+                      onValueChange={(files: any) => {
+                        setImageCoverFile(files[0] || null);
+                        field.onChange(files);
+                      }}
                       maxFiles={1}
-                      maxSize={5 * 1024 * 1024} // 5MB
+                      maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Images */}
             <FormField
               control={form.control}
               name="images"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gambar Galeri</FormLabel>
+                  <FormLabel>Images</FormLabel>
                   <FormControl>
                     <FileUploader
-                      value={field.value}
-                      onValueChange={field.onChange}
+                      value={imageFiles}
+                      onValueChange={(files: unknown) => {
+                        if (Array.isArray(files)) {
+                          const validFiles = files.filter(
+                            (file) => file instanceof File
+                          ) as File[];
+                          setImageFiles(validFiles);
+                          field.onChange(validFiles);
+                        }
+                      }}
                       maxFiles={6}
-                      maxSize={5 * 1024 * 1024} // 5MB
+                      maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
                   <FormMessage />
@@ -242,35 +298,29 @@ export default function WisataForm({
               )}
             />
 
-            {/* Price */}
             <FormField
               control={form.control}
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Harga</FormLabel>
+                  <FormLabel>Price</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       placeholder="Masukkan Harga Tiket Masuk Wisata..."
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value, 10))
-                      }
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Location */}
             <FormField
               control={form.control}
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Lokasi</FormLabel>
+                  <FormLabel>Location</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Masukkan Link Lokasi Google Maps..."
@@ -281,8 +331,6 @@ export default function WisataForm({
                 </FormItem>
               )}
             />
-
-            {/* Status */}
             <FormField
               control={form.control}
               name="status"
@@ -308,11 +356,9 @@ export default function WisataForm({
                 </FormItem>
               )}
             />
-
-            {/* Submit Button */}
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
-                {loading ? "Mengirimkan..." : "Simpan Wisata"}
+                {loading ? "Memperbarui..." : "Perbarui Wisata"}
               </Button>
             </div>
           </form>

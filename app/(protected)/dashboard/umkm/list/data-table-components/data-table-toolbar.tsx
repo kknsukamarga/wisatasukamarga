@@ -127,7 +127,7 @@ export function DataTableToolbar<TData>({
     <div className="flex flex-wrap items-center justify-between">
       <div className="flex flex-1 flex-wrap items-center gap-2">
         <Input
-          placeholder="Search by product name or description..."
+          placeholder="Cari data..."
           value={search ?? ""}
           onChange={handleSearchChange}
           className="h-8 w-[250px] lg:w-[350px]"

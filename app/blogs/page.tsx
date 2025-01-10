@@ -15,7 +15,7 @@ export default async function Page() {
       <Navbar isLoggedIn={isLoggedIn} />
       <Hero />
       <ArtikelTerbaru />
-      <Kategori />
+      {/* <Kategori /> */}
       <SemuaArtikel />
       <Footer />
     </main>
