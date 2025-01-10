@@ -27,7 +27,7 @@ export function DataTableToolbar<TData>({
   const handleDateSelect = ({ from, to }: { from: Date; to: Date }) => {
     setDateRange({ from, to });
     // Filter table data based on selected date range
-    table.getColumn("createdAt")?.setFilterValue([from, to]);
+    table.getColumn("updatedAt")?.setFilterValue([from, to]);
   };
 
   return (
@@ -44,7 +44,7 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetGlobalFilter()}
+            onClick={() => table.resetColumnFilters()}
             className="h-8 px-2 lg:px-3"
           >
             Reset

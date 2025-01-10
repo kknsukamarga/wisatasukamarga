@@ -18,6 +18,15 @@ type BlogParams = {
   category: "TEMPAT_WISATA" | "KARYA_UMKM"; // Enum category
 };
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString); // Convert string to Date object
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Add leading zero
+  const day = String(date.getDate()).padStart(2, "0"); // Add leading zero
+
+  return `${year}-${month}-${day}`;
+};
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const mode = searchParams.get("mode");
@@ -39,7 +48,12 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Blog not found" }, { status: 404 });
       }
 
-      return NextResponse.json(blog);
+      const formattedBlog = {
+        ...blog,
+        updatedAt: formatDate(blog.updatedAt.toISOString()),
+      };
+
+      return NextResponse.json(formattedBlog);
     } else {
       const blogs = await prisma.blog.findMany({
         take: limit + 1,
@@ -52,12 +66,17 @@ export async function GET(req: NextRequest) {
       const nextCursor = hasNextPage ? blogs[blogs.length - 1].id : null;
       const trimmedBlogs = hasNextPage ? blogs.slice(0, -1) : blogs;
 
+      const formattedBlogs = trimmedBlogs.map((blog) => ({
+        ...blog,
+        updatedAt: formatDate(blog.updatedAt.toISOString()),
+      }));
+
       const categories = await prisma.blog.groupBy({
         by: ["category"],
       });
 
       return NextResponse.json({
-        articles: trimmedBlogs,
+        articles: formattedBlogs,
         categories: categories.map((cat) => cat.category),
         next_cursor: nextCursor,
       });
@@ -179,8 +198,16 @@ export async function PUT(req: NextRequest) {
 
     let imageUrl = existingBlog.coverImage;
 
-    const isBase64 = coverImage.startsWith("data:image/");
-    if (isBase64) {
+    if (
+      coverImage !== existingBlog.coverImage &&
+      coverImage.startsWith("data:image/")
+    ) {
+
+      const publicId = existingBlog.coverImage.split("/").pop()?.split(".")[0];
+      if (publicId) {
+        await cloudinary.uploader.destroy(`blogs/${publicId}`);
+      }
+
       const cloudinaryResponse = await cloudinary.uploader.upload(coverImage, {
         folder: "blogs",
         public_id: title.toLowerCase().replace(/\s+/g, "-"),
@@ -242,6 +269,19 @@ export async function DELETE(req: NextRequest) {
   try {
     if (!slug) {
       return NextResponse.json({ error: "Slug is required" }, { status: 400 });
+    }
+
+    const blog = await prisma.blog.findUnique({
+      where: { slug },
+    });
+
+    if (!blog) {
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+    }
+
+    const publicId = blog.coverImage.split("/").pop()?.split(".")[0];
+    if (publicId) {
+      await cloudinary.uploader.destroy(`blogs/${publicId}`);
     }
 
     await prisma.blog.delete({

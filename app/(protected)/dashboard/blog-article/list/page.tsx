@@ -12,19 +12,19 @@ export default function BlogListPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch("/api/blog?mode=all"); // Pastikan mode=all untuk mendapatkan semua blog
+        const response = await fetch("/api/blog?mode=all");
 
         if (!response.ok) {
           throw new Error("Failed to fetch blogs");
         }
 
-        const { articles } = await response.json(); // Ambil `articles` dari response API
+        const { articles } = await response.json();
 
         if (!articles || articles.length === 0) {
           throw new Error("No blogs available.");
         }
 
-        setData(articles); // Tetapkan `articles` ke state data
+        setData(articles);
       } catch (err) {
         setError((err as Error).message || "Unknown error");
       } finally {
@@ -35,14 +35,6 @@ export default function BlogListPage() {
     fetchBlogs();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   return (
     <div className="h-full flex-1 flex-col space-y-2 px-8 md:flex">
       <h1>List Data Blog</h1>
@@ -51,7 +43,12 @@ export default function BlogListPage() {
           Here&apos;s a list of your blogs!
         </p>
       </div>
-      <DataTable data={data} columns={columns} />
+      <DataTable
+        data={data}
+        columns={columns}
+        isLoading={loading}
+        error={error}
+      />
     </div>
   );
 }
