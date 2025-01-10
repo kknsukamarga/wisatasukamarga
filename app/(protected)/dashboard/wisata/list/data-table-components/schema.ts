@@ -1,15 +1,23 @@
 import { z } from "zod";
 
-// We're keeping a simple non-relational schema here.
-// IRL, you will have a schema for your data models.
-export const expenseSchema = z.object({
-  id: z.string(),
-  label: z.string(),
-  note: z.string(),
-  category: z.string(),
-  type: z.enum(["income", "expense"]),
-  amount: z.number(),
-  date: z.string(),
+// Schema for FasilitasWisata (nested model)
+export const fasilitasWisataSchema = z.object({
+  id: z.string().optional(), // Optional for new records
+  name: z.string().min(1, "Fasilitas name is required"),
+  image: z.string().url("Image must be a valid URL"),
+  description: z.string().min(1, "Description is required"),
 });
 
-export type Expense = z.infer<typeof expenseSchema>;
+// Schema for Wisata
+export const wisataSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  image: z.string(),
+  description: z.string(),
+  price: z.number(),
+  location: z.string(),
+  status: z.enum(["Buka", "Tutup", "Pemeliharaan"]),
+  fasilitasWisata: z.array(fasilitasWisataSchema), // Nested facilities
+});
+
+export type Wisata = z.infer<typeof wisataSchema>;

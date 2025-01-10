@@ -2,6 +2,7 @@ import { TangoSansBold } from "@/app/fonts";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { MapPinned } from "lucide-react";
 
 function InteractiveMap() {
   return (
@@ -19,12 +20,12 @@ function InteractiveMap() {
         >
           Ilustrasi
           <br />
-          Interactive{" "}
+          Interaktif{" "}
           <span className="bg-orange-primary px-4 pt-2 pb-1">Map</span>
         </h2>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-10 px-2 md:px-0">
         <Image
           src="/interactive-map.png"
           alt="icon-lake"
@@ -34,8 +35,11 @@ function InteractiveMap() {
       </div>
 
       <div className="w-full flex justify-center items-center">
-        <Link href="/interactive-map" className="mx-auto">
-          <Button className="mt-12">Coba fitur interactive map</Button>
+        <Link href="/peta-interaktif" className="mx-auto">
+          <Button className="mt-12 bg-white text-gray hover:bg-white hover:text-gray flex items-center">
+            <MapPinned />
+            Coba fitur Interaktif Map
+          </Button>
         </Link>
       </div>
     </div>

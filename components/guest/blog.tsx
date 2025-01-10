@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { Columns, Copy, FileBadge, Signature } from "lucide-react";
 import { TangoSansBold } from "@/app/fonts";
@@ -6,98 +8,113 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import Image from "next/image";
 
-const Skeleton = () => (
-  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl   dark:bg-dot-white/[0.2] bg-dot-black/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]  border border-transparent dark:border-white/[0.2] bg-neutral-100 dark:bg-black"></div>
-);
-
-const items = [
-  {
-    title: "The Dawn of Innovation",
-    description:
-      "Kopi Suoh adalah jenis kopi yang berasal dari Suoh, sebuah daerah di Kabupaten Lampung Barat, Provinsi Lampung. Suoh terkenal sebagai salah satu kawasan penghasil kopi di Indonesia, dengan kualitas kopi yang khas karena kondisi geografis dan lingkungan yang mendukung.",
-    header: (
-      <Image
-        src="https://picsum.photos/200/300"
-        alt="The Dawn of Innovation"
-        width={300}
-        height={200}
-        className="w-full h-full object-cover rounded-xl"
-      />
-    ),
-    className: "md:col-span-2",
-    author: "John Doe",
-    icon: <Copy className="h-4 w-4 text-neutral-500" />,
-  },
-  {
-    title: "The Digital Revolution",
-    description: "Dive into the transformative power of technology.",
-    header: (
-      <Image
-        src="https://picsum.photos/200/300"
-        alt="The Digital Revolution"
-        width={300}
-        height={200}
-        className="w-full h-full object-cover rounded-xl"
-      />
-    ),
-    className: "md:col-span-1",
-    author: "John Doe",
-    icon: <FileBadge className="h-4 w-4 text-neutral-500" />,
-  },
-  {
-    title: "The Art of Design",
-    description: "Discover the beauty of thoughtful and functional design.",
-    header: (
-      <Image
-        src="https://picsum.photos/200/300"
-        alt="The Art of Design"
-        width={300}
-        height={200}
-        className="w-full h-full object-cover rounded-xl"
-      />
-    ),
-    className: "md:col-span-1",
-    author: "John Doe",
-    icon: <Signature className="h-4 w-4 text-neutral-500" />,
-  },
-  {
-    title: "The Power of Communication",
-    description:
-      "Understand the impact of effective communication in our lives.",
-    header: (
-      <Image
-        src="https://picsum.photos/200/300"
-        alt="The Power of Communication"
-        width={300}
-        height={200}
-        className="w-full h-full object-cover rounded-xl"
-      />
-    ),
-    className: "md:col-span-2",
-    author: "John Doe",
-    icon: <Columns className="h-4 w-4 text-neutral-500" />,
-  },
-];
-
-export function BentoGridBlog() {
+export function BentoGridBlog({ articles }: { articles: Artikel[] }) {
   return (
-    <BentoGrid className="max-w-4xl mx-auto md:mx-5 mt-10">
-      {items.map((item, i) => (
+    <BentoGrid className="max-w-4xl mx-auto md:mx-5 mt-10 px-2 md:px-0">
+      {articles.map((article, i) => (
         <BentoGridItem
+          link={`/blog/${article.slug}`}
           key={i}
-          title={item.title}
-          description={item.description}
-          header={item.header}
-          className={item.className}
-          icon={item.icon}
-          author={item.author}
+          title={article.title}
+          description={
+            <div
+              className="text-sm text-gray-600 mt-2 line-clamp-2"
+              dangerouslySetInnerHTML={{
+                __html:
+                  articles[0].content.slice(0, 150) +
+                  (articles[0].content.length > 150 ? "..." : ""),
+              }}
+            />
+          } // Potong deskripsi
+          header={
+            <Image
+              src={article.coverImage}
+              alt={article.title}
+              width={300}
+              height={200}
+              className="w-full h-full object-cover rounded-xl"
+            />
+          }
+          className={`md:col-span-1 ${
+            i === 0 || i === 3 ? "md:col-span-2" : ""
+          }`}
+          icon={<Copy className="h-4 w-4 text-neutral-500" />} // Gunakan icon default
+          author={article.category} // Gunakan category sebagai author
+          category={article.category}
+          date={new Date(article.updatedAt).toLocaleDateString("id-ID", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
         />
       ))}
     </BentoGrid>
   );
 }
 
+interface Artikel {
+  title: string;
+  coverImage: string;
+  category: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
+function BentoGridSkeleton() {
+  const skeletonItems = Array.from({ length: 4 }); // 4 skeleton items
+
+  return (
+    <BentoGrid className="max-w-4xl mx-auto md:mx-5 mt-10 px-2 md:px-0">
+      {skeletonItems.map((_, i) => (
+        <div
+          key={i}
+          className={`p-4 bg-white shadow-md min-w-[300px] rounded-lg ${
+            i === 0 || i === 3 ? "md:col-span-2" : "md:col-span-1"
+          }`}
+        >
+          <div className="w-full h-[200px] bg-black/10 rounded-xl animate-pulse"></div>
+          <div className="mt-4 h-6 w-3/4 bg-black/10 rounded animate-pulse"></div>
+          <div className="mt-2 h-4 w-1/2 bg-black/10 rounded animate-pulse"></div>
+          <div className="mt-4 flex items-center space-x-2">
+            <div className="h-4 w-4 bg-black/10 rounded-full animate-pulse"></div>
+            <div className="h-4 w-20 bg-black/10 rounded animate-pulse"></div>
+          </div>
+          <div className="mt-2 h-4 w-1/3 bg-black/10 rounded animate-pulse"></div>
+        </div>
+      ))}
+    </BentoGrid>
+  );
+}
+
 function Blog() {
+  const [artikels, setArtikels] = useState<Artikel[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch data dari API
+    const fetchArtikels = async () => {
+      setLoading(true);
+
+      try {
+        const response = await fetch("/api/blog?mode=all&limit=4"); // Gunakan parameter mode dan limit
+        const data = await response.json();
+
+        if (data.articles) {
+          setArtikels(data.articles); // Pastikan Anda mengambil `articles` dari response API
+        }
+      } catch (error) {
+        console.error("Gagal mengambil data artikel", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArtikels();
+  }, []);
+
   return (
     <div
       className="min-h-screen py-24 md:py:12 flex flex-col items-center justify-center"
@@ -111,16 +128,17 @@ function Blog() {
         <h2
           className={`${TangoSansBold.className} mt-5 w-fit rounded-md text-2xl text-gray text-center`}
         >
-          Blog & Artikel
+          Blog, Artikel, Berita
         </h2>
 
         <p className="md:w-[50%] w-[90%] mx-auto mt-2">
-          Spot Wisata Suka Marga menawarkan keindahan alam yang memukau dengan
-          hamparan perbukitan hijau dan udara sejuk yang menyegarkan.
+          Dapatkan informasi terbaru tentang wisata, umkm, dan hal lainnya di
+          Desa Suka Marga
         </p>
       </div>
 
-      <BentoGridBlog />
+      {/* <BentoGridBlog articles={artikels} /> */}
+      {loading ? <BentoGridSkeleton /> : <BentoGridBlog articles={artikels} />}
 
       <div className="w-full flex justify-center items-center">
         <Link href="/blogs" className="mx-auto">

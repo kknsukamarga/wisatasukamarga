@@ -12,17 +12,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Load the rich text editor dynamically to avoid SSR issues
-const RichTextEditor = dynamic(
-  () => import("../_components/rich-text-editor"),
-  { ssr: false }
-);
+// Gunakan dynamic import untuk ReactQuill
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import "react-quill/dist/quill.snow.css";
+
+const MAX_FILE_SIZE = 5000000;
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -30,12 +37,19 @@ const formSchema = z.object({
   }),
   coverImage: z
     .any()
-    .refine((files) => files?.length > 0, "A cover image is required."),
+    .refine((files) => files?.length > 0, "A cover image is required.")
+    .refine(
+      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
+      `Cover image size must not exceed 5MB.`
+    ),
   content: z.string().min(10, {
     message: "Content must be at least 10 characters.",
   }),
   author: z.string().min(2, {
     message: "Author name must be at least 2 characters.",
+  }),
+  category: z.enum(["TEMPAT_WISATA", "KARYA_UMKM"], {
+    errorMap: () => ({ message: "Please select a valid category." }),
   }),
 });
 
@@ -46,32 +60,38 @@ export default function BlogForm({
   initialData: any | null;
   pageTitle: string;
 }) {
-  const defaultValues = {
-    title: initialData?.title || "",
-    coverImage: initialData?.coverImage || "",
-    content: initialData?.content || "",
-    author: initialData?.author || "",
-  };
-
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      title: initialData?.title || "",
+      coverImage: initialData?.coverImage || null,
+      content: initialData?.content || "",
+      author: initialData?.author || "",
+      category: initialData?.category || "",
+    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
 
-    // Prepare form data
-    const formData = {
-      title: values.title,
-      coverImage: values.coverImage[0]?.name || "", // Use file name as placeholder
-      content: values.content,
-      author: values.author,
-    };
-
     try {
+      let base64Image = "";
+
+      if (values.coverImage && values.coverImage.length > 0) {
+        const file = values.coverImage[0];
+        base64Image = await toBase64(file);
+      }
+
+      const formData = {
+        title: values.title,
+        coverImage: base64Image,
+        content: values.content,
+        author: values.author,
+        category: values.category,
+      };
+
       const response = await fetch("/api/blog", {
         method: "POST",
         headers: {
@@ -90,13 +110,22 @@ export default function BlogForm({
       const data = await response.json();
       console.log("Blog created successfully:", data);
       alert("Blog created successfully!");
-      form.reset(); // Reset form after successful submission
+      form.reset();
     } catch (error) {
       console.error("Error submitting blog:", error);
       alert("An error occurred while submitting the blog.");
     } finally {
       setLoading(false);
     }
+  }
+
+  function toBase64(file: any) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   }
 
   return (
@@ -109,7 +138,6 @@ export default function BlogForm({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Title */}
             <FormField
               control={form.control}
               name="title"
@@ -123,8 +151,6 @@ export default function BlogForm({
                 </FormItem>
               )}
             />
-
-            {/* Cover Image */}
             <FormField
               control={form.control}
               name="coverImage"
@@ -136,15 +162,13 @@ export default function BlogForm({
                       value={field.value}
                       onValueChange={field.onChange}
                       maxFiles={1}
-                      maxSize={5 * 1024 * 1024} // 5MB
+                      maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Content */}
             <FormField
               control={form.control}
               name="content"
@@ -152,17 +176,25 @@ export default function BlogForm({
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <RichTextEditor
+                    <ReactQuill
                       value={field.value}
                       onChange={field.onChange}
+                      theme="snow"
+                      modules={{
+                        toolbar: [
+                          ["bold", "italic", "underline"],
+                          ["blockquote", "code-block"],
+                          [{ list: "ordered" }, { list: "bullet" }],
+                          ["link", "image"],
+                        ],
+                      }}
+                      className="max-w-screen-2xl"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Author */}
             <FormField
               control={form.control}
               name="author"
@@ -176,8 +208,27 @@ export default function BlogForm({
                 </FormItem>
               )}
             />
-
-            {/* Submit Button */}
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="TEMPAT_WISATA">
+                        Tempat Wisata
+                      </SelectItem>
+                      <SelectItem value="KARYA_UMKM">Karya UMKM</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
                 {loading ? "Submitting..." : "Submit Blog"}

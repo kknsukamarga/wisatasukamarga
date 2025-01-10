@@ -21,7 +21,7 @@ const MorphNav = ({ isLoggedIn }: NavProps): JSX.Element => {
   useEffect(() => {
     const calculateResponsiveSize = () => {
       const width = window.innerWidth > 768 ? "40vw" : "80vw";
-      const height = window.innerWidth > 768 ? "70vh" : "90vh";
+      const height = window.innerWidth > 768 ? "70vh" : "70vh";
       setResponsiveSize({ width, height });
     };
 
@@ -53,15 +53,15 @@ const MorphNav = ({ isLoggedIn }: NavProps): JSX.Element => {
   };
 
   return (
-    <div className={`${styles.header} right-5 top-5 md:right-5 md:top-5 z-50`}>
+    <div className={`${styles.header} right-8 top-[14px] z-50`}>
       <motion.div
         className={`${styles.menu} shadow-md`}
         variants={menu}
         animate={isActive ? "open" : "closed"}
         initial="closed"
         style={{
-          width: isActive ? responsiveSize.width : "100px",
-          height: isActive ? responsiveSize.height : "40px",
+          width: isActive ? responsiveSize.width : "90px",
+          height: isActive ? responsiveSize.height : "50px",
         }}
       >
         <AnimatePresence>

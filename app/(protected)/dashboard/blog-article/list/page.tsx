@@ -1,13 +1,8 @@
 "use client";
-// import { Metadata } from "next";
+
 import { DataTable } from "./data-table-components/data-table";
 import { columns } from "./data-table-components/columns";
 import { useState, useEffect } from "react";
-
-// export const metadata: Metadata = {
-//   title: "Blog Data List",
-//   description: "List of blog data",
-// };
 
 export default function BlogListPage() {
   const [data, setData] = useState([]);
@@ -17,24 +12,19 @@ export default function BlogListPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch("/api/blog", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch("/api/blog?mode=all"); // Pastikan mode=all untuk mendapatkan semua blog
 
         if (!response.ok) {
           throw new Error("Failed to fetch blogs");
         }
 
-        const data = await response.json();
+        const { articles } = await response.json(); // Ambil `articles` dari response API
 
-        if (!data || data.length === 0) {
+        if (!articles || articles.length === 0) {
           throw new Error("No blogs available.");
         }
 
-        setData(data);
+        setData(articles); // Tetapkan `articles` ke state data
       } catch (err) {
         setError((err as Error).message || "Unknown error");
       } finally {

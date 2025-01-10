@@ -89,8 +89,7 @@ function HighlightUMKM() {
         </p>
       </div>
 
-      {/* carousel */}
-      <div className="flex justify-between items-center w-full absolute translate-y-[-300px]">
+      <div className="justify-between items-center w-full absolute translate-y-[-300px] hidden md:flex">
         <Image
           src="/umkm-kiri.png"
           alt="umkm-kiri"
@@ -109,7 +108,7 @@ function HighlightUMKM() {
         />
       </div>
 
-      <div className="rounded-xl w-full flex justify-center items-center relative bg-orange-primary overflow-hidden mt-5 py-5 flex-col">
+      <div className="rounded-t-xl w-full flex justify-center items-center relative bg-orange-primary overflow-hidden mt-5 py-5 flex-col">
         <Image
           src="/umkm-pattern.png"
           alt="umkm-pattern"

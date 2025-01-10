@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -11,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { handleSignOut } from "@/actions/sign-out";
-import { SubmitButton } from "../SubmitButton";
 import { LogOut } from "lucide-react";
 
 export function ProfileDropdown() {
@@ -21,17 +19,15 @@ export function ProfileDropdown() {
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
             <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-            <AvatarFallback>SN</AvatarFallback>
+            <AvatarFallback>AD</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">satnaing</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              satnaingdev@gmail.com
-            </p>
+            <p className="text-sm font-medium leading-none">Admin</p>
+            <p className="text-xs leading-none text-muted-foreground"></p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -48,8 +44,6 @@ export function ProfileDropdown() {
               </div>
               <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
             </Button>
-            {/* <SubmitButton pendingText="Signing out...">Log out</SubmitButton> */}
-            {/* Log out */}
           </DropdownMenuItem>
         </form>
       </DropdownMenuContent>
