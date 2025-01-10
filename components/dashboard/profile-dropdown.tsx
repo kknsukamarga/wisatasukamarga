@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { handleSignOut } from "@/actions/sign-out";
 import { LogOut } from "lucide-react";
+import { auth } from "@/auth";
 
 export function ProfileDropdown() {
   return (

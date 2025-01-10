@@ -5,13 +5,27 @@ import { useRouter } from "next/navigation";
 import Footer from "@/components/guest/footer";
 import Navbar from "@/components/guest/navbar";
 import Hero from "@/components/guest/umkm/hero";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
-export default function UMKMPage({ isLoggedIn }: { isLoggedIn: boolean }) {
+const SkeletonCard = () => (
+  <div className="bg-white rounded-lg shadow-md p-4 animate-pulse">
+    <div className="w-full h-48 bg-black/10 rounded-lg mb-4"></div>
+    <div className="h-6 bg-black/10 rounded mb-2"></div>
+    <div className="h-4 bg-black/10 rounded mb-4"></div>
+    <div className="flex justify-between items-center">
+      <div className="h-6 bg-black/10 rounded w-1/3"></div>
+      <div className="h-6 bg-black/10 rounded w-5"></div>
+    </div>
+  </div>
+);
+
+export default function UMKMPage() {
   const router = useRouter();
 
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(8); // Limit 8 items per page
+  const [itemsPerPage] = useState(8);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -61,10 +75,10 @@ export default function UMKMPage({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   return (
     <main className="bg-[#e5e0d5]">
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar />
       <Hero />
 
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 py-10">
         <header className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">UMKM Suka Marga</h1>
           <p className="text-lg">
@@ -74,9 +88,36 @@ export default function UMKMPage({ isLoggedIn }: { isLoggedIn: boolean }) {
           </p>
         </header>
 
-        {loading && <div className="text-center">Loading...</div>}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {Array.from({ length: itemsPerPage }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        )}
+
         {error && (
-          <div className="text-center text-red-500">Error: {error}</div>
+          <div className="flex flex-col items-center justify-center p-6 text-center">
+            {/* Mascot Image */}
+            <div className="w-48 h-48 overflow-hidden">
+              <Image
+                src="/eror-maskot.png"
+                alt="Leaf Mascot"
+                width={1080}
+                height={1080}
+                className="rotate-[10deg]"
+              />
+            </div>
+
+            {/* Error Message */}
+            <h2 className="text-2xl font-bold text-red-500 mt-4">
+              Oops! Sepertinya ada yang salah.
+            </h2>
+            <p className="text-gray-600 mt-2">
+              Silakan coba refresh lagi nanti atau hubungi dukungan jika masalah
+              berlanjut.
+            </p>
+          </div>
         )}
 
         {!loading && !error && (
@@ -89,24 +130,27 @@ export default function UMKMPage({ isLoggedIn }: { isLoggedIn: boolean }) {
                   onClick={() => handleProductClick(item.slug)}
                 >
                   <img
-                    src={item.image}
+                    src={item.image[0]}
                     alt={item.product_name}
                     className="w-full h-48 object-cover rounded-lg"
                   />
-                  <h2 className="text-xl font-bold mb-2">
+
+                  <h2 className="text-xl font-bold mb-2 line-clamp-1">
                     {item.product_name}
                   </h2>
+
                   <p className="text-gray-600 mb-4 line-clamp-2">
                     {item.description}
                   </p>
+
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold">
                       Rp{((item.price + 1) * 10).toLocaleString("id-ID")},00
                     </span>
 
                     {/* Button that redirects to the product page */}
-                    <button
-                      className="icon-btn"
+                    <Button
+                      className="icon-btn rounded-full px-3"
                       onClick={() => handleProductClick(item.slug)}
                     >
                       <svg
@@ -123,36 +167,66 @@ export default function UMKMPage({ isLoggedIn }: { isLoggedIn: boolean }) {
                           d="M9 5l7 7-7 7"
                         />
                       </svg>
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
             </div>
 
             <div className="flex justify-between items-center mt-6">
-              <button
+              <Button
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
                 className={`px-4 py-2 border rounded ${
                   currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                Sebelumnya
-              </button>
+                <div className="rotate-180">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+                <span className="hidden md:block">Sebelumnya</span>
+              </Button>
               <span>
-                Halaman {currentPage} of {totalPages}
+                Halaman {currentPage} dari {totalPages}
               </span>
-              <button
+              <Button
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages}
-                className={`px-4 py-2 border rounded ${
+                className={`px-4 py-2 border rounded flex items-center ${
                   currentPage === totalPages
                     ? "opacity-50 cursor-not-allowed"
                     : ""
                 }`}
               >
-                Selanjutnya
-              </button>
+                <span className="hidden md:block">Selanjutnya</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </Button>
             </div>
           </>
         )}

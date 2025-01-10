@@ -96,7 +96,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className={`mx-auto ${conditionalClassName}`}>
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar />
 
       <Hero />
 
