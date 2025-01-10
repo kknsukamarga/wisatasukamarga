@@ -19,19 +19,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import ReactQuill, { Quill } from "react-quill";
+import imageResize from "quill-image-resize-module-react";
 
-// Gunakan dynamic import untuk ReactQuill
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
+import { handlers } from "@/auth";
 
+Quill.register("modules/imageResize", imageResize);
 const MAX_FILE_SIZE = 5000000;
-
 const formSchema = z.object({
   title: z.string().min(2, {
     message: "Title must be at least 2 characters.",
@@ -61,6 +62,7 @@ export default function BlogForm({
   initialData: any | null;
   pageTitle: string;
 }) {
+  const quillRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -141,6 +143,44 @@ export default function BlogForm({
     });
   }
 
+  const initializeQuill = (el: any) => {
+    if (el && !quillRef.current) {
+      quillRef.current = el.getEditor();
+    }
+  };
+
+  const imageHandler = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+    input.onchange = async () => {
+      if (input !== null && input.files !== null) {
+        const file = input.files[0];
+        const url = await uploadToCloudinary(file);
+        console.log(url);
+        console.log(quillRef);
+
+        const range = quillRef?.current.getSelection(true);
+        quillRef?.current.insertEmbed(range.index, "image", url);
+      }
+    };
+  }, []);
+
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "contentimage");
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
+      { method: "POST", body: formData }
+    );
+    const data = await res.json();
+    const url = data.url;
+
+    return url;
+  };
+
   return (
     <Card className="mx-auto w-full">
       <CardHeader>
@@ -190,17 +230,61 @@ export default function BlogForm({
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <ReactQuill
-                      value={field.value}
-                      onChange={field.onChange}
+                      ref={initializeQuill}
                       theme="snow"
                       modules={{
-                        toolbar: [
-                          ["bold", "italic", "underline"],
-                          ["blockquote", "code-block"],
-                          [{ list: "ordered" }, { list: "bullet" }],
-                          ["link", "image"],
-                        ],
+                        imageResize: {
+                          parchment: Quill.import("parchment"),
+                          modules: ["Resize", "DisplaySize"],
+                        },
+                        toolbar: {
+                          container: [
+                            [{ header: "1" }, { header: "2" }, { font: [] }],
+                            [{ size: [] }],
+                            [
+                              "bold",
+                              "italic",
+                              "underline",
+                              "strike",
+                              "blockquote",
+                            ],
+                            [
+                              { list: "ordered" },
+                              { list: "bullet" },
+                              { indent: "-1" },
+                              { indent: "+1" },
+                            ],
+                            ["link", "image", "video"],
+                            ["code-block"],
+                            ["clean"],
+                          ],
+                          handlers: {
+                            image: imageHandler,
+                          },
+                        },
+                        clipboard: {
+                          matchVisual: false,
+                        },
                       }}
+                      formats={[
+                        "header",
+                        "font",
+                        "size",
+                        "bold",
+                        "italic",
+                        "underline",
+                        "strike",
+                        "blockquote",
+                        "list",
+                        "bullet",
+                        "indent",
+                        "link",
+                        "image",
+                        "video",
+                        "code-block",
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
                       className="max-w-screen-2xl"
                     />
                   </FormControl>

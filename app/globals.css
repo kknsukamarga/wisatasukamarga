@@ -314,3 +314,12 @@ html.lenis body {
   width: 100%;
   height: 300px; /* Atur tinggi sesuai kebutuhan */
 }
+
+img {
+  display: block; /* Menghindari space di bawah gambar */
+  margin: 0 auto; /* Membuat gambar berada di tengah secara horizontal */
+  max-width: 100%; /* Membatasi lebar gambar */
+  height: auto; /* Menjaga proporsi gambar */
+  object-fit: contain; /* Menyesuaikan konten gambar */
+  object-position: center; /* Posisi gambar di tengah */
+}
