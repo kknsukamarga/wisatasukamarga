@@ -21,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,9 +59,11 @@ const formSchema = z.object({
 export default function EditForm() {
   const router = useRouter();
   const { slug } = useParams();
+  const { toast } = useToast(); // Initialize toast
   const [initialData, setInitialData] = useState<any | null>(null);
   const [generatedSlug, setGeneratedSlug] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,7 +76,6 @@ export default function EditForm() {
     },
   });
 
-  // Fetch existing blog data
   useEffect(() => {
     async function fetchBlogData() {
       if (!slug) return;
@@ -97,13 +100,14 @@ export default function EditForm() {
         });
       } catch (error) {
         console.error("Error fetching blog data:", error);
+      } finally {
+        setIsFetching(false);
       }
     }
 
     fetchBlogData();
   }, [slug, form]);
 
-  // Generate slug based on title
   const generateSlug = (title: string) =>
     title
       .toLowerCase()
@@ -151,15 +155,26 @@ export default function EditForm() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to update blog.");
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to update blog.",
+          variant: "destructive",
+        });
         return;
       }
 
-      alert("Blog updated successfully!");
+      toast({
+        title: "Success",
+        description: "Blog updated successfully!",
+      });
       router.push("/dashboard/blog-article/list");
     } catch (error) {
       console.error("Error updating blog:", error);
-      alert("An error occurred while updating the blog.");
+      toast({
+        title: "Error",
+        description: "An error occurred while updating the blog.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -174,8 +189,20 @@ export default function EditForm() {
     });
   }
 
-  if (!initialData) {
-    return <p>Loading...</p>;
+  if (isFetching) {
+    return (
+      <Card className="mx-auto w-full">
+        <CardHeader>
+          <Skeleton className="h-8 w-1/4" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Skeleton key={index} className="h-10 w-full" />
+          ))}
+          <Skeleton className="h-12 w-32" />
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
