@@ -269,7 +269,6 @@ interface FileCardProps {
 }
 
 function FileCard({ file, progress, onRemove }: FileCardProps) {
-  console.log(file);
   return (
     <div className="relative flex items-center space-x-4">
       <div className="flex flex-1 space-x-4">
