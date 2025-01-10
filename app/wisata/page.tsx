@@ -10,7 +10,7 @@ export default async function Page() {
 
   return (
     <main className="bg-white">
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar />
 
       <Hero />
 

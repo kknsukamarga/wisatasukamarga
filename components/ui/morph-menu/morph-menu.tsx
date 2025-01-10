@@ -2,14 +2,13 @@ import styles from "./style.module.scss";
 import { motion } from "framer-motion";
 import { links, footerLinks } from "./data";
 import { perspective, slideIn } from "./animation";
-import { NavProps } from "./morph-nav";
 
 interface Link {
   title: string;
   href: string;
 }
 
-export default function MorphMenu({ isLoggedIn }: NavProps): JSX.Element {
+export default function MorphMenu(): JSX.Element {
   return (
     <div className={styles.nav}>
       <div className={`${styles.body} gap-8`}>
