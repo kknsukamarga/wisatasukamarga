@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import UMKMEditForm from "../../_components/umkm-edit-form";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton component
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface UMKMData {
   product_name: string;
@@ -15,42 +15,36 @@ interface UMKMData {
   category?: "service" | "product";
 }
 
+const fetchUMKMBySlug = async ({
+  queryKey,
+}: {
+  queryKey: [string, { slug: string }];
+}): Promise<UMKMData> => {
+  const [, { slug }] = queryKey;
+
+  const response = await fetch(`/api/umkm?slug=${slug}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch UMKM data");
+  }
+
+  return response.json();
+};
+
 export default function UMKMEditPage({ params }: { params: { slug: string } }) {
-  const [initialData, setInitialData] = useState<UMKMData | null>(null); // Properly typed state
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { slug } = params;
 
-  useEffect(() => {
-    const fetchUMKMData = async () => {
-      try {
-        const response = await fetch(`/api/umkm?slug=${slug}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch UMKM data");
-        }
-        const data = await response.json();
-        setInitialData({
-          product_name: data.product_name,
-          image: data.image,
-          price: data.price,
-          description: data.description,
-          wanumber: data.wanumber,
-          owner: data.owner,
-          category: data.category,
-        });
-      } catch (err) {
-        setError((err as Error).message || "Unknown error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["umkm", { slug }],
+    queryFn: fetchUMKMBySlug,
+  });
 
-    if (slug) {
-      fetchUMKMData();
-    }
-  }, [slug]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
@@ -84,7 +78,7 @@ export default function UMKMEditPage({ params }: { params: { slug: string } }) {
     );
   }
 
-  if (!initialData) {
+  if (!data) {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
@@ -96,11 +90,7 @@ export default function UMKMEditPage({ params }: { params: { slug: string } }) {
 
   return (
     <div>
-      <UMKMEditForm
-        initialData={initialData}
-        pageTitle="Edit UMKM"
-        slug={slug}
-      />
+      <UMKMEditForm initialData={data} pageTitle="Edit UMKM" slug={slug} />
     </div>
   );
 }

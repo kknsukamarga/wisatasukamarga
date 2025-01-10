@@ -3,7 +3,7 @@
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Row } from "@tanstack/react-table";
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Import router for navigation
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -15,14 +15,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { revalidatePath } from "next/cache";
+import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 interface UMKMData {
@@ -36,32 +35,19 @@ interface DataTableRowActionsProps {
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { toast } = useToast();
-
   const { slug } = row.original;
-  const router = useRouter(); // Router for navigation
-  const [isDialogOpen, setDialogOpen] = useState(false); // State for delete confirmation dialog
-  const [isDeleting, setIsDeleting] = useState(false); // State for loading state
-  const [isSuccessDialogOpen, setSuccessDialogOpen] = useState(false); // State for success dialog
+  const router = useRouter();
 
-  const handleDelete = async () => {
-    if (!slug) {
-      toast({
-        title: "Gagal!",
-        description: "Data Tidak Ditemukan!",
-      });
-      return;
-    }
+  const [isDialogOpen, setDialogOpen] = useState(false);
 
-    setIsDeleting(true);
-
-    try {
-      // Create FormData object
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (slug: string) => {
       const formData = new FormData();
       formData.append("slug", slug);
 
       const response = await fetch(`/api/umkm`, {
         method: "DELETE",
-        body: formData, // Pass the FormData as the request body
+        body: formData,
       });
 
       if (!response.ok) {
@@ -69,8 +55,10 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         throw new Error(errorData?.details || "Gagal menghapus data UMKM.");
       }
 
+      return response.json();
+    },
+    onSuccess: () => {
       setDialogOpen(false);
-
       toast({
         title: "Berhasil!",
         description: "UMKM berhasil dihapus.",
@@ -79,14 +67,26 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       setTimeout(() => {
         window.location.reload();
       }, 2000);
-    } catch (error) {
+    },
+    onError: () => {
+      setDialogOpen(false);
       toast({
         title: "Gagal!",
         description: "Gagal menghapus UMKM. Silakan coba lagi.",
       });
-    } finally {
-      setIsDeleting(false);
+    },
+  });
+
+  const handleDelete = () => {
+    if (!slug) {
+      toast({
+        title: "Gagal!",
+        description: "Data Tidak Ditemukan!",
+      });
+      return;
     }
+
+    mutate(slug);
   };
 
   const handleEdit = () => {
@@ -95,7 +95,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       return;
     }
 
-    router.push(`/dashboard/umkm/edit/${slug}`); // Navigate to the edit page
+    router.push(`/dashboard/umkm/edit/${slug}`);
   };
 
   return (
@@ -120,7 +120,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       </DropdownMenu>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+      <AlertDialog open={isDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Konfirmasi Penghapusan</AlertDialogTitle>
@@ -130,26 +130,9 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Success Message Dialog */}
-      <AlertDialog
-        open={isSuccessDialogOpen}
-        onOpenChange={setSuccessDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>UMKM Berhasil Dihapus</AlertDialogTitle>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setSuccessDialogOpen(false)}>
-              OK
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isPending}>
+              {isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
