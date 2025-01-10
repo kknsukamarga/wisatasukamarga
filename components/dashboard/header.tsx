@@ -32,11 +32,11 @@ export const Header = ({
   return (
     <header
       className={cn(
-        "flex items-center justify-between gap-3 sm:gap-4 bg-transparent p-4 h-16 transition-[width,height] ease-linear",
+        "flex items-center justify-between gap-3 sm:gap-4 bg-transparent p-4 h-16 transition-[width,height] ease-linear w-full",
         fixed && "header-fixed peer/header fixed z-50 rounded-md",
         state === "expanded"
-          ? "w-[calc(100%_-_16rem)]" // Lebar saat sidebar diperluas
-          : "w-[calc(100%_-_4rem)]", // Lebar saat sidebar dalam mode ikon
+          ? "md:w-[calc(100%_-_16rem)]"
+          : "md:w-[calc(100%_-_4rem)]",
         className
       )}
       {...props}

@@ -28,6 +28,7 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -89,8 +90,10 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       <DataTableToolbar search={search} setSearch={setSearch} table={table} />
-      <div className="overflow-y-auto rounded-md border">
-        <Table>
+      <ScrollArea
+        className={`border rounded-md max-w-[400px] md:max-w-[600px] xl:max-w-[1400px]`}
+      >
+        <Table className={`min-w-[200px]`}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -147,13 +150,14 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className={`h-24 text-center ${error ? "text-red-500" : ""}`}
                 >
-                  {error ? `Error ${error}` : "No Results."}
+                  {error ? `Error ${error}` : "Data Tidak Ada."}
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
       <DataTablePagination
         table={table}
         page={page}

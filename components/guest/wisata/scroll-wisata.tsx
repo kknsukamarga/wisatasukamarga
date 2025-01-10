@@ -56,7 +56,7 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
         className="absolute inset-0 z-10 brightness-50"
       />
 
-      <div className="w-full h-full flex gap-5 justify-end items-start p-20 flex-col md:w-[50%]">
+      <div className="w-full h-full flex gap-5 justify-end items-start p-8 md:p-20 flex-col md:w-[50%]">
         <div className="flex items-center gap-2 px-4 py-3 rounded-full bg-white/10 border-white border z-20 text-white">
           <MapPin /> Sukamarga, Lampung Barat
         </div>
@@ -64,7 +64,7 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
           Kawah Nirwana
         </h1>
 
-        <p className="z-20 text-white max-w-[70%]">
+        <p className="z-20 text-white md:max-w-[70%] w-full">
           Wisata Keramikan Suoh ini mulai dibuka sekitar tahun 2004 dan mulai
           dikenal tahun 2006, letaknya berada di kaki Bukit Gunung Ratu,
           tepatnya berdekatan dengan Danau Minyak dan Danau Asam.
@@ -86,7 +86,10 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
   const rotate = useTransform(scrollYProgress, [0, 1], [5, 0]);
 
   return (
-    <motion.div style={{ scale, rotate }} className="relative h-screen">
+    <motion.div
+      style={{ scale, rotate }}
+      className="sticky top-0 h-screen text-white"
+    >
       <Image
         src={"/wisata/kawah-nirwana.png"}
         alt="Image 2"
@@ -94,7 +97,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
         className="absolute inset-0 z-10 brightness-50"
       />
 
-      <div className="w-full h-full flex gap-5 justify-end items-start p-20 flex-col md:w-[50%]">
+      <div className="w-full h-full flex gap-5 justify-end items-start p-8 md:p-20 flex-col md:w-[50%]">
         <div className="flex items-center gap-2 px-4 py-3 rounded-full bg-white/10 border-white border z-20 text-white">
           <MapPin /> Sukamarga, Lampung Barat
         </div>
@@ -102,7 +105,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
           Kawah Nirwana
         </h1>
 
-        <p className="z-20 text-white max-w-[70%]">
+        <p className="z-20 text-white md:max-w-[70%] w-full">
           Wisata Keramikan Suoh ini mulai dibuka sekitar tahun 2004 dan mulai
           dikenal tahun 2006, letaknya berada di kaki Bukit Gunung Ratu,
           tepatnya berdekatan dengan Danau Minyak dan Danau Asam.
