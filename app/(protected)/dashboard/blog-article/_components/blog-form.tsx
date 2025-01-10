@@ -154,15 +154,35 @@ export default function BlogForm({
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/*");
     input.click();
+
     input.onchange = async () => {
       if (input !== null && input.files !== null) {
         const file = input.files[0];
-        const url = await uploadToCloudinary(file);
-        console.log(url);
-        console.log(quillRef);
 
-        const range = quillRef?.current.getSelection(true);
-        quillRef?.current.insertEmbed(range.index, "image", url);
+        try {
+          // Upload file ke Cloudinary
+          const url = await uploadToCloudinary(file);
+          console.log("Uploaded image URL:", url);
+
+          // Pastikan quillRef tidak null sebelum mencoba mengaksesnya
+          if (quillRef?.current) {
+            // @ts-ignore
+            const range = quillRef.current.getSelection(true);
+            // @ts-ignore
+            quillRef.current.insertEmbed(range.index, "image", url);
+          } else {
+            console.error(
+              "quillRef is null. Make sure the editor is initialized."
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Error uploading image or inserting image in editor:",
+            error
+          );
+        }
+      } else {
+        console.warn("No file selected or input is null.");
       }
     };
   }, []);

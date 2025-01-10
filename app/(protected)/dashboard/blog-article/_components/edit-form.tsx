@@ -207,13 +207,38 @@ export default function EditForm() {
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/*");
     input.click();
+
     input.onchange = async () => {
       if (input !== null && input.files !== null) {
         const file = input.files[0];
-        const url = await uploadToCloudinary(file);
 
-        const range = quillRef?.current.getSelection(true);
-        quillRef?.current.insertEmbed(range.index, "image", url);
+        try {
+          // Upload file ke Cloudinary
+          const url = await uploadToCloudinary(file);
+
+          // Pastikan quillRef tidak null sebelum mencoba mengaksesnya
+          if (quillRef?.current) {
+            // @ts-ignore
+            const range = quillRef.current.getSelection(true);
+            if (range) {
+              // @ts-ignore
+              quillRef.current.insertEmbed(range.index, "image", url);
+            } else {
+              console.warn("No range selected in the editor.");
+            }
+          } else {
+            console.error(
+              "quillRef is null. Ensure the editor is properly initialized."
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Error during image upload or editor manipulation:",
+            error
+          );
+        }
+      } else {
+        console.warn("No file selected or input is null.");
       }
     };
   }, []);
