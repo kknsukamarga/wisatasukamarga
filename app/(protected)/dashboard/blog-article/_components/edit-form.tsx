@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { FileUploader } from "@/components/file-uploader";
 import { Button } from "@/components/ui/button";
@@ -21,17 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import ReactQuill, { Quill } from "react-quill";
-import imageResize from "quill-image-resize-module-react";
-import { useToast } from "@/hooks/use-toast";
-
 import "react-quill/dist/quill.snow.css";
-
-Quill.register("modules/imageResize", imageResize);
+import ReactQuill from "react-quill";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -63,12 +58,9 @@ const formSchema = z.object({
 export default function EditForm() {
   const router = useRouter();
   const { slug } = useParams();
-  const quillRef = useRef(null); // Initialize ref for ReactQuill
   const [initialData, setInitialData] = useState<any | null>(null);
   const [generatedSlug, setGeneratedSlug] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true); // Add state for fetching
-  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -106,8 +98,6 @@ export default function EditForm() {
         });
       } catch (error) {
         console.error("Error fetching blog data:", error);
-      } finally {
-        setIsFetching(false); // Set fetching to false after fetch is complete
       }
     }
 
@@ -162,26 +152,15 @@ export default function EditForm() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        toast({
-          title: "Gagal",
-          description: errorData.error || "Gagal mengupdate blog.",
-          variant: "destructive",
-        });
+        alert(errorData.error || "Failed to update blog.");
         return;
       }
 
-      toast({
-        title: "Berhasil",
-        description: "Blog berhasil diupdate.",
-      });
+      alert("Blog updated successfully!");
       router.push("/dashboard/blog-article/list");
     } catch (error) {
-      console.error("Error submitting blog:", error);
-      toast({
-        title: "Gagal",
-        description: "Gagal mengupdate blog.",
-        variant: "destructive",
-      });
+      console.error("Error updating blog:", error);
+      alert("An error occurred while updating the blog.");
     } finally {
       setLoading(false);
     }
@@ -196,77 +175,25 @@ export default function EditForm() {
     });
   }
 
-  const initializeQuill = (el: any) => {
-    if (el && !quillRef.current) {
-      quillRef.current = el.getEditor();
-    }
-  };
-
-  const imageHandler = useCallback(() => {
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
-    input.click();
-
-    input.onchange = async () => {
-      if (input !== null && input.files !== null) {
-        const file = input.files[0];
-
-        try {
-          // Upload file ke Cloudinary
-          const url = await uploadToCloudinary(file);
-
-          // Pastikan quillRef tidak null sebelum mencoba mengaksesnya
-          if (quillRef?.current) {
-            // @ts-ignore
-            const range = quillRef.current.getSelection(true);
-            if (range) {
-              // @ts-ignore
-              quillRef.current.insertEmbed(range.index, "image", url);
-            } else {
-              console.warn("No range selected in the editor.");
-            }
-          } else {
-            console.error(
-              "quillRef is null. Ensure the editor is properly initialized."
-            );
-          }
-        } catch (error) {
-          console.error(
-            "Error during image upload or editor manipulation:",
-            error
-          );
-        }
-      } else {
-        console.warn("No file selected or input is null.");
-      }
-    };
-  }, []);
-
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "contentimage");
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
-      { method: "POST", body: formData }
-    );
-    const data = await res.json();
-    return data.url;
-  };
-
-  if (isFetching) {
-    // Render skeleton loader while data is being fetched
+  if (!initialData) {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
-          <Skeleton className="h-8 w-1/4" />
+          <Skeleton className=" h-8 w-1/3" />
         </CardHeader>
-        <CardContent className="space-y-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Skeleton key={index} className="h-10 w-full" />
+        <CardContent>
+          {Array.from({ length: 7 }).map((_, index) => (
+            <div
+              key={index}
+              className={`space-y-1 ${index == 0 ? "" : "mt-10"} `}
+            >
+              <Skeleton className=" h-6 w-1/2" />
+              <Skeleton className=" h-10 w-full" />
+            </div>
           ))}
-          <Skeleton className="h-12 w-32" />
+          <div className="flex justify-end mt-12">
+            <Skeleton className="h-10 w-32" />
+          </div>
         </CardContent>
       </Card>
     );
@@ -325,61 +252,17 @@ export default function EditForm() {
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <ReactQuill
-                      ref={initializeQuill}
                       value={field.value}
                       onChange={field.onChange}
                       theme="snow"
                       modules={{
-                        imageResize: {
-                          parchment: Quill.import("parchment"),
-                          modules: ["Resize", "DisplaySize"],
-                        },
-                        toolbar: {
-                          container: [
-                            [{ header: "1" }, { header: "2" }, { font: [] }],
-                            [{ size: [] }],
-                            [
-                              "bold",
-                              "italic",
-                              "underline",
-                              "strike",
-                              "blockquote",
-                            ],
-                            [
-                              { list: "ordered" },
-                              { list: "bullet" },
-                              { indent: "-1" },
-                              { indent: "+1" },
-                            ],
-                            ["link", "image", "video"],
-                            ["code-block"],
-                            ["clean"],
-                          ],
-                          handlers: {
-                            image: imageHandler,
-                          },
-                        },
-                        clipboard: {
-                          matchVisual: false,
-                        },
+                        toolbar: [
+                          ["bold", "italic", "underline"],
+                          ["blockquote", "code-block"],
+                          [{ list: "ordered" }, { list: "bullet" }],
+                          ["link", "image"],
+                        ],
                       }}
-                      formats={[
-                        "header",
-                        "font",
-                        "size",
-                        "bold",
-                        "italic",
-                        "underline",
-                        "strike",
-                        "blockquote",
-                        "list",
-                        "bullet",
-                        "indent",
-                        "link",
-                        "image",
-                        "video",
-                        "code-block",
-                      ]}
                       className="max-w-screen-2xl"
                     />
                   </FormControl>
