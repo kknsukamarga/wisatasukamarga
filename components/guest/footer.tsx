@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="bg-white py-8 md:py-12">
-      <div className="container mx-auto flex justify-between gap-8 px-4 md:px-6 lg:max-w-7xl">
+      <div className="container mx-auto flex flex-col md:flex-row justify-between gap-8 px-4 md:px-6 lg:max-w-7xl">
         <div className="flex flex-col items-start gap-4">
           <Link href="/" className="flex items-center gap-2" prefetch={false}>
             <Image

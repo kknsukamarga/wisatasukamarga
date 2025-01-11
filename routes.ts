@@ -9,8 +9,11 @@ export const publicRoutes = [
   "/wisata",
   "/umkm",
   "/blogs",
+  "/blog/*",
   "/peta-interaktif",
   "/api/blog",
+  "/api/umkm",
+  "/api/wisata",
 ];
 
 export const authRoutes = ["/sign-in"];

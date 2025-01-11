@@ -74,6 +74,7 @@
 .nav {
   display: flex;
   flex-direction: column;
+  margin-top: 5px;
   justify-content: space-between;
   padding: 100px 40px 50px 40px;
   height: 100%;
@@ -103,9 +104,10 @@
 
 .header {
   position: fixed;
+
   .menu {
     width: 480px;
-    height: 500px;
+    height: 480px;
     background-color: #1f3d3b;
     border-radius: 20px;
     position: relative;
