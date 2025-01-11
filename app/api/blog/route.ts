@@ -232,7 +232,8 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
-    const { title, coverImage, content, author, category } = body;
+    const { title, coverImage, content, author, category, deletedImages } =
+      body;
 
     if (!title || !coverImage || !content || !author || !category) {
       return NextResponse.json(
@@ -245,7 +246,17 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invalid category." }, { status: 400 });
     }
 
-    // Upload cover image if updated
+    // Step 1: Hapus gambar yang tidak lagi digunakan (dari deletedImages)
+    if (deletedImages && Array.isArray(deletedImages)) {
+      for (const imageUrl of deletedImages) {
+        const publicId = imageUrl.split("/").pop()?.split(".")[0];
+        if (publicId) {
+          await cloudinary.uploader.destroy(`blogs/content-images/${publicId}`);
+        }
+      }
+    }
+
+    // Step 2: Upload cover image jika diubah
     let imageUrl = existingBlog.coverImage;
 
     if (
@@ -265,7 +276,7 @@ export async function PUT(req: NextRequest) {
       imageUrl = cloudinaryResponse.secure_url;
     }
 
-    // Process and upload images in content
+    // Step 3: Process and upload images in content
     let updatedContent = content;
     const base64Regex = /<img src="(data:image\/.*?;base64,.*?)".*?>/g;
     const matches = [...content.matchAll(base64Regex)];
@@ -287,7 +298,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Generate slug
+    // Step 4: Generate slug
     let newSlug = title
       .toLowerCase()
       .replace(/\s+/g, "-")
@@ -304,7 +315,7 @@ export async function PUT(req: NextRequest) {
       counter++;
     }
 
-    // Update the blog in the database
+    // Step 5: Update the blog in the database
     const updatedBlog = await prisma.blog.update({
       where: { slug },
       data: {

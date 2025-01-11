@@ -27,6 +27,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -61,6 +62,7 @@ export default function EditForm() {
   const [initialData, setInitialData] = useState<any | null>(null);
   const [generatedSlug, setGeneratedSlug] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,8 +128,8 @@ export default function EditForm() {
     setLoading(true);
 
     try {
+      // Step 1: Konversi cover image ke base64 jika diubah
       let finalCoverImage = "";
-
       if (Array.isArray(values.coverImage) && values.coverImage.length > 0) {
         const file = values.coverImage[0];
         finalCoverImage = await toBase64(file);
@@ -135,6 +137,16 @@ export default function EditForm() {
         finalCoverImage = values.coverImage;
       }
 
+      // Step 2: Ambil URL gambar lama dan baru
+      const oldImageUrls = extractImageUrlsFromContent(initialData.content);
+      const newImageUrls = extractImageUrlsFromContent(values.content);
+
+      // Step 3: Cari gambar yang dihapus
+      const deletedImageUrls = oldImageUrls.filter(
+        (url) => !newImageUrls.includes(url)
+      );
+
+      // Step 4: Siapkan data untuk dikirim
       const updatedData = {
         title: values.title,
         slug: generatedSlug,
@@ -142,8 +154,10 @@ export default function EditForm() {
         content: values.content,
         author: values.author,
         category: values.category,
+        deletedImages: deletedImageUrls, // Kirim gambar yang dihapus ke backend
       };
 
+      // Step 5: Kirim data ke backend
       const response = await fetch(`/api/blog?slug=${slug}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -152,15 +166,25 @@ export default function EditForm() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to update blog.");
+        toast({
+          title: "Gagal",
+          description: `Gagal memperbarui blog : ${errorData?.error}`,
+          variant: "destructive",
+        });
         return;
       }
+      toast({
+        title: "Berhasil",
+        description: "Blog berhasil dibuat",
+      });
 
-      alert("Blog updated successfully!");
       router.push("/dashboard/blog-article/list");
     } catch (error) {
-      console.error("Error updating blog:", error);
-      alert("An error occurred while updating the blog.");
+      toast({
+        title: "Gagal",
+        description: "Terjadi kesalahan saat memperbarui blog",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -174,6 +198,18 @@ export default function EditForm() {
       reader.onerror = (error) => reject(error);
     });
   }
+
+  const extractImageUrlsFromContent = (content: string): string[] => {
+    const imgRegex = /<img src="([^"]+)"/g;
+    let match: RegExpExecArray | null;
+    const matches: string[] = [];
+
+    while ((match = imgRegex.exec(content)) !== null) {
+      matches.push(match[1]); // Ambil grup pertama (URL)
+    }
+
+    return matches;
+  };
 
   if (!initialData) {
     return (

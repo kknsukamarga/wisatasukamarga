@@ -111,12 +111,11 @@ export default function BlogForm({
         });
         return;
       }
-
-      const data = await response.json();
       toast({
         title: "Berhasil",
         description: "Blog berhasil dibuat",
       });
+
       form.reset();
     } catch (error) {
       console.error("Error submitting blog:", error);
