@@ -398,7 +398,7 @@ export default function ProductDetailPage({
                   onClick={() => handleProductClick(item.slug)}
                 >
                   <img
-                    src={item.image}
+                    src={item.image[0]}
                     alt={item.product_name}
                     className="w-full h-48 object-cover rounded-lg"
                   />
