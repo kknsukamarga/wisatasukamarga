@@ -19,6 +19,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -37,9 +38,48 @@ export function DataTableToolbar<TData>({
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (slugs: string[]) => {
+      const formData = new FormData();
+      formData.append("slugs", JSON.stringify(slugs));
+
+      const response = await fetch("/api/umkm", {
+        method: "DELETE",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(
+          error?.details || "Terjadi kesalahan saat menghapus item."
+        );
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Berhasil",
+        description: "Item berhasil dihapus.",
+      });
+      setIsDialogOpen(false);
+      table.resetRowSelection();
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    },
+    onError: () => {
+      toast({
+        title: "Gagal",
+        description: "Terjadi kesalahan saat menghapus item.",
+        variant: "destructive",
+      });
+      setIsDialogOpen(false);
+    },
+  });
+
+  const handleDelete = () => {
     const rows = table.getFilteredSelectedRowModel().rows;
 
     const arrayOfSlug = rows.map((row) => {
@@ -56,46 +96,7 @@ export function DataTableToolbar<TData>({
       return;
     }
 
-    setIsDeleting(true);
-
-    const formData = new FormData();
-    formData.append("slugs", JSON.stringify(arrayOfSlug));
-
-    try {
-      const response = await fetch("/api/umkm", {
-        method: "DELETE",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        toast({
-          title: "Gagal",
-          description: `Gagal menghapus: ${error.message}`,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Berhasil",
-        description: "Item berhasil dihapus.",
-      });
-      setIsDialogOpen(false);
-      table.resetRowSelection();
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    } catch (error) {
-      console.error("Error deleting items:", error);
-      toast({
-        title: "Gagal",
-        description: "Terjadi kesalahan saat menghapus item.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
+    mutate(arrayOfSlug);
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,7 +128,7 @@ export function DataTableToolbar<TData>({
     <div className="flex flex-wrap items-center justify-between">
       <div className="flex flex-1 flex-wrap items-center gap-2">
         <Input
-          placeholder="Search by product name or description..."
+          placeholder="Cari data..."
           value={search ?? ""}
           onChange={handleSearchChange}
           className="h-8 w-[250px] lg:w-[350px]"
@@ -164,9 +165,9 @@ export function DataTableToolbar<TData>({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Deleting..." : "Delete"}
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isPending}>
+              {isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

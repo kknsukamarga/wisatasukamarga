@@ -18,6 +18,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -80,7 +88,7 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
     try {
       let base64Images = [];
       if (values.image && values.image.length > 0) {
-        base64Images = await Promise.all(
+        const base64Images = await Promise.all(
           values.image.map(async (file: any) => await toBase64(file))
         );
       }
@@ -105,17 +113,15 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Gagal mengirim UMKM:", errorData);
         toast({
           title: "Gagal",
-          description: errorData.error || "Gagal mengirim data UMKM.",
+          description: `Gagal mengirim data UMKM : ${errorData?.error}`,
           variant: "destructive",
         });
         return;
       }
 
       const data = await response.json();
-      console.log("UMKM berhasil dibuat:", data);
 
       // Show success toast
       toast({
@@ -125,7 +131,6 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
 
       form.reset();
     } catch (error) {
-      console.error("Terjadi kesalahan saat mengirim data UMKM:", error);
       toast({
         title: "Gagal",
         description: "Terjadi kesalahan saat mengirim data UMKM.",
@@ -188,13 +193,20 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
                 <FormItem>
                   <FormLabel>Kategori</FormLabel>
                   <FormControl>
-                    <select
-                      {...field}
-                      className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring focus:ring-opacity-50"
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
                     >
-                      <option value="product">Product</option>
-                      <option value="service">Service</option>
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Pilih kategori" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="product">Produk</SelectItem>
+                          <SelectItem value="service">Jasa</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -260,7 +272,7 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
                   <FormControl>
                     <Input
                       type="text"
-                      placeholder="Masukkan nomor WhatsApp"
+                      placeholder="Masukkan nomor WhatsApp contoh : 0851125399812"
                       {...field}
                     />
                   </FormControl>

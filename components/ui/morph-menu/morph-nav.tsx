@@ -6,11 +6,7 @@ import Button from "./button";
 import styles from "./style.module.scss";
 import MorphMenu from "./morph-menu";
 
-export interface NavProps {
-  isLoggedIn: boolean;
-}
-
-const MorphNav = ({ isLoggedIn }: NavProps): JSX.Element => {
+const MorphNav = (): JSX.Element => {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [responsiveSize, setResponsiveSize] = useState({
     width: "80vw",
@@ -21,7 +17,7 @@ const MorphNav = ({ isLoggedIn }: NavProps): JSX.Element => {
   useEffect(() => {
     const calculateResponsiveSize = () => {
       const width = window.innerWidth > 768 ? "40vw" : "80vw";
-      const height = window.innerWidth > 768 ? "70vh" : "90vh";
+      const height = window.innerWidth > 768 ? "70vh" : "70vh";
       setResponsiveSize({ width, height });
     };
 
@@ -65,7 +61,7 @@ const MorphNav = ({ isLoggedIn }: NavProps): JSX.Element => {
         }}
       >
         <AnimatePresence>
-          {isActive && <MorphMenu isLoggedIn={isLoggedIn} />}
+          {isActive && <MorphMenu />}
         </AnimatePresence>
       </motion.div>
 

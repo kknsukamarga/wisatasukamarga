@@ -20,7 +20,6 @@ export function Toaster() {
   }, []);
 
   if (!hydrated) {
-    // Avoid rendering dynamic content until hydration is complete
     return null;
   }
 

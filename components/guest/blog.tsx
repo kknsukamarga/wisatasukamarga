@@ -21,8 +21,8 @@ export function BentoGridBlog({ articles }: { articles: Artikel[] }) {
               className="text-sm text-gray-600 mt-2 line-clamp-2"
               dangerouslySetInnerHTML={{
                 __html:
-                  articles[0].content.slice(0, 150) +
-                  (articles[0].content.length > 150 ? "..." : ""),
+                  article.content.slice(0, 150) +
+                  (article.content.length > 150 ? "..." : ""),
               }}
             />
           } // Potong deskripsi

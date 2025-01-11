@@ -26,6 +26,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -175,7 +176,27 @@ export default function EditForm() {
   }
 
   if (!initialData) {
-    return <p>Loading...</p>;
+    return (
+      <Card className="mx-auto w-full">
+        <CardHeader>
+          <Skeleton className=" h-8 w-1/3" />
+        </CardHeader>
+        <CardContent>
+          {Array.from({ length: 7 }).map((_, index) => (
+            <div
+              key={index}
+              className={`space-y-1 ${index == 0 ? "" : "mt-10"} `}
+            >
+              <Skeleton className=" h-6 w-1/2" />
+              <Skeleton className=" h-10 w-full" />
+            </div>
+          ))}
+          <div className="flex justify-end mt-12">
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

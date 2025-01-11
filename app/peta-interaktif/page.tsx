@@ -8,7 +8,7 @@ export default async function Page() {
 
   return (
     <main className="bg-white">
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar />
       <div className="flex flex-col items-center justify-center h-screen">
         <h1 className="text-4xl font-bold">Peta Interaktif</h1>
         <p className="text-lg text-gray-500">Coming soon...</p>
