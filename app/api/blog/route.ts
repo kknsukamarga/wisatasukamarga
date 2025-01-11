@@ -368,11 +368,37 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
+    // Step 1: Hapus cover image dari Cloudinary
     const publicId = blog.coverImage.split("/").pop()?.split(".")[0];
     if (publicId) {
       await cloudinary.uploader.destroy(`blogs/${publicId}`);
     }
 
+    // Step 2: Hapus semua gambar yang ada di konten React Quill
+    const extractImageUrlsFromContent = (content: string): string[] => {
+      const imgRegex = /<img src="([^"]+)"/g;
+      let match: RegExpExecArray | null;
+      const matches: string[] = [];
+
+      while ((match = imgRegex.exec(content)) !== null) {
+        matches.push(match[1]); // Ambil grup pertama (URL gambar)
+      }
+
+      return matches;
+    };
+
+    const contentImageUrls = extractImageUrlsFromContent(blog.content);
+
+    for (const imageUrl of contentImageUrls) {
+      const contentImagePublicId = imageUrl.split("/").pop()?.split(".")[0];
+      if (contentImagePublicId) {
+        await cloudinary.uploader.destroy(
+          `blogs/content-images/${contentImagePublicId}`
+        );
+      }
+    }
+
+    // Step 3: Hapus blog dari database
     await prisma.blog.delete({
       where: { slug },
     });
