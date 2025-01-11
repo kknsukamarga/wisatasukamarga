@@ -43,12 +43,14 @@ export default function BlogListPage() {
           Here&apos;s a list of your blogs!
         </p>
       </div>
-      <DataTable
-        data={data}
-        columns={columns}
-        isLoading={loading}
-        error={error}
-      />
+      <div className="relative">
+        <DataTable
+          data={data}
+          columns={columns}
+          isLoading={loading}
+          error={error}
+        />
+      </div>
     </div>
   );
 }

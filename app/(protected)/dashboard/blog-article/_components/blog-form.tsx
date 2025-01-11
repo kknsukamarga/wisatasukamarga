@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import * as z from "zod";
@@ -60,6 +61,7 @@ export default function BlogForm({
   initialData: any | null;
   pageTitle: string;
 }) {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -102,18 +104,27 @@ export default function BlogForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Failed to submit blog:", errorData);
-        alert(errorData.error || "Failed to submit blog.");
+        toast({
+          title: "Gagal",
+          description: `Gagal membuat blog : ${errorData?.error}`,
+          variant: "destructive",
+        });
         return;
       }
 
       const data = await response.json();
-      console.log("Blog created successfully:", data);
-      alert("Blog created successfully!");
+      toast({
+        title: "Berhasil",
+        description: "Blog berhasil dibuat",
+      });
       form.reset();
     } catch (error) {
       console.error("Error submitting blog:", error);
-      alert("An error occurred while submitting the blog.");
+      toast({
+        title: "Gagal",
+        description: "Terjadi kesalahan saat membuat blog",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
