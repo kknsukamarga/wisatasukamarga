@@ -284,21 +284,18 @@ export async function PUT(req: NextRequest) {
     for (const match of matches) {
       const base64Image = match[1];
 
-      // Upload each base64 image to Cloudinary
       const imageResponse = await cloudinary.uploader.upload(base64Image, {
         folder: "blogs/content-images",
       });
 
       const imageUrl = imageResponse.secure_url;
 
-      // Replace base64 string with the Cloudinary URL in content and inject CSS class
       updatedContent = updatedContent.replace(
         match[0],
         `<img src="${imageUrl}" class="img-resize-blog">`
       );
     }
 
-    // Step 4: Generate slug
     let newSlug = title
       .toLowerCase()
       .replace(/\s+/g, "-")
@@ -315,7 +312,6 @@ export async function PUT(req: NextRequest) {
       counter++;
     }
 
-    // Step 5: Update the blog in the database
     const updatedBlog = await prisma.blog.update({
       where: { slug },
       data: {
@@ -368,20 +364,18 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
-    // Step 1: Hapus cover image dari Cloudinary
     const publicId = blog.coverImage.split("/").pop()?.split(".")[0];
     if (publicId) {
       await cloudinary.uploader.destroy(`blogs/${publicId}`);
     }
 
-    // Step 2: Hapus semua gambar yang ada di konten React Quill
     const extractImageUrlsFromContent = (content: string): string[] => {
       const imgRegex = /<img src="([^"]+)"/g;
       let match: RegExpExecArray | null;
       const matches: string[] = [];
 
       while ((match = imgRegex.exec(content)) !== null) {
-        matches.push(match[1]); // Ambil grup pertama (URL gambar)
+        matches.push(match[1]);
       }
 
       return matches;
@@ -398,7 +392,6 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
-    // Step 3: Hapus blog dari database
     await prisma.blog.delete({
       where: { slug },
     });

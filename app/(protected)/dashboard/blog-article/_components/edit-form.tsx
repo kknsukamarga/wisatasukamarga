@@ -292,13 +292,47 @@ export default function EditForm() {
                       onChange={field.onChange}
                       theme="snow"
                       modules={{
-                        toolbar: [
-                          ["bold", "italic", "underline"],
-                          ["blockquote", "code-block"],
-                          [{ list: "ordered" }, { list: "bullet" }],
-                          ["link", "image"],
-                        ],
+                        toolbar: {
+                          container: [
+                            [{ header: "1" }, { header: "2" }],
+                            [{ size: [] }],
+                            [
+                              "bold",
+                              "italic",
+                              "underline",
+                              "strike",
+                              "blockquote",
+                            ],
+                            [
+                              { list: "ordered" },
+                              { list: "bullet" },
+                              { indent: "-1" },
+                              { indent: "+1" },
+                            ],
+                            ["link", "image"],
+                          ],
+                        },
+                        clipboard: {
+                          matchVisual: false,
+                        },
                       }}
+                      formats={[
+                        "header",
+                        "font",
+                        "size",
+                        "bold",
+                        "italic",
+                        "underline",
+                        "strike",
+                        "blockquote",
+                        "list",
+                        "bullet",
+                        "indent",
+                        "link",
+                        "image",
+                        "video",
+                        "code-block",
+                      ]}
                       className="max-w-screen-2xl"
                     />
                   </FormControl>

@@ -36,7 +36,6 @@ function BreadcrumbBlog({ slug }: { slug: string }) {
   );
 }
 
-// Fungsi untuk mendapatkan blog berdasarkan slug
 async function getBlogBySlug(slug: string) {
   const blog = await prisma.blog.findUnique({
     where: { slug },
@@ -48,8 +47,8 @@ async function getBlogBySlug(slug: string) {
 
   return {
     ...blog,
-    createdAt: blog.createdAt.toISOString(), // Konversi DateTime ke ISO string
-    updatedAt: blog.updatedAt?.toISOString(), // Konversi updatedAt jika ada
+    createdAt: blog.createdAt.toISOString(),
+    updatedAt: blog.updatedAt?.toISOString(), 
   };
 }
 
