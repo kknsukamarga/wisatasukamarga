@@ -32,27 +32,27 @@ import { useToast } from "@/hooks/use-toast";
 const MAX_FILE_SIZE = 5000000;
 
 const formSchema = z.object({
-  title: z.string().min(2, { message: "Title must be at least 2 characters." }),
+  title: z.string().min(2, { message: "Title minimal 2 karakter." }),
   coverImage: z
     .any()
     .refine((value) => {
       if (typeof value === "string" && value.startsWith("http")) return true;
       if (Array.isArray(value) && value.length > 0) return true;
       return false;
-    }, "A cover image is required.")
+    }, "Gambar cover diperlukan.")
     .refine((value) => {
       if (typeof value === "string" && value.startsWith("http")) return true;
       if (Array.isArray(value) && value[0]?.size <= MAX_FILE_SIZE) return true;
       return false;
-    }, `Cover image size must not exceed 5MB.`),
+    }, `Ukuran gambar cover tidak boleh melebihi 5MB.`),
   content: z
     .string()
-    .min(10, { message: "Content must be at least 10 characters." }),
+    .min(10, { message: "Konten minimal memiliki 10 karakter." }),
   author: z
     .string()
-    .min(2, { message: "Author name must be at least 2 characters." }),
+    .min(2, { message: "Nama pembuat minimal memiliki 2 karakter." }),
   category: z.enum(["TEMPAT_WISATA", "KARYA_UMKM"], {
-    errorMap: () => ({ message: "Please select a valid category." }),
+    errorMap: () => ({ message: "Mohon pilih kategori yang valid." }),
   }),
 });
 
@@ -342,7 +342,7 @@ export default function EditForm() {
             />
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
-                {loading ? "Updating..." : "Update Blog"}
+                {loading ? "Mengupdate.." : "Update Blog"}
               </Button>
             </div>
           </form>

@@ -34,23 +34,23 @@ const MAX_FILE_SIZE = 5000000;
 
 const formSchema = z.object({
   title: z.string().min(2, {
-    message: "Title must be at least 2 characters.",
+    message: "Title minimal 2 karakter.",
   }),
   coverImage: z
     .any()
-    .refine((files) => files?.length > 0, "A cover image is required.")
+    .refine((files) => files?.length > 0, "Gambar cover diperlukan.")
     .refine(
       (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Cover image size must not exceed 5MB.`
+      `Ukuran gambar cover tidak boleh melebihi 5MB.`
     ),
   content: z.string().min(10, {
-    message: "Content must be at least 10 characters.",
+    message: "Konten minimal memiliki 10 karakter.",
   }),
   author: z.string().min(2, {
-    message: "Author name must be at least 2 characters.",
+    message: "Nama pembuat minimal memiliki 2 karakter.",
   }),
   category: z.enum(["TEMPAT_WISATA", "KARYA_UMKM"], {
-    errorMap: () => ({ message: "Please select a valid category." }),
+    errorMap: () => ({ message: "Mohon pilih kategori yang valid." }),
   }),
 });
 
@@ -118,7 +118,6 @@ export default function BlogForm({
 
       form.reset();
     } catch (error) {
-      console.error("Error submitting blog:", error);
       toast({
         title: "Gagal",
         description: "Terjadi kesalahan saat membuat blog",
@@ -275,7 +274,7 @@ export default function BlogForm({
             />
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
-                {loading ? "Submitting..." : "Submit Blog"}
+                {loading ? "Menambahkan.." : "Tambah Blog"}
               </Button>
             </div>
           </form>
