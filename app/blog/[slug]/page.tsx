@@ -70,13 +70,11 @@ export default async function BlogDetailPage({
 
       <main className="mx-auto px-3 py-12 bg-white">
         {params.slug && <BreadcrumbBlog slug={params.slug} />}
-        {/* Detail Blog */}
         <article className="max-w-6xl mx-auto">
           <div className="space-y-6 my-5 flex flex-col items-center justify-center">
             <Badge className="rounded-md bg-orange-secondary/70 text-gray">
               WISATA
             </Badge>
-            {/* Judul */}
             <h1
               className={`text-5xl font-bold text-gray-900 text-center ${Questa.className}`}
             >
@@ -91,8 +89,6 @@ export default async function BlogDetailPage({
               })}
             </p>
           </div>
-
-          {/* Gambar Cover */}
           <div className="relative h-[500px] w-auto rounded-lg overflow-auto">
             <img
               src={blog.coverImage}
@@ -101,19 +97,14 @@ export default async function BlogDetailPage({
             />
           </div>
 
-          {/* Judul dan Konten */}
-
           <div className="relative flex flex-col-reverse md:flex-row">
             <div className="md:sticky top-16 lg:top-12 flex-shrink-0 h-fit">
               <div className="p-3 w-full md:w-36 flex flex-col items-center gap-3">
                 <p className="text-sm mb-2 font-semibold">Bagikan Artikel</p>
-
                 <Sharelink />
               </div>
             </div>
-            {/* Main Content */}
             <div className="prose prose-lg text-gray-800 flex-grow my-5">
-              {/* Konten */}
               <div
                 dangerouslySetInnerHTML={{ __html: blog.content }}
                 className="text-justify"
