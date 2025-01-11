@@ -99,7 +99,7 @@ function Blog() {
       setLoading(true);
 
       try {
-        const response = await fetch("/api/blog?mode=all&limit=4"); // Gunakan parameter mode dan limit
+        const response = await fetch("/api/blog?mode=get4&limit=4"); // Gunakan parameter mode dan limit
         const data = await response.json();
 
         if (data.articles) {

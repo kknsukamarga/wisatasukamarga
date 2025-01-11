@@ -48,6 +48,27 @@ export const DataKegiatanFakultas: KegiatanFakultas[] = [
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iste, nulla nihil neque consequatur.",
     backgroundClass: "bg-yellow-500 bg-cover",
   },
+  {
+    date: "10 Agustus 2024",
+    title: "Info Kegiatan SLurd 5",
+    description:
+      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iste, nulla nihil neque consequatur.",
+    backgroundClass: "bg-yellow-500 bg-cover",
+  },
+  {
+    date: "10 Agustus 2024",
+    title: "Info Kegiatan SLurd 5",
+    description:
+      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iste, nulla nihil neque consequatur.",
+    backgroundClass: "bg-yellow-500 bg-cover",
+  },
+  {
+    date: "10 Agustus 2024",
+    title: "Info Kegiatan SLurd 5",
+    description:
+      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iste, nulla nihil neque consequatur.",
+    backgroundClass: "bg-yellow-500 bg-cover",
+  },
 ];
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -89,22 +110,23 @@ function HighlightUMKM() {
         </p>
       </div>
 
-      <div className="justify-between items-center w-full absolute translate-y-[-300px] hidden md:flex">
+      <div className="items-center w-full relative translate-y-[-150px] hidden md:flex">
         <Image
           src="/umkm-kiri.png"
           alt="umkm-kiri"
           // layout="fill"
           width={320}
           height={320}
-          className="z-20"
+          className="z-20 absolute left-0"
         />
+
         <Image
           src="/umkm-kanan.png"
           alt="umkm-kanan"
           // layout="fill"
           width={320}
           height={320}
-          className="z-20"
+          className="z-20 absolute right-0"
         />
       </div>
 
@@ -112,7 +134,7 @@ function HighlightUMKM() {
         <Image
           src="/umkm-pattern.png"
           alt="umkm-pattern"
-          className="absolute inset-0 z-10"
+          className="absolute inset-0 z-10 w-full h-full object-cover"
           layout="fill"
         />
 
@@ -137,7 +159,7 @@ function HighlightUMKM() {
                 <Card
                   className={`xl:w-[300px] cursor-grab md:w-[300px] lg:w-[310px] md:h-[550px] w-[280px] h-[500px] xl:h-[400px] overflow-hidden rounded-lg relative bg-cover font-montserrat bg-white`}
                 >
-                  <CardContent className="p-0 w-full h-full text-white">
+                  <CardContent className="p-0 w-full h-[45%] text-white">
                     <Image
                       src={
                         "https://awsimages.detik.net.id/community/media/visual/2023/04/10/ciri-ciri-kopi-berkualitas-1.jpeg"
@@ -145,11 +167,11 @@ function HighlightUMKM() {
                       alt="kopi pai"
                       width={1000}
                       height={1000}
-                      className="w-full h-full object-fit rounded-lg p-2 object-center"
+                      className="w-full h-full object-cover rounded-lg p-2 object-center"
                     />
                   </CardContent>
 
-                  <CardContent className="absolute bottom-0 flex flex-col items-start justify-center bg-white py-4">
+                  <CardContent className="flex flex-col items-start justify-center bg-white py-4">
                     <h3 className="font-bold text-lg">Kopi Lampung Suoh</h3>
 
                     <p className="mt-2 text-base text-justify">
