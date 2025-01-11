@@ -9,7 +9,9 @@ export const publicRoutes = [
   "/wisata",
   "/umkm",
   "/blogs",
-  "/blog/*",
+  "/blog/*", // Semua route di bawah /blog/
+  "/umkm/*", // Semua route di bawah /umkm/
+  "/wisata/*", // Semua route di bawah /wisata/
   "/peta-interaktif",
   "/api/blog",
   "/api/umkm",

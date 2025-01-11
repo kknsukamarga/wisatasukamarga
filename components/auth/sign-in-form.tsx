@@ -1,24 +1,30 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signInAction } from "@/lib/actions";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "../SubmitButton";
+import { useToast } from "@/hooks/use-toast";
 
 export function SignInForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
+  const { toast } = useToast();
+
   const handleFormSubmit = async (formData: FormData) => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const res = await signInAction({ email, password });
 
     if (res.error) {
-      alert(res.error);
+      toast({
+        title: "Error",
+        description: res.error,
+        variant: "destructive",
+      });
       return;
     }
 
@@ -32,9 +38,9 @@ export function SignInForm({
       action={handleFormSubmit}
     >
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Login to your account</h1>
+        <h1 className="text-2xl font-bold">Login Admin Panel</h1>
         <p className="text-balance text-sm text-muted-foreground">
-          Enter your email below to login to your account
+          Masukan email dan password untuk login
         </p>
       </div>
       <div className="grid gap-6">
@@ -44,7 +50,7 @@ export function SignInForm({
             id="email"
             type="email"
             name="email"
-            placeholder="m@example.com"
+            placeholder="m@gmail.com"
             required
           />
         </div>

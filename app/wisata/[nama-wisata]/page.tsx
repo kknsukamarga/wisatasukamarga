@@ -102,7 +102,9 @@ export default async function Page({ params }: PageProps) {
 
       <div className="md:px-10 px-2 py-20">
         <h1 className="text-4xl font-bold mb-4">Deskripsi {data.name}</h1>
-        <p className="text-lg mb-6 text-justify">{data.description}</p>
+        <p className="text-sm md:text-lg mb-6 text-justify">
+          {data.description}
+        </p>
       </div>
 
       <div className="py-10">
