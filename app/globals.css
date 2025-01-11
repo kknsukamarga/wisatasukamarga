@@ -23,6 +23,16 @@ html.lenis body {
   width: 0px;
 }
 
+.img-resize-blog {
+  max-width: 300px;
+  height: 300px;
+  object-fit: cover;
+}
+
+.ql-toolbar.ql-snow:not(:has(+ .ql-container.ql-snow)) {
+  display: none;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

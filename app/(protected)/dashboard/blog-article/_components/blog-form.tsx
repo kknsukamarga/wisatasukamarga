@@ -19,20 +19,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState, useCallback, useRef } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import * as z from "zod";
-import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import ReactQuill, { Quill } from "react-quill";
-import imageResize from "quill-image-resize-module-react";
 
+// Gunakan dynamic import untuk ReactQuill
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
-import { handlers } from "@/auth";
 
-Quill.register("modules/imageResize", imageResize);
 const MAX_FILE_SIZE = 5000000;
+
 const formSchema = z.object({
   title: z.string().min(2, {
     message: "Title must be at least 2 characters.",
@@ -62,9 +60,7 @@ export default function BlogForm({
   initialData: any | null;
   pageTitle: string;
 }) {
-  const quillRef = useRef(null);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -107,28 +103,17 @@ export default function BlogForm({
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Failed to submit blog:", errorData);
-        toast({
-          title: "Gagal",
-          description: errorData.error || "Gagal mengirim data blog.",
-          variant: "destructive",
-        });
+        alert(errorData.error || "Failed to submit blog.");
         return;
       }
 
       const data = await response.json();
       console.log("Blog created successfully:", data);
-      toast({
-        title: "Berhasil",
-        description: "Blog berhasil dikirim.",
-      });
+      alert("Blog created successfully!");
       form.reset();
     } catch (error) {
       console.error("Error submitting blog:", error);
-      toast({
-        title: "Gagal",
-        description: "Gagal mengirim data blog.",
-        variant: "destructive",
-      });
+      alert("An error occurred while submitting the blog.");
     } finally {
       setLoading(false);
     }
@@ -142,64 +127,6 @@ export default function BlogForm({
       reader.onerror = (error) => reject(error);
     });
   }
-
-  const initializeQuill = (el: any) => {
-    if (el && !quillRef.current) {
-      quillRef.current = el.getEditor();
-    }
-  };
-
-  const imageHandler = useCallback(() => {
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
-    input.click();
-
-    input.onchange = async () => {
-      if (input !== null && input.files !== null) {
-        const file = input.files[0];
-
-        try {
-          // Upload file ke Cloudinary
-          const url = await uploadToCloudinary(file);
-          console.log("Uploaded image URL:", url);
-
-          // Pastikan quillRef tidak null sebelum mencoba mengaksesnya
-          if (quillRef?.current) {
-            // @ts-ignore
-            const range = quillRef.current.getSelection(true);
-            // @ts-ignore
-            quillRef.current.insertEmbed(range.index, "image", url);
-          } else {
-            console.error(
-              "quillRef is null. Make sure the editor is initialized."
-            );
-          }
-        } catch (error) {
-          console.error(
-            "Error uploading image or inserting image in editor:",
-            error
-          );
-        }
-      } else {
-        console.warn("No file selected or input is null.");
-      }
-    };
-  }, []);
-
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "contentimage");
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
-      { method: "POST", body: formData }
-    );
-    const data = await res.json();
-    const url = data.url;
-
-    return url;
-  };
 
   return (
     <Card className="mx-auto w-full">
@@ -250,16 +177,13 @@ export default function BlogForm({
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <ReactQuill
-                      ref={initializeQuill}
+                      value={field.value}
+                      onChange={field.onChange}
                       theme="snow"
                       modules={{
-                        imageResize: {
-                          parchment: Quill.import("parchment"),
-                          modules: ["Resize", "DisplaySize"],
-                        },
                         toolbar: {
                           container: [
-                            [{ header: "1" }, { header: "2" }, { font: [] }],
+                            [{ header: "1" }, { header: "2" }],
                             [{ size: [] }],
                             [
                               "bold",
@@ -274,13 +198,8 @@ export default function BlogForm({
                               { indent: "-1" },
                               { indent: "+1" },
                             ],
-                            ["link", "image", "video"],
-                            ["code-block"],
-                            ["clean"],
+                            ["link", "image"],
                           ],
-                          handlers: {
-                            image: imageHandler,
-                          },
                         },
                         clipboard: {
                           matchVisual: false,
@@ -303,8 +222,6 @@ export default function BlogForm({
                         "video",
                         "code-block",
                       ]}
-                      value={field.value}
-                      onChange={field.onChange}
                       className="max-w-screen-2xl"
                     />
                   </FormControl>

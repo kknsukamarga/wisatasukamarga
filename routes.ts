@@ -10,6 +10,7 @@ export const publicRoutes = [
   "/umkm",
   "/blogs",
   "/peta-interaktif",
+  "/api/blog",
 ];
 
 export const authRoutes = ["/sign-in"];
