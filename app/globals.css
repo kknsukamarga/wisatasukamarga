@@ -325,11 +325,16 @@ html.lenis body {
   height: 300px; /* Atur tinggi sesuai kebutuhan */
 }
 
-img {
-  display: block; /* Menghindari space di bawah gambar */
-  margin: 0 auto; /* Membuat gambar berada di tengah secara horizontal */
-  max-width: 100%; /* Membatasi lebar gambar */
-  height: auto; /* Menjaga proporsi gambar */
-  object-fit: contain; /* Menyesuaikan konten gambar */
-  object-position: center; /* Posisi gambar di tengah */
+/* Custom styles for Swiper navigation */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #cfcbba !important;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  color: #cfcbba; /* Warna saat hover */
+  opacity: 0.9; /* Opacity saat hover */
+  transition: all;
+  transition-duration: 0.3s ease; /* Durasi transisi */
 }
