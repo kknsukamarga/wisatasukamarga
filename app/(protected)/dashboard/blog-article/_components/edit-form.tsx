@@ -175,14 +175,14 @@ export default function EditForm() {
       }
       toast({
         title: "Berhasil",
-        description: "Blog berhasil dibuat",
+        description: "Blog sudah diupdate",
       });
 
       router.push("/dashboard/blog-article/list");
     } catch (error) {
       toast({
         title: "Gagal",
-        description: "Terjadi kesalahan saat memperbarui blog",
+        description: "Terjadi kesalahan saat mengupdate blog",
         variant: "destructive",
       });
     } finally {
