@@ -26,14 +26,17 @@ const DeleteConfirmModal = ({
         <DialogHeader>
           <DialogTitle>Konfirmasi Hapus</DialogTitle>
         </DialogHeader>
+
         <p>
           Apakah Anda yakin ingin menghapus item ini? Tindakan ini tidak dapat
           dibatalkan.
         </p>
+
         <DialogFooter>
           <Button variant="ghost" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
+
           <Button variant="destructive" onClick={onConfirm} disabled={loading}>
             {loading ? "Menghapus..." : "Hapus"}
           </Button>
