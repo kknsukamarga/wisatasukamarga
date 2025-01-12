@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
@@ -59,36 +60,37 @@ const ArtikelSkeleton: React.FC = () => (
   </div>
 );
 
+const fetchArtikels = async () => {
+  const response = await fetch("/api/blog?mode=all&limit=3");
+
+  if (!response.ok) {
+    throw new Error("Gagal mengambil data artikel");
+  }
+
+  return response.json();
+};
+
 const ArtikelTerbaru: React.FC = () => {
-  const [artikels, setArtikels] = useState<Artikel[]>([]);
-  const router = useRouter(); // Router untuk navigasi
-  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  useEffect(() => {
-    // Fetch data dari API
-    const fetchArtikels = async () => {
-      setLoading(true);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["artikelTerbaru"],
+    queryFn: fetchArtikels,
+  });
 
-      try {
-        const response = await fetch("/api/blog?mode=all&limit=3"); // Gunakan parameter mode dan limit
-        const data = await response.json();
-
-        if (data.articles) {
-          setArtikels(data.articles); // Pastikan Anda mengambil `articles` dari response API
-        }
-      } catch (error) {
-        console.error("Gagal mengambil data artikel", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchArtikels();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return <ArtikelSkeleton />;
   }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500">
+        Terjadi kesalahan saat mengambil data artikel.
+      </div>
+    );
+  }
+
+  const artikels: Artikel[] = data?.articles || [];
 
   return (
     <div className="max-w-screen-lg mx-auto py-10 px-4">

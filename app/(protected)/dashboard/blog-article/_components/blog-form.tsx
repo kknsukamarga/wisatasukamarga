@@ -22,6 +22,7 @@ import {
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -62,7 +63,6 @@ export default function BlogForm({
   pageTitle: string;
 }) {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,10 +75,9 @@ export default function BlogForm({
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-
-    try {
+  // Mutation for POST request
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
       let base64Image = "";
 
       if (values.coverImage && values.coverImage.length > 0) {
@@ -104,29 +103,26 @@ export default function BlogForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        toast({
-          title: "Gagal",
-          description: `Gagal membuat blog : ${errorData?.error}`,
-          variant: "destructive",
-        });
-        return;
+        throw new Error(errorData?.error || "Failed to create blog.");
       }
-      toast({
-        title: "Berhasil",
-        description: "Blog berhasil dibuat",
-      });
 
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Berhasil!",
+        description: "Blog berhasil dibuat.",
+      });
       form.reset();
-    } catch (error) {
+    },
+    onError: (error: any) => {
       toast({
         title: "Gagal",
-        description: "Terjadi kesalahan saat membuat blog",
+        description: error.message || "Terjadi kesalahan saat membuat blog.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
-    }
-  }
+    },
+  });
 
   function toBase64(file: any) {
     return new Promise<string>((resolve, reject) => {
@@ -146,7 +142,10 @@ export default function BlogForm({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit((values) => mutate(values))}
+            className="space-y-8"
+          >
             <FormField
               control={form.control}
               name="title"
@@ -273,8 +272,8 @@ export default function BlogForm({
               )}
             />
             <div className="flex justify-end w-full">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Menambahkan.." : "Tambah Blog"}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Menambahkan.." : "Tambah Blog"}
               </Button>
             </div>
           </form>

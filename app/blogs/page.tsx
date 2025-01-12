@@ -8,7 +8,7 @@ import SemuaArtikel from "@/components/guest/blog/SemuaArtikel";
 export default async function Page() {
   return (
     <main className="bg-white">
-      <Navbar />**
+      <Navbar />
       <Hero />
       <ArtikelTerbaru />
       <SemuaArtikel />
