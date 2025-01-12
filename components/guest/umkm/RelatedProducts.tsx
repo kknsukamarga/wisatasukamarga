@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import SkeletonLoader from "./SkeletonLoader";
 
 const RelatedProductsSkeleton = ({ items = 4 }: { items?: number }) => (
   <div className="mt-8 bg-orange-secondary/90 p-4 rounded-lg">
@@ -29,32 +29,27 @@ const RelatedProductsSkeleton = ({ items = 4 }: { items?: number }) => (
     </div>
   </div>
 );
+const fetchRelatedProducts = async () => {
+  const response = await fetch("/api/umkm");
+  if (!response.ok) {
+    throw new Error("Failed to fetch related products");
+  }
+  return response.json();
+};
 
 export default function RelatedProducts() {
-  const [relatedProducts, setRelatedProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(4);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const itemsPerPage = 4;
 
-  useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      try {
-        const response = await fetch("/api/umkm");
-        if (!response.ok) {
-          throw new Error("Failed to fetch related products");
-        }
-        const products = await response.json();
-        setRelatedProducts(products || []);
-      } catch (err) {
-        setError((err as Error).message || "Unknown error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRelatedProducts();
-  }, []);
+  const {
+    data: relatedProducts = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["relatedProducts"],
+    queryFn: fetchRelatedProducts,
+  });
 
   const totalPages = Math.ceil(relatedProducts.length / itemsPerPage);
   const paginatedData = relatedProducts.slice(
@@ -70,12 +65,16 @@ export default function RelatedProducts() {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
-  if (loading) {
+  if (isLoading) {
     return <RelatedProductsSkeleton />;
   }
 
-  if (error) {
-    return <div className="text-red-500 text-center">{error}</div>;
+  if (isError) {
+    return (
+      <div className="text-red-500 text-center">
+        {error instanceof Error ? error.message : "Unknown error occurred"}
+      </div>
+    );
   }
 
   return (

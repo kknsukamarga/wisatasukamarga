@@ -1,46 +1,54 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import SkeletonLoader from "./SkeletonLoader";
 import BreadcrumbBlog from "./BreadcrumbBlog";
+
+const fetchProduct = async (slug: string) => {
+  const response = await fetch(`/api/umkm?slug=${slug}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch product details");
+  }
+  return response.json();
+};
+
 export default function ProductDetails({ slug }: { slug: string }) {
-  const [product, setProduct] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
+  const {
+    data: product,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["product", slug],
+    queryFn: () => fetchProduct(slug),
+  });
+
+  // Update selectedImage when product data changes
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(`/api/umkm?slug=${slug}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch product details");
-        }
-        const productData = await response.json();
-        setProduct(productData);
-        setSelectedImage(productData.image?.[0] || "");
-      } catch (err) {
-        setError((err as Error).message || "Unknown error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (product && product.image?.length > 0) {
+      setSelectedImage(product.image[0]);
+    }
+  }, [product]);
 
-    fetchProduct();
-  }, [slug]);
-
-  if (loading) {
+  if (isLoading) {
     return <SkeletonLoader />;
   }
 
-  if (error) {
-    return <div className="text-red-500 text-center">{error}</div>;
+  if (isError) {
+    return (
+      <div className="text-red-500 text-center">
+        {error instanceof Error ? error.message : "Unknown error occurred"}
+      </div>
+    );
   }
 
   return (
     <div className="p-4 md:p-10 xl:py-15 xl:px-40">
       <BreadcrumbBlog slug={slug} />
-      <div className="flex  flex-col lg:flex-row mt-10">
+      <div className="flex flex-col lg:flex-row mt-10">
         <div className="lg:w-1/2">
           <img
             src={selectedImage}

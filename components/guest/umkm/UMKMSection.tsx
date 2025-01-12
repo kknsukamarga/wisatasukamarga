@@ -1,41 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import UMKMGrid from "@/components/guest/umkm/UMKMGrid";
 import SkeletonGrid from "@/components/guest/umkm/SkeletonGrid";
 
+const fetchUMKM = async () => {
+  const response = await fetch("/api/umkm", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch UMKM data");
+  }
+
+  return response.json();
+};
+
 export default function UMKMSection() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["umkmData"],
+    queryFn: fetchUMKM,
+  });
 
-  useEffect(() => {
-    const fetchUMKM = async () => {
-      try {
-        const response = await fetch("/api/umkm", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch UMKM data");
-        }
-
-        const fetchedData = await response.json();
-        setData(fetchedData || []);
-      } catch (err) {
-        setError((err as Error).message || "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUMKM();
-  }, []);
-
-  if (loading)
+  if (isLoading)
     return (
       <section className="container mx-auto p-4 py-10">
         <header className="text-center mb-8">
@@ -49,14 +39,15 @@ export default function UMKMSection() {
         <SkeletonGrid itemsPerPage={8} />
       </section>
     );
-  if (error)
+
+  if (isError)
     return (
       <div className="text-center p-6">
         <h2 className="text-2xl font-bold text-red-500 mt-4">
           Oops! Sepertinya ada yang salah.
         </h2>
         <p className="text-gray-600 mt-2">
-          Silakan coba lagi nanti atau hubungi dukungan jika masalah berlanjut.
+          {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
     );
