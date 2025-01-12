@@ -1,38 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import EditForm from "../../_components/edit-dayatarik";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+
+const fetchFasilitasWisataData = async (id: string) => {
+  const response = await fetch(`/api/fasilitas-wisata?id=${id}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  const data = await response.json();
+  return data[0];
+};
 
 export default function FasilitasWisataEditPage() {
   const { id } = useParams();
-  const [initialData, setInitialData] = useState(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchFasilitasWisataData() {
-      try {
-        const response = await fetch(`/api/fasilitas-wisata?id=${id}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const data = await response.json();
-        setInitialData(data[0]); // Ensure the API returns fasilitasWisata with related wisata
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    }
+  const {
+    data: initialData,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["fasilitasWisata", id],
+    queryFn: () => fetchFasilitasWisataData(id as string),
+  });
 
-    if (id) {
-      fetchFasilitasWisataData();
-    }
-  }, [id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
@@ -60,7 +55,7 @@ export default function FasilitasWisataEditPage() {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
-          <h1 className="text-red-500">Error: {error}</h1>
+          <h1 className="text-red-500">Error: {error.message}</h1>
         </CardHeader>
       </Card>
     );
@@ -78,7 +73,11 @@ export default function FasilitasWisataEditPage() {
 
   return (
     <div>
-      <EditForm initialData={initialData} pageTitle="Edit Daya Tarik Wisata" />
+      <EditForm
+        initialData={initialData}
+        pageTitle="Edit Daya Tarik Wisata"
+        id={id as string}
+      />
     </div>
   );
 }

@@ -1,27 +1,33 @@
 "use client";
+
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import DeleteConfirmModal from "../../_components/delete-pop-up";
-import { revalidatePath } from "next/cache";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 interface WisataData {
-  id: string; // Ensure 'slug' exists as a property
+  id: string; // Ensure 'id' exists as a property
   [key: string]: any; // Allow other properties dynamically
 }
 
@@ -31,53 +37,59 @@ interface DataTableRowActionsProps {
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const { id } = row.original;
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  // Identifier for the Wisata being deleted
+  const [isDialogOpen, setDialogOpen] = useState(false);
 
-  const handleDelete = async () => {
-    setIsOpen(true); // Open the modal
-  };
-  const confirmDelete = async () => {
-    if (!id) {
-      alert("Error: ID not found for this item.");
-      return;
-    }
-
-    setLoading(true); // Start loading state
-
-    try {
+  // useMutation for handling delete
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (id: string) => {
       const response = await fetch(`/api/fasilitas-wisata?id=${id}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete Wisata.");
+        const errorData = await response.json();
+        throw new Error(errorData?.details || "Failed to delete Wisata.");
       }
 
-      alert("Wisata deleted successfully.");
-      revalidatePath("/dashboard/wisata/list-dayatarik");
-      // Optionally refresh data or perform navigation
-      onClose();
-    } catch (error) {
-      alert("An error occurred while deleting the Wisata.");
-    } finally {
-      setLoading(false); // End loading state
-      setIsOpen(false); // Close the modal
-    }
-  };
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "Wisata successfully deleted.",
+      });
 
-  const onClose = () => setIsOpen(false);
+      setTimeout(() => {
+        window.location.reload(); // Refresh the page or data
+      }, 1000);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error!",
+        description:
+          error.message || "Failed to delete Wisata. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      setDialogOpen(false); // Close the dialog after success or error
+    },
+  });
 
-  const onOpen = (id: string) => {
-    setIsOpen(true); // Open the dialog
+  const handleDelete = () => {
+    mutate(id); // Trigger the mutation
   };
 
   const handleEdit = () => {
     if (!id) {
-      alert("Error: Slug not found for this row.");
+      toast({
+        title: "Error!",
+        description: "ID not found for this row.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -86,6 +98,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
   return (
     <>
+      {/* Dropdown Menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -99,18 +112,31 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleDelete}>
+          <DropdownMenuItem onClick={() => setDialogOpen(true)}>
             Delete
             <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <DeleteConfirmModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onConfirm={confirmDelete}
-        loading={loading}
-      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Penghapusan</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus Wisata ini? Tindakan ini tidak
+              dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isPending}>
+              {isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

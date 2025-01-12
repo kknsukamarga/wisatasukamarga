@@ -62,7 +62,8 @@ export const columns: ColumnDef<FasilitasWisata>[] = [
     ),
     cell: ({ row }) => {
       return (
-      <div className="w-[150px] font-medium capitalize">
+        <div className="w-[150px] font-medium capitalize">
+          {/* @ts-ignore */}
         {row.original.wisata.name}
       </div>
       )

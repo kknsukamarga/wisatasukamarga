@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
 import { FileUploader } from "@/components/file-uploader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import * as z from "zod";
+import { useMutation } from "@tanstack/react-query";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -28,7 +28,10 @@ const formSchema = z.object({
   }),
   image: z
     .array(z.any())
-    .refine((files) => files?.length > 0, "Setidaknya satu gambar wajib diunggah."),
+    .refine(
+      (files) => files?.length > 0,
+      "Setidaknya satu gambar wajib diunggah."
+    ),
   description: z.string().min(20, {
     message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
@@ -37,15 +40,60 @@ const formSchema = z.object({
 export default function FasilitasWisataEditForm({
   initialData,
   pageTitle,
+  id,
 }: {
   initialData: any;
   pageTitle: string;
+  id: string;
 }) {
-  const router = useRouter();
-  const { id } = useParams();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const base64Images = await Promise.all(
+        imageFiles.map((file) => toBase64(file))
+      );
+
+      const updatedData = {
+        name: values.name,
+        image: base64Images,
+        description: values.description,
+      };
+
+      const response = await fetch(`/api/fasilitas-wisata?id=${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+
+        throw new Error(errorData?.details || "Terjadi kesalahan.");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Berhasil",
+        description: "Fasilitas wisata berhasil dihapus!",
+        variant: "default",
+      });
+
+      setTimeout(() => {
+        window.location.replace("/dashboard/wisata/list-dayatarik");
+      }, 2000);
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal Menghapus Data",
+        description: error.message || "Terjadi kesalahan.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,24 +112,30 @@ export default function FasilitasWisataEditForm({
           if (!response.ok) {
             throw new Error(`Failed to fetch image: ${response.statusText}`);
           }
+
           const blob = await response.blob();
-          const fileName = `image.jpg`; // You can customize the filename as needed
+          const fileName = initialData.image.split("/").pop() || "image.jpg";
+
           const convertedFile = Object.assign(
             new File([blob], fileName, { type: blob.type }),
             { preview: initialData.image }
           );
-          setImageFiles([convertedFile]); // Wrap the file in an array to keep compatibility
-          console.log([convertedFile]);
-          form.setValue("image", [convertedFile]); // Wrap in an array if the form expects an array
+
+          setImageFiles([convertedFile]);
+          form.setValue("image", [convertedFile]);
         }
       } catch (error) {
-        console.error("Error converting image:", error);
+        toast({
+          title: "Gagal Mengkonversi Gambar",
+          description: "Terjadi kesalahan Server.",
+          variant: "destructive",
+        });
       }
     };
-  
+
     convertImageToFile();
   }, [initialData.image, form]);
-  
+
   const toBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -92,53 +146,7 @@ export default function FasilitasWisataEditForm({
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-
-    try {
-      const base64Images = await Promise.all(
-        imageFiles.map((file) => toBase64(file))
-      );
-
-      const updatedData = {
-        name: values.name,
-        image: base64Images,
-        description: values.description,
-      };
-
-      const response = await fetch(`/api/fasilitas-wisata?id=${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast({
-          title: "Gagal Memperbarui Data",
-          description: errorData.error || "Terjadi kesalahan.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Berhasil",
-        description: "Fasilitas wisata berhasil diperbarui!",
-        variant: "default",
-      });
-
-      setTimeout(() => {
-        router.push("/dashboard/fasilitas-wisata/list");
-      }, 2000);
-    } catch (error) {
-      toast({
-        title: "Gagal Memperbarui Data",
-        description: `Error: ${error}`,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    mutate(values);
   }
 
   return (
@@ -156,9 +164,12 @@ export default function FasilitasWisataEditForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan Nama Fasilitas Wisata..." {...field} />
+                    <Input
+                      placeholder="Masukkan Nama Fasilitas Wisata..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -169,7 +180,7 @@ export default function FasilitasWisataEditForm({
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Images</FormLabel>
+                  <FormLabel>Gambar</FormLabel>
                   <FormControl>
                     <FileUploader
                       value={imageFiles}
@@ -182,7 +193,7 @@ export default function FasilitasWisataEditForm({
                           field.onChange(validFiles);
                         }
                       }}
-                      maxFiles={6}
+                      maxFiles={1}
                       maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
@@ -195,10 +206,10 @@ export default function FasilitasWisataEditForm({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Deskripsi</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Masukkan Deskripsi Fasilitas Wisata..."
+                      placeholder="Masukkan Deskripsi Daya Tarik Wisata..."
                       {...field}
                     />
                   </FormControl>
@@ -207,8 +218,8 @@ export default function FasilitasWisataEditForm({
               )}
             />
             <div className="flex justify-end w-full">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Memperbarui..." : "Perbarui Fasilitas Wisata"}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Memperbarui..." : "Perbarui"}
               </Button>
             </div>
           </form>

@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const prisma = new PrismaClient();
 
@@ -31,7 +38,8 @@ export async function GET(req: NextRequest) {
     const allFasilitasWisata = await prisma.fasilitasWisata.findMany({
       include: {
         wisata: true, // Include the related Wisata data
-      }});
+      },
+    });
 
     return NextResponse.json(allFasilitasWisata);
   } catch (error: any) {
@@ -56,11 +64,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const cloudinaryResponse = await cloudinary.uploader.upload(body.image, {
+      folder: "wisata",
+      public_id: body.name.toLowerCase().replace(/\s+/g, "-"),
+    });
+
+    const imageUrl = cloudinaryResponse.secure_url;
+
     // Create new fasilitas
     const newFasilitas = await prisma.fasilitasWisata.create({
       data: {
         name,
-        image,
+        image: imageUrl,
         description,
         wisataId,
       },
@@ -106,14 +121,21 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    const cloudinaryResponse = await cloudinary.uploader.upload(image[0], {
+      folder: "wisata",
+      public_id: name.toLowerCase().replace(/\s+/g, "-"),
+    });
+
+    const updatedData = {
+      name: name,
+      image: cloudinaryResponse.secure_url,
+      description: description,
+    };
+
     // Update fasilitas
     const updatedFasilitas = await prisma.fasilitasWisata.update({
       where: { id },
-      data: {
-        name,
-        image,
-        description,
-      },
+      data: updatedData,
     });
 
     return NextResponse.json(updatedFasilitas);
