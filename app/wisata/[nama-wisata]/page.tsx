@@ -18,18 +18,52 @@ interface PageProps {
   };
 }
 
-// Metadata for SEO
+function toCamelCaseWithSpaces(input: string): string {
+  return input
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
+    .join(" ");
+}
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const wisataName = decodeURIComponent(params["nama-wisata"]);
+  const wisataNameRaw = decodeURIComponent(params["nama-wisata"]);
+  const wisataName = toCamelCaseWithSpaces(wisataNameRaw);
+
+  const description = `Discover everything about ${wisataName}, a must-visit destination with amazing attractions and experiences.`;
+
   return {
-    title: `Explore ${wisataName} - Amazing Destinations`,
-    description: `Discover everything about ${wisataName}, a must-visit destination with amazing attractions and experiences.`,
+    title: `${wisataName} - Desa Suka Marga`,
+    description,
+    robots: "index, follow",
+    authors: [{ name: "Desa Wisata Suka Marga" }],
+    openGraph: {
+      type: "website",
+      url: `https://wisatasukamarga.my.id/`,
+      title: `${wisataName} - Desa Wisata Suka Marga`,
+      description,
+      images: [
+        {
+          url: `https://wisatasukamarga.my.id/`, // Replace with the correct image URL if available
+          alt: `${wisataName} - Desa Wisata Suka Marga`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${wisataName} - Desa Wisata Suka Marga`,
+      description,
+      images: [
+        {
+          url: `https://wisatasukamarga.my.id/`,
+          alt: `${wisataName} - Desa Wisata Suka Marga`,
+        },
+      ],
+    },
   };
 }
 
-// Mock Data Fetching Function
 async function fetchData(namaWisata: string) {
   console.log(`Fetching mock data for: ${namaWisata}`);
 
