@@ -1,24 +1,21 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import EditForm from "../../_components/edit-form";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import EditForm from "../../_components/edit-dayatarik";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-const fetchWisataData = async (id: string) => {
-  const response = await fetch(`/api/wisata?id=${id}`);
-
+const fetchFasilitasWisataData = async (id: string) => {
+  const response = await fetch(`/api/fasilitas-wisata?id=${id}`);
   if (!response.ok) {
     throw new Error("Failed to fetch data");
   }
-
   const data = await response.json();
-
-  return data.wisata;
+  return data[0];
 };
 
-export default function WisataEditPage() {
+export default function FasilitasWisataEditPage() {
   const { id } = useParams();
 
   const {
@@ -26,24 +23,24 @@ export default function WisataEditPage() {
     error,
     isLoading,
   } = useQuery({
-    queryKey: ["wisata", id],
-    queryFn: () => fetchWisataData(id as string),
+    queryKey: ["fasilitasWisata", id],
+    queryFn: () => fetchFasilitasWisataData(id as string),
   });
 
   if (isLoading) {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
-          <Skeleton className=" h-8 w-1/3" />
+          <Skeleton className="h-8 w-1/3" />
         </CardHeader>
         <CardContent>
           {Array.from({ length: 7 }).map((_, index) => (
             <div
               key={index}
-              className={`space-y-1 ${index == 0 ? "" : "mt-10"} `}
+              className={`space-y-1 ${index === 0 ? "" : "mt-10"}`}
             >
-              <Skeleton className=" h-6 w-1/2" />
-              <Skeleton className=" h-10 w-full" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-10 w-full" />
             </div>
           ))}
           <div className="flex justify-end mt-12">
@@ -76,7 +73,11 @@ export default function WisataEditPage() {
 
   return (
     <div>
-      <EditForm initialData={initialData} pageTitle="Edit Wisata" />
+      <EditForm
+        initialData={initialData}
+        pageTitle="Edit Daya Tarik Wisata"
+        id={id as string}
+      />
     </div>
   );
 }

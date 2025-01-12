@@ -1,21 +1,25 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import EditForm from "../../_components/edit-form";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import FasilitasForm from "../../_components/fasilitas-form";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const fetchWisataData = async (id: string) => {
-  const response = await fetch(`/api/wisata?id=${id}`);
+const fetchWisataById = async (id: string) => {
+  const response = await fetch(`/api/wisata?id=${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch data");
+    throw new Error("Failed to fetch Wisata data");
   }
 
   const data = await response.json();
-
-  return data.wisata;
+  return data;
 };
 
 export default function WisataEditPage() {
@@ -27,7 +31,8 @@ export default function WisataEditPage() {
     isLoading,
   } = useQuery({
     queryKey: ["wisata", id],
-    queryFn: () => fetchWisataData(id as string),
+    queryFn: () => fetchWisataById(id as string),
+    enabled: !!id,
   });
 
   if (isLoading) {
@@ -37,13 +42,13 @@ export default function WisataEditPage() {
           <Skeleton className=" h-8 w-1/3" />
         </CardHeader>
         <CardContent>
-          {Array.from({ length: 7 }).map((_, index) => (
+          {Array.from({ length: 3 }).map((_, index) => (
             <div
               key={index}
               className={`space-y-1 ${index == 0 ? "" : "mt-10"} `}
             >
               <Skeleton className=" h-6 w-1/2" />
-              <Skeleton className=" h-10 w-full" />
+              <Skeleton className={`${index == 1 ? "h-20" : "h-10"} w-full`} />
             </div>
           ))}
           <div className="flex justify-end mt-12">
@@ -64,19 +69,9 @@ export default function WisataEditPage() {
     );
   }
 
-  if (!initialData) {
-    return (
-      <Card className="mx-auto w-full">
-        <CardHeader>
-          <h1>Data Tidak Ada</h1>
-        </CardHeader>
-      </Card>
-    );
-  }
-
   return (
     <div>
-      <EditForm initialData={initialData} pageTitle="Edit Wisata" />
+      <FasilitasForm initialData={initialData} pageTitle="Tambah Daya Tarik" />
     </div>
   );
 }

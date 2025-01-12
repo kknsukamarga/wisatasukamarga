@@ -1,34 +1,14 @@
 "use client";
 
-import { FileUploader } from "@/components/file-uploader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import Link from "next/link";
+import Image from "next/image";
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: "Nama fasilitas harus terdiri dari minimal 2 karakter.",
+    message: "Nama daya tarik harus terdiri dari minimal 2 karakter.",
   }),
   image: z.any().refine((files) => files?.length > 0, "Gambar wajib diunggah."),
   description: z.string().min(20, {
@@ -39,81 +19,36 @@ const formSchema = z.object({
   }),
 });
 
+export interface Wisata {
+  id: string; // Unique identifier
+  name: string; // Name of the wisata
+  imageCover: string; // URL for the cover image
+  description: string; // Description of the wisata
+  price: number; // Price in numeric format
+  location: string; // Google Maps link
+  status: "Buka" | "Tutup" | "Pemeliharaan"; // Enum for status
+  image: string[]; // Array of image URLs
+  createdAt: string;
+  updatedAt: string;
+  fasilitasWisata: FasilitasWisata[];
+}
+
+export interface FasilitasWisata {
+  id: string; // Unique identifier for the fasilitas
+  name: string; // Name of the fasilitas
+  description?: string; // Optional description for the fasilitas
+  image?: string; // Optional image URL for the fasilitas
+  createdAt?: string; // Optional creation date in ISO format
+  updatedAt?: string; // Optional update date in ISO format
+}
+
 export default function FasilitasCard({
   initialData,
-  wisataOptions,
   pageTitle,
 }: {
-  initialData: any | null;
-  wisataOptions: { id: string; name: string }[];
+  initialData: Wisata[];
   pageTitle: string;
 }) {
-  const defaultValues = {
-    name: initialData?.name || "",
-    image: initialData?.image || null,
-    description: initialData?.description || "",
-    wisataId: initialData?.wisataId || "",
-  };
-
-  const [loading, setLoading] = useState(false);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues,
-  });
-
-  const toBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-
-    try {
-      let base64Image = "";
-
-      if (values.image && values.image.length > 0) {
-        const file = values.image[0];
-        base64Image = await toBase64(file);
-      }
-
-      const formData = {
-        name: values.name,
-        image: base64Image,
-        description: values.description,
-        wisataId: values.wisataId,
-      };
-
-      const response = await fetch("/api/fasilitas-wisata", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.error || "Failed to submit fasilitas wisata.");
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Fasilitas wisata created successfully:", data);
-      alert("Fasilitas wisata created successfully!");
-      form.reset();
-    } catch (error) {
-      alert("An error occurred while submitting the fasilitas wisata.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <Card className="mx-auto w-full">
       <CardHeader>
@@ -124,20 +59,24 @@ export default function FasilitasCard({
       <CardContent>
         {/* Display wisata options as cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {wisataOptions.map((wisata) => (
+          {initialData.map((wisata) => (
             <Card key={wisata.id} className="shadow-md">
               <CardHeader>
+                <Image
+                  src={wisata.imageCover}
+                  width={300}
+                  height={300}
+                  alt={wisata.name}
+                  className="w-full min-h-48 object-cover"
+                />
                 <CardTitle className="text-xl font-bold text-center">
                   {wisata.name}
                 </CardTitle>
               </CardHeader>
+
               <CardContent>
-                <Link href={`/dashboard/wisata/create-fasilitas/${wisata.id}`}>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => form.setValue("wisataId", wisata.id)}
-                  >
+                <Link href={`/dashboard/wisata/create-dayatarik/${wisata.id}`}>
+                  <Button variant="outline" className="w-full">
                     Pilih Wisata
                   </Button>
                 </Link>

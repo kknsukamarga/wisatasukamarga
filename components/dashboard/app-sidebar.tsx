@@ -65,11 +65,15 @@ const data = {
         },
         {
           title: "Tambah Daya Tarik",
-          url: "/dashboard/wisata/create-fasilitas",
+          url: "/dashboard/wisata/create-dayatarik",
         },
         {
           title: "Data Wisata",
           url: "/dashboard/wisata/list",
+        },
+        {
+          title: "Data Daya Tarik",
+          url: "/dashboard/wisata/list-dayatarik",
         },
       ],
     },

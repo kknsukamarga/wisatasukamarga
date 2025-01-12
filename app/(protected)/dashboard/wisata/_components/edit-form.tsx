@@ -26,6 +26,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import * as z from "zod";
+import { useMutation } from "@tanstack/react-query";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -77,11 +78,60 @@ export default function WisataEditForm({
 }) {
   const router = useRouter();
   const { id } = useParams();
-  const { toast } = useToast(); // Menggunakan hook useToast
-  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const [imageCoverFile, setImageCoverFile] = useState<File | null>(null);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const base64Images = await Promise.all(
+        imageFiles.map((file) => toBase64(file))
+      );
+
+      const updatedData = {
+        name: values.name,
+        imageCover: imageCoverFile ? await toBase64(imageCoverFile) : null,
+        image: base64Images,
+        description: values.description,
+        price: values.price,
+        location: values.location,
+        status: values.status,
+      };
+
+      const response = await fetch(`/api/wisata?id=${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+
+        throw new Error(errorData?.details || "Terjadi kesalahan.");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Berhasil",
+        description: "Wisata berhasil diperbarui!",
+        variant: "default",
+      });
+
+      setTimeout(() => {
+        router.push("/dashboard/wisata/list");
+      }, 2000);
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal Memperbarui Data",
+        description: error.message || "Terjadi kesalahan.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -107,12 +157,15 @@ export default function WisataEditForm({
             );
           }
           const blob = await response.blob();
+          const fileName =
+            initialData.imageCover.split("/").pop() || "image-cover.jpg";
           const file = Object.assign(
-            new File([blob], "cover.jpg", { type: blob.type }),
+            new File([blob], `${fileName}-cover`, { type: blob.type }),
             {
               preview: initialData.imageCover,
             }
           );
+
           setImageCoverFile(file);
           form.setValue("imageCover", [file]);
         }
@@ -127,19 +180,29 @@ export default function WisataEditForm({
                 );
               }
               const blob = await response.blob();
-              const fileName = `image-${index + 1}.jpg`;
+              const fileName =
+                imageUrl.split("/").pop() || `image-${index + 1}.jpg`;
               return Object.assign(
-                new File([blob], fileName, { type: blob.type }),
+                new File([blob], `${fileName}`, {
+                  type: blob.type,
+                }),
                 {
                   preview: imageUrl,
                 }
               );
             })
           );
+
           setImageFiles(convertedFiles);
           form.setValue("images", convertedFiles);
         }
-      } catch (error) {}
+      } catch (error) {
+        toast({
+          title: "Gagal Mengkonversi Gambar",
+          description: "Terjadi kesalahan Server.",
+          variant: "destructive",
+        });
+      }
     };
 
     convertAllImagesToFiles();
@@ -155,61 +218,7 @@ export default function WisataEditForm({
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-
-    try {
-      const base64ImageCover = imageCoverFile
-        ? await toBase64(imageCoverFile)
-        : initialData.imageCover;
-
-      const base64Images = await Promise.all(
-        imageFiles.map((file) => toBase64(file))
-      );
-
-      const updatedData = {
-        name: values.name,
-        imageCover: base64ImageCover,
-        image: base64Images,
-        description: values.description,
-        price: values.price,
-        location: values.location,
-        status: values.status,
-      };
-
-      const response = await fetch(`/api/wisata?id=${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast({
-          title: "Gagal Memperbarui Data",
-          description: errorData.error || "Terjadi kesalahan.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Berhasil",
-        description: "Wisata berhasil diperbarui!",
-        variant: "default",
-      });
-
-      setTimeout(() => {
-        router.push("/dashboard/wisata/list");
-      }, 2000);
-    } catch (error) {
-      toast({
-        title: "Gagal Memperbarui Data",
-        description: `Error: ${error}`,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    mutate(values);
   }
 
   return (
@@ -240,7 +249,7 @@ export default function WisataEditForm({
               name="imageCover"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image Cover</FormLabel>
+                  <FormLabel>Gambar Cover</FormLabel>
                   <FormControl>
                     <FileUploader
                       value={imageCoverFile ? [imageCoverFile] : []}
@@ -261,7 +270,7 @@ export default function WisataEditForm({
               name="images"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Images</FormLabel>
+                  <FormLabel>Gambar Gallery</FormLabel>
                   <FormControl>
                     <FileUploader
                       value={imageFiles}
@@ -357,8 +366,8 @@ export default function WisataEditForm({
               )}
             />
             <div className="flex justify-end w-full">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Memperbarui..." : "Perbarui Wisata"}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Memperbarui..." : "Perbarui Wisata"}
               </Button>
             </div>
           </form>
