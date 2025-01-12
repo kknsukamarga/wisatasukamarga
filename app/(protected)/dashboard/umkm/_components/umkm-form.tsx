@@ -120,10 +120,6 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
         });
         return;
       }
-
-      const data = await response.json();
-
-      // Show success toast
       toast({
         title: "Berhasil",
         description: "UMKM berhasil ditambahkan!",

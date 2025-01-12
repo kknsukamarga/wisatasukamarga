@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { FileUploader } from "@/components/file-uploader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,12 +57,31 @@ const formSchema = z.object({
   }),
 });
 
+const fetchBlogBySlug = async ({
+  queryKey,
+}: {
+  queryKey: [string, { slug: string }];
+}) => {
+  const [, { slug }] = queryKey;
+
+  const response = await fetch(`/api/blog?mode=single&slug=${slug}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch blog data");
+  }
+
+  return response.json();
+};
+
 export default function EditForm() {
   const router = useRouter();
-  const { slug } = useParams();
-  const [initialData, setInitialData] = useState<any | null>(null);
+  const { slug } = useParams<{ slug: string }>();
   const [generatedSlug, setGeneratedSlug] = useState<string>("");
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -75,38 +95,62 @@ export default function EditForm() {
     },
   });
 
-  // Fetch existing blog data
-  useEffect(() => {
-    async function fetchBlogData() {
-      if (!slug) return;
+  const {
+    data: initialData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["blog", { slug }],
+    queryFn: fetchBlogBySlug,
+    enabled: !!slug,
+  });
 
-      try {
-        const response = await fetch(`/api/blog?mode=single&slug=${slug}`);
-        if (!response.ok) {
-          console.error("Failed to fetch blog data");
-          return;
-        }
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      let finalCoverImage = initialData?.coverImage || "";
 
-        const data = await response.json();
-        setInitialData(data);
-        setGeneratedSlug(data.slug);
-
-        form.reset({
-          title: data.title,
-          coverImage: data.coverImage,
-          content: data.content,
-          author: data.author,
-          category: data.category,
-        });
-      } catch (error) {
-        console.error("Error fetching blog data:", error);
+      if (Array.isArray(values.coverImage) && values.coverImage.length > 0) {
+        const file = values.coverImage[0];
+        finalCoverImage = await toBase64(file);
       }
-    }
 
-    fetchBlogData();
-  }, [slug, form]);
+      const updatedData = {
+        ...values,
+        slug: generatedSlug,
+        coverImage: finalCoverImage,
+      };
 
-  // Generate slug based on title
+      const response = await fetch(`/api/blog?slug=${slug}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update blog");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Berhasil!",
+        description: "Blog berhasil diperbarui.",
+        variant: "default",
+      });
+      router.push("/dashboard/blog-article/list");
+    },
+    onError: () => {
+      toast({
+        title: "Error!",
+        description: "Gagal memperbarui blog.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const generateSlug = (title: string) =>
     title
       .toLowerCase()
@@ -114,6 +158,19 @@ export default function EditForm() {
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
       .slice(0, 50);
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        title: initialData.title,
+        coverImage: initialData.coverImage,
+        content: initialData.content,
+        author: initialData.author,
+        category: initialData.category,
+      });
+      setGeneratedSlug(initialData.slug);
+    }
+  }, [initialData, form]);
 
   useEffect(() => {
     const subscription = form.watch((value) => {
@@ -124,94 +181,19 @@ export default function EditForm() {
     return () => subscription.unsubscribe();
   }, [form]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    mutate(values);
+  };
 
-    try {
-      // Step 1: Konversi cover image ke base64 jika diubah
-      let finalCoverImage = "";
-      if (Array.isArray(values.coverImage) && values.coverImage.length > 0) {
-        const file = values.coverImage[0];
-        finalCoverImage = await toBase64(file);
-      } else if (typeof values.coverImage === "string") {
-        finalCoverImage = values.coverImage;
-      }
-
-      // Step 2: Ambil URL gambar lama dan baru
-      const oldImageUrls = extractImageUrlsFromContent(initialData.content);
-      const newImageUrls = extractImageUrlsFromContent(values.content);
-
-      // Step 3: Cari gambar yang dihapus
-      const deletedImageUrls = oldImageUrls.filter(
-        (url) => !newImageUrls.includes(url)
-      );
-
-      // Step 4: Siapkan data untuk dikirim
-      const updatedData = {
-        title: values.title,
-        slug: generatedSlug,
-        coverImage: finalCoverImage,
-        content: values.content,
-        author: values.author,
-        category: values.category,
-        deletedImages: deletedImageUrls, // Kirim gambar yang dihapus ke backend
-      };
-
-      // Step 5: Kirim data ke backend
-      const response = await fetch(`/api/blog?slug=${slug}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast({
-          title: "Gagal",
-          description: `Gagal memperbarui blog : ${errorData?.error}`,
-          variant: "destructive",
-        });
-        return;
-      }
-      toast({
-        title: "Berhasil",
-        description: "Blog sudah diupdate",
-      });
-
-      router.push("/dashboard/blog-article/list");
-    } catch (error) {
-      toast({
-        title: "Gagal",
-        description: "Terjadi kesalahan saat mengupdate blog",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function toBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
+  const toBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result as string);
       reader.onerror = (error) => reject(error);
     });
-  }
 
-  const extractImageUrlsFromContent = (content: string): string[] => {
-    const imgRegex = /<img src="([^"]+)"/g;
-    let match: RegExpExecArray | null;
-    const matches: string[] = [];
-
-    while ((match = imgRegex.exec(content)) !== null) {
-      matches.push(match[1]); // Ambil grup pertama (URL)
-    }
-
-    return matches;
-  };
-
-  if (!initialData) {
+  if (isLoading) {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
@@ -233,6 +215,10 @@ export default function EditForm() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <div>Error loading blog: {(error as Error).message}</div>;
   }
 
   return (
@@ -258,10 +244,6 @@ export default function EditForm() {
                 </FormItem>
               )}
             />
-            <div>
-              <FormLabel>Generated Slug</FormLabel>
-              <p>{generatedSlug}</p>
-            </div>
             <FormField
               control={form.control}
               name="coverImage"
@@ -287,54 +269,7 @@ export default function EditForm() {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <ReactQuill
-                      value={field.value}
-                      onChange={field.onChange}
-                      theme="snow"
-                      modules={{
-                        toolbar: {
-                          container: [
-                            [{ header: "1" }, { header: "2" }],
-                            [{ size: [] }],
-                            [
-                              "bold",
-                              "italic",
-                              "underline",
-                              "strike",
-                              "blockquote",
-                            ],
-                            [
-                              { list: "ordered" },
-                              { list: "bullet" },
-                              { indent: "-1" },
-                              { indent: "+1" },
-                            ],
-                            ["link", "image"],
-                          ],
-                        },
-                        clipboard: {
-                          matchVisual: false,
-                        },
-                      }}
-                      formats={[
-                        "header",
-                        "font",
-                        "size",
-                        "bold",
-                        "italic",
-                        "underline",
-                        "strike",
-                        "blockquote",
-                        "list",
-                        "bullet",
-                        "indent",
-                        "link",
-                        "image",
-                        "video",
-                        "code-block",
-                      ]}
-                      className="max-w-screen-2xl"
-                    />
+                    <ReactQuill value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -374,9 +309,9 @@ export default function EditForm() {
                 </FormItem>
               )}
             />
-            <div className="flex justify-end w-full">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Mengupdate.." : "Update Blog"}
+            <div className="flex justify-end">
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Updating..." : "Update Blog"}
               </Button>
             </div>
           </form>
