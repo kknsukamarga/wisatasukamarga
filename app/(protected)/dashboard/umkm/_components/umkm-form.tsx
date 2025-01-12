@@ -86,9 +86,9 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
     setLoading(true);
 
     try {
-      let base64Images = [];
+      let base64Images: any[] = [];
       if (values.image && values.image.length > 0) {
-        const base64Images = await Promise.all(
+        base64Images = await Promise.all(
           values.image.map(async (file: any) => await toBase64(file))
         );
       }

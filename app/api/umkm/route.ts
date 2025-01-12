@@ -148,6 +148,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Konversi nomor WhatsApp jika diawali dengan 08 menjadi 628
+    const formattedWaNumber = wanumber.startsWith("08")
+      ? `62${wanumber.slice(1)}`
+      : wanumber;
+
     // Upload all Base64 images to Cloudinary
     const uploadedImages = await Promise.all(
       images.map(async (image: any, index: any) => {
@@ -183,7 +188,7 @@ export async function POST(req: NextRequest) {
         image: uploadedImages,
         price,
         description,
-        wanumber,
+        wanumber: formattedWaNumber, // Simpan nomor WhatsApp yang telah diformat
         owner,
         category,
       },
@@ -229,6 +234,7 @@ export async function PUT(req: NextRequest) {
       owner,
       category,
     } = body;
+
     // Fetch existing UMKM entry
     const existingUmkm = await prisma.umkm.findUnique({ where: { slug } });
     if (!existingUmkm) {
@@ -238,30 +244,12 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    await Promise.all(
-      existingUmkm.image.map(async (imageUrl: any) => {
-        const publicId = "umkm/" + imageUrl.split("/").pop()?.split(".")[0];
-        if (publicId) {
-          await cloudinary.uploader.destroy(publicId);
-        }
-      })
-    );
-
-    // Generate a new slug based on updated product_name
-    let newSlug = product_name
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-    let existingSlug = await prisma.umkm.findUnique({
-      where: { slug: newSlug },
-    });
-    let counter = 1;
-
-    while (existingSlug && existingSlug.slug !== existingUmkm.slug) {
-      newSlug = `${newSlug}-${counter}`;
-      existingSlug = await prisma.umkm.findUnique({ where: { slug: newSlug } });
-      counter++;
-    }
+    // Konversi nomor WhatsApp jika diawali dengan 08 menjadi 628
+    const formattedWaNumber = wanumber
+      ? wanumber.startsWith("08")
+        ? `62${wanumber.slice(1)}`
+        : wanumber
+      : existingUmkm.wanumber;
 
     const updatedImageUrl = await Promise.all(
       image.map(async (image: any, index: any) => {
@@ -277,11 +265,13 @@ export async function PUT(req: NextRequest) {
 
     const updatedData = {
       product_name: product_name || existingUmkm.product_name,
-      slug: newSlug,
+      slug: product_name
+        ? product_name.toLowerCase().replace(/\s+/g, "-")
+        : existingUmkm.slug,
       image: updatedImageUrl,
       price: price || existingUmkm.price,
       description: description || existingUmkm.description,
-      wanumber: wanumber || existingUmkm.wanumber,
+      wanumber: formattedWaNumber,
       owner: owner || existingUmkm.owner,
       category: category || existingUmkm.category,
     };
