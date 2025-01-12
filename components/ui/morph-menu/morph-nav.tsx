@@ -17,7 +17,7 @@ const MorphNav = (): JSX.Element => {
   useEffect(() => {
     const calculateResponsiveSize = () => {
       const width = window.innerWidth > 768 ? "40vw" : "80vw";
-      const height = window.innerWidth > 768 ? "70vh" : "70vh";
+      const height = window.innerWidth >= 768 ? "70vh" : "60vh";
       setResponsiveSize({ width, height });
     };
 
@@ -60,9 +60,7 @@ const MorphNav = (): JSX.Element => {
           height: isActive ? responsiveSize.height : "50px",
         }}
       >
-        <AnimatePresence>
-          {isActive && <MorphMenu />}
-        </AnimatePresence>
+        <AnimatePresence>{isActive && <MorphMenu />}</AnimatePresence>
       </motion.div>
 
       <Button isActive={isActive} toggleMenu={() => setIsActive(!isActive)} />

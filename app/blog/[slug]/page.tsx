@@ -103,9 +103,9 @@ export default async function BlogDetailPage({
 
           {/* Judul dan Konten */}
 
-          <div className="relative flex flex-col md:flex-row">
-            <div className="md:sticky top-12 flex-shrink-0 h-fit">
-              <div className="p-3 w-full md:w-36 flex flex-row md:flex-col items-center gap-3">
+          <div className="relative flex flex-col-reverse md:flex-row">
+            <div className="md:sticky top-16 lg:top-12 flex-shrink-0 h-fit">
+              <div className="p-3 w-full md:w-36 flex flex-col items-center gap-3">
                 <p className="text-sm mb-2 font-semibold">Bagikan Artikel</p>
 
                 <Sharelink />

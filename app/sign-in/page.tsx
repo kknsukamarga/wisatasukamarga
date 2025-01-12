@@ -38,18 +38,33 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
 import { SignInForm } from "@/components/auth/sign-in-form";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function SignInPage() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
-          <a href="#" className="flex items-center gap-2 font-medium">
+          {/* <a href="#" className="flex items-center gap-2 font-medium">
             <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <GalleryVerticalEnd className="size-4" />
             </div>
             Acme Inc.
-          </a>
+          </a> */}
+          <Link
+            href="/"
+            className="gap-4 flex items-center bg-gray px-4 py-2.5 shadow-md rounded-full text-white"
+            prefetch={false}
+          >
+            <Image
+              src="/logo-putih.png"
+              alt="logo-putih"
+              width={1201}
+              height={936}
+              className="h-8 w-16"
+            />
+          </Link>
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
@@ -59,7 +74,7 @@ export default function SignInPage() {
       </div>
       <div className="relative hidden bg-muted lg:block">
         <img
-          src="https://c0.wallpaperflare.com/preview/311/930/415/indonesia-cisarua-taman-wisata-alam-telaga-warna.jpg"
+          src="/wisata/kawah-nirwana.png"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />

@@ -114,6 +114,11 @@ export const columns: ColumnDef<Blog>[] = [
       });
       return <div>{formattedDate}</div>;
     },
+    filterFn: (row, id, value) => {
+      const rowDate = new Date(row.getValue(id));
+      const [startDate, endDate] = value;
+      return rowDate >= startDate && rowDate <= endDate;
+    },
   },
   {
     id: "actions",

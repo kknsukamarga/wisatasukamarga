@@ -18,7 +18,7 @@ function Sharelink() {
   return (
     <div className="flex justify-center items-center flex-col text-center w-fit">
       <div className="flex flex-col gap-4 mt-2 relative">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-row gap-4 md:flex-col">
           <Link
             href="https://x.com/intent/post?text=Ayo+jalan+jalan"
             target="_blank"

@@ -21,8 +21,8 @@ export function BentoGridBlog({ articles }: { articles: Artikel[] }) {
               className="text-sm text-gray-600 mt-2 line-clamp-2"
               dangerouslySetInnerHTML={{
                 __html:
-                  articles[0].content.slice(0, 150) +
-                  (articles[0].content.length > 150 ? "..." : ""),
+                  article.content.slice(0, 150) +
+                  (article.content.length > 150 ? "..." : ""),
               }}
             />
           } // Potong deskripsi
@@ -99,7 +99,7 @@ function Blog() {
       setLoading(true);
 
       try {
-        const response = await fetch("/api/blog?mode=all&limit=4"); // Gunakan parameter mode dan limit
+        const response = await fetch("/api/blog?mode=get4&limit=4"); // Gunakan parameter mode dan limit
         const data = await response.json();
 
         if (data.articles) {

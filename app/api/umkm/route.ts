@@ -198,9 +198,6 @@ export async function POST(req: NextRequest) {
   }
 }
 export async function PUT(req: NextRequest) {
-  const body = await req.json();
-  const { searchParams } = new URL(req.url);
-  const slug = searchParams.get("slug");
   const session = await auth();
   const isLoggedIn = !!session?.user?.email;
 
@@ -210,6 +207,10 @@ export async function PUT(req: NextRequest) {
       { status: 401 }
     );
   }
+
+  const body = await req.json();
+  const { searchParams } = new URL(req.url);
+  const slug = searchParams.get("slug");
 
   try {
     if (!slug) {
@@ -301,9 +302,6 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const formData = await req.formData();
-  const slugsString = formData.get("slugs") as string;
-  const slug = formData.get("slug") as string;
   const session = await auth();
   const isLoggedIn = !!session?.user?.email;
 
@@ -313,6 +311,10 @@ export async function DELETE(req: NextRequest) {
       { status: 401 }
     );
   }
+
+  const formData = await req.formData();
+  const slugsString = formData.get("slugs") as string;
+  const slug = formData.get("slug") as string;
 
   try {
     if (slug) {
