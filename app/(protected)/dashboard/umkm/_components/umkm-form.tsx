@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast"; // Import the custom useToast hook
-import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMutation } from "@tanstack/react-query";
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -67,7 +67,6 @@ interface UMKMFormProps {
 
 export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -82,63 +81,59 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-
-    try {
-      let base64Images: any[] = [];
-      if (values.image && values.image.length > 0) {
-        base64Images = await Promise.all(
-          values.image.map(async (file: any) => await toBase64(file))
-        );
-      }
-
-      const formData = {
-        product_name: values.product_name,
-        images: base64Images, // Send an array of Base64 strings
-        price: values.price,
-        description: values.description,
-        wanumber: values.wanumber,
-        owner: values.owner,
-        category: values.category,
-      };
-
+  // Mutation Hook
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (data: any) => {
       const response = await fetch("/api/umkm", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        toast({
-          title: "Gagal",
-          description: `Gagal mengirim data UMKM : ${errorData?.error}`,
-          variant: "destructive",
-        });
-        return;
+        throw new Error(errorData?.error || "Gagal mengirim data UMKM.");
       }
 
-      const data = await response.json();
-
-      // Show success toast
+      return await response.json();
+    },
+    onSuccess: () => {
       toast({
         title: "Berhasil",
         description: "UMKM berhasil ditambahkan!",
       });
-
-      form.reset();
-    } catch (error) {
+      form.reset(); // Reset the form after success
+    },
+    onError: (error: any) => {
       toast({
         title: "Gagal",
-        description: "Terjadi kesalahan saat mengirim data UMKM.",
+        description: `Terjadi kesalahan: ${error.message}`,
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    let base64Images: any[] = [];
+    if (values.image && values.image.length > 0) {
+      base64Images = await Promise.all(
+        values.image.map(async (file: any) => await toBase64(file))
+      );
     }
+
+    const formData = {
+      product_name: values.product_name,
+      images: base64Images, // Send an array of Base64 strings
+      price: values.price,
+      description: values.description,
+      wanumber: values.wanumber,
+      owner: values.owner,
+      category: values.category,
+    };
+
+    mutate(formData); // Call the mutation
   }
 
   function toBase64(file: any) {
@@ -281,8 +276,8 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
               )}
             />
             <div className="flex justify-end w-full">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Mengirim..." : "Tambah UMKM"}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Mengirim..." : "Tambah UMKM"}
               </Button>
             </div>
           </form>
