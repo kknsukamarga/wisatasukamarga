@@ -100,7 +100,7 @@ export default function RelatedProducts() {
             </p>
             <div className="flex justify-between items-center">
               <span className="text-lg font-bold">
-                Rp{((item.price + 1) * 10).toLocaleString("id-ID")},00
+                Rp{item.price.toLocaleString("id-ID")},00
               </span>
             </div>
           </div>
