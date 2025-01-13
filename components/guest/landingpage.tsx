@@ -8,18 +8,23 @@ import Testimonials from "@/components/guest/testimonials";
 import InteractiveMap from "@/components/guest/interactive-map";
 import Blog from "@/components/guest/blog";
 import { ReactLenis } from "@/lib/lenis";
+import { ParralaxBanner } from "./ParralaxBanner";
+import { ParallaxProvider } from "react-scroll-parallax";
 
 function LandingPage() {
   return (
-    <ReactLenis root>
-      <Hero />
-      <About />
-      <HighlightWisata />
-      <HighlightUMKM />
-      <Testimonials />
-      <InteractiveMap />
-      <Blog />
-    </ReactLenis>
+    <ParallaxProvider>
+      <ReactLenis root>
+        {/* <Hero /> */}
+        <ParralaxBanner />
+        <About />
+        <HighlightWisata />
+        <HighlightUMKM />
+        <Testimonials />
+        <InteractiveMap />
+        <Blog />
+      </ReactLenis>
+    </ParallaxProvider>
   );
 }
 export default LandingPage;

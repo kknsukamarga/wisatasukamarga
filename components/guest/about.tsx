@@ -73,14 +73,14 @@ export default function About(): JSX.Element {
       ref={container}
       className="flex min-h-screen items-center justify-center bg-gray text-white flex-col relative"
     >
-      <motion.div
+      {/* <motion.div
         className="absolute inset-0 z-[10] rotate-180 scale-x-[-1] opacity-10"
         style={{
           backgroundImage: `url(/image-bottom.png)`,
           backgroundPosition: "bottom",
           backgroundSize: "cover",
         }}
-      />
+      /> */}
 
       <div className="p-2 rounded-full bg-orange-primary z-20">
         <Image src="/icon-lake.png" alt="icon-lake" width={32} height={32} />

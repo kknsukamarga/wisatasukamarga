@@ -9,22 +9,43 @@ import MorphMenu from "./morph-menu";
 const MorphNav = (): JSX.Element => {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [responsiveSize, setResponsiveSize] = useState({
-    width: "80vw",
-    height: "90vh",
+    width: "80vw", // Default width
+    height: "60vh", // Default height
   });
 
-  // Calculate responsive size only in the client
   useEffect(() => {
     const calculateResponsiveSize = () => {
-      const width = window.innerWidth > 768 ? "40vw" : "80vw";
-      const height = window.innerWidth >= 768 ? "70vh" : "60vh";
+      const width =
+        window.innerWidth >= 1024
+          ? "30vw" // Desktop
+          : window.innerWidth >= 768
+          ? "50vw" // Tablet
+          : "80vw"; // Mobile
+
+      const height =
+        window.innerWidth >= 1024
+          ? "80vh" // Desktop
+          : window.innerWidth >= 768
+          ? "70vh" // Tablet
+          : "60vh"; // Mobile
+
       setResponsiveSize({ width, height });
     };
 
-    calculateResponsiveSize(); // Set initial size
-    window.addEventListener("resize", calculateResponsiveSize); // Update on resize
+    // Debounce resize event
+    let resizeTimeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(calculateResponsiveSize, 150); // Adjust debounce delay as needed
+    };
 
-    return () => window.removeEventListener("resize", calculateResponsiveSize); // Cleanup
+    calculateResponsiveSize(); // Set initial size
+    window.addEventListener("resize", handleResize); // Add resize listener
+
+    return () => {
+      clearTimeout(resizeTimeout);
+      window.removeEventListener("resize", handleResize); // Cleanup listener
+    };
   }, []);
 
   const menu: Variants = {

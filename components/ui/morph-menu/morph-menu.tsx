@@ -23,7 +23,7 @@ export default function MorphMenu(): JSX.Element {
                 animate="enter"
                 exit="exit"
               >
-                <a href={href} className="text-3xl md:text-5xl">
+                <a href={href} className="text-2xl md:text-4xl xl:text-5xl">
                   {title}
                 </a>
               </motion.div>

@@ -1,9 +1,9 @@
-import { auth } from "@/auth";
 import Footer from "@/components/guest/footer";
 import Hero from "@/components/guest/wisata/hero";
 import Navbar from "@/components/guest/navbar";
 import ScrollWisata from "@/components/guest/wisata/scroll-wisata";
 import { Metadata } from "next";
+import ShowcaseWisata from "@/components/guest/wisata/showcase";
 
 export const metadata: Metadata = {
   title: "Telusuri Wisata - Desa Suka Marga",
@@ -39,18 +39,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const session = await auth();
-  const isLoggedIn = !!session?.user?.email;
-
   return (
     <main className="bg-white">
       <Navbar />
 
       <Hero />
 
-      <ScrollWisata />
-      <ScrollWisata />
-      <ScrollWisata />
+      <ShowcaseWisata />
 
       <Footer />
     </main>

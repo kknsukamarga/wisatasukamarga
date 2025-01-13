@@ -22,3 +22,6 @@ export function formatBytes(
     sizeType === "accurate" ? accurateSizes[i] ?? "Bytest" : sizes[i] ?? "Bytes"
   }`;
 }
+
+export const CDN_GITHUB_URL =
+  "https://cdn.jsdelivr.net/gh/kknsukamarga/wisata-sukamarga-image/";
