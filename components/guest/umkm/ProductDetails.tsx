@@ -66,7 +66,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
             alt={product.product_name}
             className="rounded-lg mb-4 lg:mb-0 aspect-square object-cover object-center max-h-[300px] w-full md:max-h-[500px]"
           />
-          <div className="flex space-x-2 mt-2">
+          <div className="flex space-x-2 mt-2 overflow-x-scroll">
             {product.image.map((image: string, index: number) => (
               <img
                 key={index}
@@ -160,7 +160,7 @@ export default function ProductDetails({ slug }: { slug: string }) {
                     </svg>
                   </Link>
                   <Link
-                    href="https://api.whatsapp.com/send/?text=Ayo+Jalan+Jalan+ke+Sukamarga+https://wisatasukamarga.my.id&type=custom_url&app_absent=0"
+                    href="https://api.whatsapp.com/send/?text=Produk+Desa+Suka+Marga+https://wisatasukamarga.my.id&type=custom_url&app_absent=0"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white p-2 bg-green rounded-full"

@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import UMKMGrid from "@/components/guest/umkm/UMKMGrid";
 import SkeletonGrid from "@/components/guest/umkm/SkeletonGrid";
+import Image from "next/image";
 
 const fetchUMKM = async () => {
   const response = await fetch("/api/umkm", {
@@ -42,12 +43,25 @@ export default function UMKMSection() {
 
   if (isError)
     return (
-      <div className="text-center p-6">
+      <div className="flex flex-col items-center justify-center p-6 text-center">
+        {/* Mascot Image */}
+        <div className="w-48 h-48 overflow-hidden">
+          <Image
+            src="/eror-maskot.png"
+            alt="Leaf Mascot"
+            width={1080}
+            height={1080}
+            className="rotate-[10deg]"
+          />
+        </div>
+
+        {/* Error Message */}
         <h2 className="text-2xl font-bold text-red-500 mt-4">
           Oops! Sepertinya ada yang salah.
         </h2>
         <p className="text-gray-600 mt-2">
-          {error instanceof Error ? error.message : "Unknown error"}
+          Silakan coba refresh lagi nanti atau hubungi dukungan jika masalah
+          berlanjut.
         </p>
       </div>
     );

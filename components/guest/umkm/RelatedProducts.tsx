@@ -110,19 +110,19 @@ export default function RelatedProducts() {
         <Button
           onClick={handlePreviousPage}
           disabled={currentPage === 1}
-          className={`px-4 py-2 rounded ${
+          className={`text-[10px] sm:text-base px-2 sm:px-4 py-2 rounded ${
             currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
           Sebelumnya
         </Button>
-        <span>
+        <span className="text-[12px] text-center sm:text-base">
           Halaman {currentPage} dari {totalPages}
         </span>
         <Button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className={`px-4 py-2 rounded ${
+          className={`text-[10px] sm:text-base px-2 sm:px-4 py-2 rounded ${
             currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
