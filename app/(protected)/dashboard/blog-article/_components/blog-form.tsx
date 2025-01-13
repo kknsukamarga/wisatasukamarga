@@ -230,7 +230,7 @@ export default function BlogForm({
                         "video",
                         "code-block",
                       ]}
-                      className="max-w-screen-2xl"
+                      className="imagemax-w-screen-2xl"
                     />
                   </FormControl>
                   <FormMessage />

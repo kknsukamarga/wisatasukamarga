@@ -23,10 +23,22 @@ html.lenis body {
   width: 0px;
 }
 
-.img-resize-blog {
-  max-width: 300px;
-  height: 300px;
-  object-fit: cover;
+.img-resize-blog,
+.prose img {
+  display: block; /* Menghindari space di bawah gambar */
+  margin: 0 auto; /* Membuat gambar berada di tengah secara horizontal */
+  max-width: 100%; /* Membatasi lebar gambar */
+  height: auto; /* Menjaga proporsi gambar */
+  object-fit: contain; /* Menyesuaikan konten gambar */
+  object-position: center; /* Posisi gambar di tengah */
+}
+
+.ql-editor img {
+  display: block; /* Menghindari space di bawah gambar */
+  margin: 0 auto; /* Membuat gambar berada di tengah secara horizontal */
+  width: 500px; /* Membatasi lebar gambar */
+  height: auto; /* Menjaga proporsi gambar */
+  object-fit: contain; /* Menyesuaikan konten gambar */
 }
 
 .ql-toolbar.ql-snow:not(:has(+ .ql-container.ql-snow)) {
@@ -337,12 +349,4 @@ html.lenis body {
   opacity: 0.9; /* Opacity saat hover */
   transition: all;
   transition-duration: 0.3s ease; /* Durasi transisi */
-}
-
-.prose img {
-  display: block;
-  margin: 0 auto;
-  height: auto;
-  object-fit: contain;
-  object-position: center;
 }
