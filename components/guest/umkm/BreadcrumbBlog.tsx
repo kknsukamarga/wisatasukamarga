@@ -20,7 +20,7 @@ export default function BreadcrumbBlog({ slug }: { slug: string }) {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbPage>{slug}</BreadcrumbPage>
+          <BreadcrumbPage className="line-clamp-1">{slug}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
