@@ -232,7 +232,8 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
-    const { title, coverImage, content, author, category } = body;
+    const { title, coverImage, content, author, category, deletedImages } =
+      body;
 
     if (!title || !coverImage || !content || !author || !category) {
       return NextResponse.json(
@@ -245,7 +246,17 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invalid category." }, { status: 400 });
     }
 
-    // Upload cover image if updated
+    // Step 1: Hapus gambar yang tidak lagi digunakan (dari deletedImages)
+    if (deletedImages && Array.isArray(deletedImages)) {
+      for (const imageUrl of deletedImages) {
+        const publicId = imageUrl.split("/").pop()?.split(".")[0];
+        if (publicId) {
+          await cloudinary.uploader.destroy(`blogs/content-images/${publicId}`);
+        }
+      }
+    }
+
+    // Step 2: Upload cover image jika diubah
     let imageUrl = existingBlog.coverImage;
 
     if (
@@ -265,7 +276,7 @@ export async function PUT(req: NextRequest) {
       imageUrl = cloudinaryResponse.secure_url;
     }
 
-    // Process and upload images in content
+    // Step 3: Process and upload images in content
     let updatedContent = content;
     const base64Regex = /<img src="(data:image\/.*?;base64,.*?)".*?>/g;
     const matches = [...content.matchAll(base64Regex)];
@@ -273,21 +284,18 @@ export async function PUT(req: NextRequest) {
     for (const match of matches) {
       const base64Image = match[1];
 
-      // Upload each base64 image to Cloudinary
       const imageResponse = await cloudinary.uploader.upload(base64Image, {
         folder: "blogs/content-images",
       });
 
       const imageUrl = imageResponse.secure_url;
 
-      // Replace base64 string with the Cloudinary URL in content and inject CSS class
       updatedContent = updatedContent.replace(
         match[0],
         `<img src="${imageUrl}" class="img-resize-blog">`
       );
     }
 
-    // Generate slug
     let newSlug = title
       .toLowerCase()
       .replace(/\s+/g, "-")
@@ -304,7 +312,6 @@ export async function PUT(req: NextRequest) {
       counter++;
     }
 
-    // Update the blog in the database
     const updatedBlog = await prisma.blog.update({
       where: { slug },
       data: {
@@ -360,6 +367,29 @@ export async function DELETE(req: NextRequest) {
     const publicId = blog.coverImage.split("/").pop()?.split(".")[0];
     if (publicId) {
       await cloudinary.uploader.destroy(`blogs/${publicId}`);
+    }
+
+    const extractImageUrlsFromContent = (content: string): string[] => {
+      const imgRegex = /<img src="([^"]+)"/g;
+      let match: RegExpExecArray | null;
+      const matches: string[] = [];
+
+      while ((match = imgRegex.exec(content)) !== null) {
+        matches.push(match[1]);
+      }
+
+      return matches;
+    };
+
+    const contentImageUrls = extractImageUrlsFromContent(blog.content);
+
+    for (const imageUrl of contentImageUrls) {
+      const contentImagePublicId = imageUrl.split("/").pop()?.split(".")[0];
+      if (contentImagePublicId) {
+        await cloudinary.uploader.destroy(
+          `blogs/content-images/${contentImagePublicId}`
+        );
+      }
     }
 
     await prisma.blog.delete({

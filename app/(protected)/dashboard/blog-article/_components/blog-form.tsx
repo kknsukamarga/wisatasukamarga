@@ -20,7 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,23 +35,23 @@ const MAX_FILE_SIZE = 5000000;
 
 const formSchema = z.object({
   title: z.string().min(2, {
-    message: "Title must be at least 2 characters.",
+    message: "Title minimal 2 karakter.",
   }),
   coverImage: z
     .any()
-    .refine((files) => files?.length > 0, "A cover image is required.")
+    .refine((files) => files?.length > 0, "Gambar cover diperlukan.")
     .refine(
       (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Cover image size must not exceed 5MB.`
+      `Ukuran gambar cover tidak boleh melebihi 5MB.`
     ),
   content: z.string().min(10, {
-    message: "Content must be at least 10 characters.",
+    message: "Konten minimal memiliki 10 karakter.",
   }),
   author: z.string().min(2, {
-    message: "Author name must be at least 2 characters.",
+    message: "Nama pembuat minimal memiliki 2 karakter.",
   }),
   category: z.enum(["TEMPAT_WISATA", "KARYA_UMKM"], {
-    errorMap: () => ({ message: "Please select a valid category." }),
+    errorMap: () => ({ message: "Mohon pilih kategori yang valid." }),
   }),
 });
 
@@ -60,7 +62,7 @@ export default function BlogForm({
   initialData: any | null;
   pageTitle: string;
 }) {
-  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,10 +75,9 @@ export default function BlogForm({
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-
-    try {
+  // Mutation for POST request
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
       let base64Image = "";
 
       if (values.coverImage && values.coverImage.length > 0) {
@@ -102,22 +103,26 @@ export default function BlogForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Failed to submit blog:", errorData);
-        alert(errorData.error || "Failed to submit blog.");
-        return;
+        throw new Error(errorData?.error || "Failed to create blog.");
       }
 
-      const data = await response.json();
-      console.log("Blog created successfully:", data);
-      alert("Blog created successfully!");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Berhasil!",
+        description: "Blog berhasil dibuat.",
+      });
       form.reset();
-    } catch (error) {
-      console.error("Error submitting blog:", error);
-      alert("An error occurred while submitting the blog.");
-    } finally {
-      setLoading(false);
-    }
-  }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal",
+        description: error.message || "Terjadi kesalahan saat membuat blog.",
+        variant: "destructive",
+      });
+    },
+  });
 
   function toBase64(file: any) {
     return new Promise<string>((resolve, reject) => {
@@ -137,7 +142,10 @@ export default function BlogForm({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit((values) => mutate(values))}
+            className="space-y-8"
+          >
             <FormField
               control={form.control}
               name="title"
@@ -222,7 +230,7 @@ export default function BlogForm({
                         "video",
                         "code-block",
                       ]}
-                      className="max-w-screen-2xl"
+                      className="imagemax-w-screen-2xl"
                     />
                   </FormControl>
                   <FormMessage />
@@ -264,8 +272,8 @@ export default function BlogForm({
               )}
             />
             <div className="flex justify-end w-full">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Submitting..." : "Submit Blog"}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Menambahkan.." : "Tambah Blog"}
               </Button>
             </div>
           </form>

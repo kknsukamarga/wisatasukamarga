@@ -131,7 +131,6 @@ export default async function BlogDetailPage({
       <Navbar />
       <main className="mx-auto px-3 py-12 bg-white">
         {params.slug && <BreadcrumbBlog slug={params.slug} />}
-        {/* Blog Details */}
         <article className="max-w-6xl mx-auto">
           <div className="space-y-6 my-5 flex flex-col items-center justify-center">
             <Badge className="rounded-md bg-orange-secondary/70 text-gray">
@@ -152,7 +151,6 @@ export default async function BlogDetailPage({
               })}
             </p>
           </div>
-          {/* Blog Cover Image */}
           <div className="relative h-[500px] w-auto rounded-lg overflow-auto">
             <img
               src={blog.coverImage}
@@ -160,7 +158,7 @@ export default async function BlogDetailPage({
               className="w-full h-full object-cover rounded-lg"
             />
           </div>
-          {/* Blog Content */}
+
           <div className="relative flex flex-col-reverse md:flex-row">
             <div className="md:sticky top-16 lg:top-12 flex-shrink-0 h-fit">
               <div className="p-3 w-full md:w-36 flex flex-col items-center gap-3">

@@ -42,15 +42,11 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const session = await auth();
-  const isLoggedIn = !!session?.user?.email;
-
   return (
     <main className="bg-white">
       <Navbar />
       <Hero />
       <ArtikelTerbaru />
-      {/* <Kategori /> */}
       <SemuaArtikel />
       <Footer />
     </main>

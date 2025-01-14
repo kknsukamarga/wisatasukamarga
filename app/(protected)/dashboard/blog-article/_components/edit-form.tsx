@@ -27,31 +27,32 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 const MAX_FILE_SIZE = 5000000;
 
 const formSchema = z.object({
-  title: z.string().min(2, { message: "Title must be at least 2 characters." }),
+  title: z.string().min(2, { message: "Title minimal 2 karakter." }),
   coverImage: z
     .any()
     .refine((value) => {
       if (typeof value === "string" && value.startsWith("http")) return true;
       if (Array.isArray(value) && value.length > 0) return true;
       return false;
-    }, "A cover image is required.")
+    }, "Gambar cover diperlukan.")
     .refine((value) => {
       if (typeof value === "string" && value.startsWith("http")) return true;
       if (Array.isArray(value) && value[0]?.size <= MAX_FILE_SIZE) return true;
       return false;
-    }, `Cover image size must not exceed 5MB.`),
+    }, `Ukuran gambar cover tidak boleh melebihi 5MB.`),
   content: z
     .string()
-    .min(10, { message: "Content must be at least 10 characters." }),
+    .min(10, { message: "Konten minimal memiliki 10 karakter." }),
   author: z
     .string()
-    .min(2, { message: "Author name must be at least 2 characters." }),
+    .min(2, { message: "Nama pembuat minimal memiliki 2 karakter." }),
   category: z.enum(["TEMPAT_WISATA", "KARYA_UMKM"], {
-    errorMap: () => ({ message: "Please select a valid category." }),
+    errorMap: () => ({ message: "Mohon pilih kategori yang valid." }),
   }),
 });
 
@@ -61,6 +62,7 @@ export default function EditForm() {
   const [initialData, setInitialData] = useState<any | null>(null);
   const [generatedSlug, setGeneratedSlug] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,8 +128,8 @@ export default function EditForm() {
     setLoading(true);
 
     try {
+      // Step 1: Konversi cover image ke base64 jika diubah
       let finalCoverImage = "";
-
       if (Array.isArray(values.coverImage) && values.coverImage.length > 0) {
         const file = values.coverImage[0];
         finalCoverImage = await toBase64(file);
@@ -135,6 +137,16 @@ export default function EditForm() {
         finalCoverImage = values.coverImage;
       }
 
+      // Step 2: Ambil URL gambar lama dan baru
+      const oldImageUrls = extractImageUrlsFromContent(initialData.content);
+      const newImageUrls = extractImageUrlsFromContent(values.content);
+
+      // Step 3: Cari gambar yang dihapus
+      const deletedImageUrls = oldImageUrls.filter(
+        (url) => !newImageUrls.includes(url)
+      );
+
+      // Step 4: Siapkan data untuk dikirim
       const updatedData = {
         title: values.title,
         slug: generatedSlug,
@@ -142,8 +154,10 @@ export default function EditForm() {
         content: values.content,
         author: values.author,
         category: values.category,
+        deletedImages: deletedImageUrls, // Kirim gambar yang dihapus ke backend
       };
 
+      // Step 5: Kirim data ke backend
       const response = await fetch(`/api/blog?slug=${slug}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -152,15 +166,25 @@ export default function EditForm() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to update blog.");
+        toast({
+          title: "Gagal",
+          description: `Gagal memperbarui blog : ${errorData?.error}`,
+          variant: "destructive",
+        });
         return;
       }
+      toast({
+        title: "Berhasil",
+        description: "Blog sudah diupdate",
+      });
 
-      alert("Blog updated successfully!");
       router.push("/dashboard/blog-article/list");
     } catch (error) {
-      console.error("Error updating blog:", error);
-      alert("An error occurred while updating the blog.");
+      toast({
+        title: "Gagal",
+        description: "Terjadi kesalahan saat mengupdate blog",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -174,6 +198,18 @@ export default function EditForm() {
       reader.onerror = (error) => reject(error);
     });
   }
+
+  const extractImageUrlsFromContent = (content: string): string[] => {
+    const imgRegex = /<img src="([^"]+)"/g;
+    let match: RegExpExecArray | null;
+    const matches: string[] = [];
+
+    while ((match = imgRegex.exec(content)) !== null) {
+      matches.push(match[1]); // Ambil grup pertama (URL)
+    }
+
+    return matches;
+  };
 
   if (!initialData) {
     return (
@@ -256,13 +292,47 @@ export default function EditForm() {
                       onChange={field.onChange}
                       theme="snow"
                       modules={{
-                        toolbar: [
-                          ["bold", "italic", "underline"],
-                          ["blockquote", "code-block"],
-                          [{ list: "ordered" }, { list: "bullet" }],
-                          ["link", "image"],
-                        ],
+                        toolbar: {
+                          container: [
+                            [{ header: "1" }, { header: "2" }],
+                            [{ size: [] }],
+                            [
+                              "bold",
+                              "italic",
+                              "underline",
+                              "strike",
+                              "blockquote",
+                            ],
+                            [
+                              { list: "ordered" },
+                              { list: "bullet" },
+                              { indent: "-1" },
+                              { indent: "+1" },
+                            ],
+                            ["link", "image"],
+                          ],
+                        },
+                        clipboard: {
+                          matchVisual: false,
+                        },
                       }}
+                      formats={[
+                        "header",
+                        "font",
+                        "size",
+                        "bold",
+                        "italic",
+                        "underline",
+                        "strike",
+                        "blockquote",
+                        "list",
+                        "bullet",
+                        "indent",
+                        "link",
+                        "image",
+                        "video",
+                        "code-block",
+                      ]}
                       className="max-w-screen-2xl"
                     />
                   </FormControl>
@@ -306,7 +376,7 @@ export default function EditForm() {
             />
             <div className="flex justify-end w-full">
               <Button type="submit" disabled={loading}>
-                {loading ? "Updating..." : "Update Blog"}
+                {loading ? "Mengupdate.." : "Update Blog"}
               </Button>
             </div>
           </form>
