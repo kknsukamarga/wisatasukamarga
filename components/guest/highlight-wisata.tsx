@@ -7,6 +7,7 @@ import { motion, MotionValue, useScroll, useTransform } from "framer-motion";
 import Lenis from "@studio-freight/lenis";
 import { TangoSansBold } from "@/app/fonts";
 import { Button } from "../ui/button";
+import { CDN_GITHUB_URL } from "@/lib/utils";
 
 export interface Project {
   title: string;
@@ -38,7 +39,7 @@ const projects: Project[] = [
     slug: "kawah-nirwana",
     description:
       "Kawah Nirwana adalah kaldera yang terletak di Desa Sukamarga, Kecamatan Suoh. Terkenal dengan danau vulkanik kecil berwarna biru muda dan aktivitas vulkanik yang aktif seperti gas belerang dan uap air panas setiap hari.",
-    src: "/wisata/kawah-nirwana.png",
+    src: `${CDN_GITHUB_URL}wisata/ilustration/NIRWANA/NIRWANA.png`,
     link: "https://maps.app.goo.gl/pSykaLfhUkRRLXZv8",
     color: "#CFCBBA",
     icon_url: "/icon-lake.png",
@@ -48,7 +49,7 @@ const projects: Project[] = [
     slug: "kawah-keramikan",
     description:
       "Kawah Keramikan menawarkan pemandangan tanah berlapis yang mengkilap akibat pengaruh belerang dan material vulkanik. Mirip lanskap Yellowstone di Amerika Serikat, kawah ini juga memiliki fumarol aktif.",
-    src: "/wisata/kawah-nirwana.png",
+    src: `${CDN_GITHUB_URL}wisata/ilustration/KERAMIKAN/KERAMIKAN.png`,
     link: "https://maps.app.goo.gl/1LucuFWJaEfEDi9G8",
     color: "#1F3D3B",
     icon_url: "/icon-mountain.png",
@@ -58,7 +59,7 @@ const projects: Project[] = [
     slug: "kawah-merah",
     description:
       "Kawah Merah adalah danau vulkanik kecil yang berwarna merah karena kandungan besi teroksidasi. Kawah ini memiliki aktivitas vulkanik lebih rendah dibandingkan kawah lainnya.",
-    src: "/wisata/kawah-nirwana.png",
+    src: `${CDN_GITHUB_URL}wisata/ilustration/KAWAH-MERAH/KAWAH-MERAH.png`,
     link: "https://maps.app.goo.gl/9PQDxtC2zmJBcFoG7",
     color: "#CFCBBA",
     icon_url: "/icon-mountain.png",
@@ -68,7 +69,7 @@ const projects: Project[] = [
     slug: "danau-asam",
     description:
       "Danau Asam adalah danau dengan air yang memiliki pH rendah karena material vulkanik dari kawah sekitarnya. Terbentuk akibat gempa pada tahun 1933 dengan kekuatan 7.7 Ms.",
-    src: "/wisata/kawah-nirwana.png",
+    src: `${CDN_GITHUB_URL}wisata/ilustration/DANAU-ASAM/DANAU-ASAM.png`,
     link: "https://maps.app.goo.gl/EU6ByrZ9hxk2Cqm98",
     color: "#1F3D3B",
     icon_url: "/icon-lake.png",
@@ -78,7 +79,7 @@ const projects: Project[] = [
     slug: "danau-lebar",
     description:
       "Terletak di selatan Danau Asam, Danau Lebar memiliki luas sekitar 0.6 km² dan akses mudah dari Jalan Lintas Suoh. Danau ini memberikan pemandangan indah dan mudah diakses.",
-    src: "/wisata/kawah-nirwana.png",
+    src: `${CDN_GITHUB_URL}wisata/ilustration/DANAU-LEBAR/DANAU-LEBAR.png`,
     link: "https://maps.app.goo.gl/KreKGLuTbJ7qfDtGA",
     color: "#CFCBBA",
     icon_url: "/icon-lake.png",
@@ -88,7 +89,7 @@ const projects: Project[] = [
     slug: "danau-minyak",
     description:
       "Danau Minyak memiliki siluet air yang menyerupai minyak. Tempat ini menjadi favorit kawanan gajah untuk berendam, terutama pada sore hari.",
-    src: "/wisata/kawah-nirwana.png",
+    src: `${CDN_GITHUB_URL}wisata/ilustration/DANAU-MINYAK/DANAU-MINYAK.png`,
     link: "https://maps.app.goo.gl/vrpL4vkTYo3PctK79",
     color: "#1F3D3B",
     icon_url: "/icon-lake.png",
@@ -98,7 +99,7 @@ const projects: Project[] = [
     slug: "pasir-minyak",
     description:
       "Pasir Kuning adalah hamparan pasir vulkanik berwarna kuning dengan luas 52.000 m². Warna kuning berasal dari kuarsa dan sulfur dari Kawah Keramikan dan Kawah Nirwana.",
-    src: "/wisata/kawah-nirwana.png",
+    src: `${CDN_GITHUB_URL}wisata/ilustration/PASIR-KUNING/PASIR-KUNING.png`,
     link: "https://maps.app.goo.gl/YZVHy2yE8dTVe6Yz9",
     color: "#CFCBBA",
     icon_url: "/icon-mountain.png",
@@ -108,7 +109,7 @@ const projects: Project[] = [
     slug: "air-terjun-cibatuan",
     description:
       "Air Terjun Cibatuan menawarkan lanskap alam yang indah dengan hamparan pasir kuning dan panorama air terjun alami yang memukau.",
-    src: "/wisata/kawah-nirwana.png",
+    src: `${CDN_GITHUB_URL}wisata/ilustration/AIR-TERJUN/AIR-TERJUN.png`,
     link: "/wisata/air-terjun-cibatuan",
     color: "#1F3D3B",
     icon_url: "/icon-waterfall.png",

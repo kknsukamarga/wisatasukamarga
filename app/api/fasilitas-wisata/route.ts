@@ -1,42 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+  const id = searchParams.get("id"); // Optional: filter by wisata ID
 
   try {
     if (id) {
-      // Fetch single wisata by id, including related fasilitas
-      const wisata = await prisma.wisata.findUnique({
+      // Fetch fasilitasWisata related to a specific wisataId
+      const fasilitasWisata = await prisma.fasilitasWisata.findMany({
         where: { id },
         include: {
-          fasilitasWisata: true,
+          wisata: true, // Include the related Wisata data
         },
       });
 
-      if (!wisata) {
+      if (fasilitasWisata.length === 0) {
         return NextResponse.json(
-          { error: "Wisata not found" },
+          { error: "No fasilitasWisata found for the given wisataId" },
           { status: 404 }
         );
       }
 
-      return NextResponse.json(wisata);
+      return NextResponse.json(fasilitasWisata);
     }
 
-    // Fetch all wisata records, including related fasilitas
-    const wisatas = await prisma.wisata.findMany({
+    // Fetch all fasilitasWisata records
+    const allFasilitasWisata = await prisma.fasilitasWisata.findMany({
       include: {
-        fasilitasWisata: true,
+        wisata: true, // Include the related Wisata data
       },
     });
 
-    return NextResponse.json(wisatas);
+    return NextResponse.json(allFasilitasWisata);
   } catch (error: any) {
-    console.error("Error during GET wisatas:", error);
+    console.error("Error during GET fasilitasWisata:", error);
     return NextResponse.json(
       { error: "Something went wrong", details: error.message },
       { status: 500 }
@@ -57,11 +64,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const cloudinaryResponse = await cloudinary.uploader.upload(body.image, {
+      folder: "wisata",
+      public_id: body.name.toLowerCase().replace(/\s+/g, "-"),
+    });
+
+    const imageUrl = cloudinaryResponse.secure_url;
+
     // Create new fasilitas
     const newFasilitas = await prisma.fasilitasWisata.create({
       data: {
         name,
-        image,
+        image: imageUrl,
         description,
         wisataId,
       },
@@ -107,14 +121,21 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    const cloudinaryResponse = await cloudinary.uploader.upload(image[0], {
+      folder: "wisata",
+      public_id: name.toLowerCase().replace(/\s+/g, "-"),
+    });
+
+    const updatedData = {
+      name: name,
+      image: cloudinaryResponse.secure_url,
+      description: description,
+    };
+
     // Update fasilitas
     const updatedFasilitas = await prisma.fasilitasWisata.update({
       where: { id },
-      data: {
-        name,
-        image,
-        description,
-      },
+      data: updatedData,
     });
 
     return NextResponse.json(updatedFasilitas);

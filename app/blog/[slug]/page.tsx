@@ -1,10 +1,10 @@
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/guest/navbar";
 import Footer from "@/components/guest/footer";
+import Sharelink from "./sharelink";
 import { Questa } from "@/app/fonts";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,8 +13,87 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import Link from "next/link";
-import Sharelink from "./sharelink";
+import { Badge } from "@/components/ui/badge";
+
+// Fungsi untuk mendapatkan blog berdasarkan slug
+async function getBlogBySlug(slug: string) {
+  const blog = await prisma.blog.findUnique({
+    where: { slug },
+  });
+
+  if (!blog) {
+    return null;
+  }
+
+  return {
+    ...blog,
+    createdAt: blog.createdAt.toISOString(),
+    updatedAt: blog.updatedAt?.toISOString(),
+  };
+}
+
+function extractContentFromHtml(html: string): string {
+  const sanitizedHtml = html.replace(/<br\s*\/?>|<img[^>]*>/gi, "");
+
+  const regex = /<(p|h1|h2|h3)[^>]*>(.*?)<\/\1>/gi;
+  let match;
+  let extractedText = "";
+
+  while ((match = regex.exec(sanitizedHtml)) !== null) {
+    if (match[2].trim()) {
+      extractedText += `${match[2].trim()} `;
+    }
+  }
+
+  return extractedText.slice(0, 150).trim() + "...";
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const blog = await getBlogBySlug(params.slug);
+
+  if (!blog) {
+    return {
+      title: "Artikel Tidak Ditemukan - Desa Suka Marga",
+      description: "Halaman artikel tidak ditemukan.",
+    };
+  }
+
+  const extractedDescription = extractContentFromHtml(blog.content);
+
+  return {
+    title: `${blog.title} - Desa Suka Marga`,
+    description: extractedDescription,
+    robots: "index, follow",
+    authors: [{ name: "Desa Wisata Suka Marga" }],
+    openGraph: {
+      type: "website",
+      url: `https://wisatasukamarga.my.id/blogs/${params.slug}`,
+      title: `${blog.title} - Desa Wisata Suka Marga`,
+      description: extractedDescription,
+      images: [
+        {
+          url: blog.coverImage,
+          alt: blog.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${blog.title} - Desa Wisata Suka Marga`,
+      description: extractedDescription,
+      images: [
+        {
+          url: blog.coverImage,
+          alt: blog.title,
+        },
+      ],
+    },
+  };
+}
 
 function BreadcrumbBlog({ slug }: { slug: string }) {
   return (
@@ -36,22 +115,6 @@ function BreadcrumbBlog({ slug }: { slug: string }) {
   );
 }
 
-async function getBlogBySlug(slug: string) {
-  const blog = await prisma.blog.findUnique({
-    where: { slug },
-  });
-
-  if (!blog) {
-    return null;
-  }
-
-  return {
-    ...blog,
-    createdAt: blog.createdAt.toISOString(),
-    updatedAt: blog.updatedAt?.toISOString(), 
-  };
-}
-
 export default async function BlogDetailPage({
   params,
 }: {
@@ -66,13 +129,12 @@ export default async function BlogDetailPage({
   return (
     <>
       <Navbar />
-
       <main className="mx-auto px-3 py-12 bg-white">
         {params.slug && <BreadcrumbBlog slug={params.slug} />}
         <article className="max-w-6xl mx-auto">
           <div className="space-y-6 my-5 flex flex-col items-center justify-center">
             <Badge className="rounded-md bg-orange-secondary/70 text-gray">
-              WISATA
+              {blog.category}
             </Badge>
             <h1
               className={`text-5xl font-bold text-gray-900 text-center ${Questa.className}`}
@@ -80,6 +142,7 @@ export default async function BlogDetailPage({
               {blog.title}
             </h1>
             <p className="text-sm">
+              {blog.author} -{" "}
               {new Date(blog.updatedAt).toLocaleDateString("id-ID", {
                 weekday: "long",
                 year: "numeric",

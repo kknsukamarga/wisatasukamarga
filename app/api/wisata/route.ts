@@ -46,6 +46,34 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(data);
     }
 
+    if (name) {
+      const nama = name
+        .split("-")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+      let wisatas = await prisma.wisata.findMany({
+        include: {
+          fasilitasWisata: true,
+        },
+      });
+      const wisata = await prisma.wisata.findMany({
+        where: { name: { contains: nama, mode: "insensitive" } },
+        include: {
+          fasilitasWisata: true,
+        },
+      });
+      if (!wisata) {
+        return NextResponse.json(
+          { error: "Wisata tidak ditemukan" },
+          { status: 404 }
+        );
+      }
+      const data = { wisata: wisata, length: wisatas.length };
+      return NextResponse.json(data);
+    }
+
     if (page) {
       if (search) {
         const wisatasSearch = await prisma.wisata.findMany({

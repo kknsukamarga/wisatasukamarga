@@ -1,38 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import EditForm from "../../_components/edit-form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchWisataData = async (id: string) => {
+  const response = await fetch(`/api/wisata?id=${id}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch data");
+  }
+
+  const data = await response.json();
+
+  return data.wisata;
+};
 
 export default function WisataEditPage() {
   const { id } = useParams();
-  const [initialData, setInitialData] = useState(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchWisataData() {
-      try {
-        const response = await fetch(`/api/wisata?id=${id}`);
-        if (!response.ok) {
-          return;
-        }
-        const data = await response.json();
-        setInitialData(data.wisata);
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    }
+  const {
+    data: initialData,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["wisata", id],
+    queryFn: () => fetchWisataData(id as string),
+  });
 
-    if (id) {
-      fetchWisataData();
-    }
-  }, [id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
@@ -60,7 +58,7 @@ export default function WisataEditPage() {
     return (
       <Card className="mx-auto w-full">
         <CardHeader>
-          <h1 className="text-red-500">Error: {error}</h1>
+          <h1 className="text-red-500">Error: {error.message}</h1>
         </CardHeader>
       </Card>
     );

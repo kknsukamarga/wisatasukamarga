@@ -12,10 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -23,9 +20,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import * as z from "zod";
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+// Validation schema
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Nama harus terdiri dari minimal 2 karakter.",
@@ -42,9 +45,15 @@ const formSchema = z.object({
   description: z.string().min(50, {
     message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
-  price: z.number().min(1, {
-    message: "Harga wajib diisi dan harus lebih besar dari 0.",
-  }),
+  price: z
+    .string()
+    .refine((value) => !isNaN(Number(value)), {
+      message: "Harga harus berupa angka yang valid.",
+    })
+    .transform((value) => Number(value))
+    .refine((value) => value > 0, {
+      message: "Harga wajib diisi dan harus lebih besar dari 0.",
+    }),
   location: z
     .string()
     .min(2, {
@@ -65,6 +74,15 @@ const formSchema = z.object({
   }),
 });
 
+// Helper to convert files to Base64
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+
 export default function WisataForm({
   initialData,
   pageTitle,
@@ -72,37 +90,25 @@ export default function WisataForm({
   initialData: any | null;
   pageTitle: string;
 }) {
-  const defaultValues = {
-    name: initialData?.name || "",
-    imageCover: initialData?.imageCover || null,
-    images: initialData?.images || [],
-    description: initialData?.description || "",
-    price: initialData?.price || "",
-    location: initialData?.location || "",
-    status: initialData?.status || "",
-  };
+  const { toast } = useToast();
 
-  const { toast } = useToast(); // Menggunakan useToast
-  const [loading, setLoading] = useState(false);
-
+  // React Hook Form setup
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      name: initialData?.name || "",
+      imageCover: initialData?.imageCover || null,
+      images: initialData?.images || [],
+      description: initialData?.description || "",
+      price: initialData?.price || "",
+      location: initialData?.location || "",
+      status: initialData?.status || "Buka",
+    },
   });
 
-  const toBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-
-    try {
+  // Mutation for form submission
+  const mutation = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
       const base64Cover = await toBase64(values.imageCover[0]);
       const base64Images = await Promise.all(
         values.images.map((file: File) => toBase64(file))
@@ -113,7 +119,7 @@ export default function WisataForm({
         imageCover: base64Cover,
         image: base64Images,
         description: values.description,
-        price: parseInt(values.price as unknown as string, 10),
+        price: values.price,
         location: values.location,
         status: values.status,
         fasilitasWisata: null,
@@ -129,38 +135,36 @@ export default function WisataForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        toast({
-          title: "Gagal Mengirim Data",
-          description: `Error: ${errorData.message || "Terjadi kesalahan."}`,
-          variant: "destructive",
-        });
-        return;
+        throw new Error(errorData.message || "Terjadi kesalahan.");
       }
 
-      const data = await response.json();
-      console.log("Wisata created successfully:", data);
+      return response.json();
+    },
+    onSuccess: () => {
       toast({
         title: "Berhasil",
         description: "Wisata berhasil dibuat!",
         variant: "default",
       });
-
       form.reset();
 
-      // Opsional: Alihkan pengguna setelah 2 detik
+      // Redirect after success
       setTimeout(() => {
         window.location.replace("/dashboard/wisata/list");
       }, 2000);
-    } catch (error) {
+    },
+    onError: (error: any) => {
       toast({
         title: "Gagal Mengirim Data",
-        description: `Error: ${error}`,
+        description: error.message || "Terjadi kesalahan.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
-    }
-  }
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    mutation.mutate(values);
+  };
 
   return (
     <Card className="mx-auto w-full">
@@ -199,7 +203,7 @@ export default function WisataForm({
                       value={field.value}
                       onValueChange={field.onChange}
                       maxFiles={1}
-                      maxSize={5 * 1024 * 1024} // 5MB
+                      maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
                   <FormMessage />
@@ -219,7 +223,7 @@ export default function WisataForm({
                       value={field.value}
                       onValueChange={field.onChange}
                       maxFiles={6}
-                      maxSize={5 * 1024 * 1024} // 5MB
+                      maxSize={MAX_FILE_SIZE}
                     />
                   </FormControl>
                   <FormMessage />
@@ -254,9 +258,6 @@ export default function WisataForm({
                       type="number"
                       placeholder="Masukkan Harga Tiket Masuk Wisata..."
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value, 10))
-                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -311,8 +312,8 @@ export default function WisataForm({
 
             {/* Submit Button */}
             <div className="flex justify-end w-full">
-              <Button type="submit" disabled={loading}>
-                {loading ? "Mengirimkan..." : "Simpan Wisata"}
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? "Mengirimkan..." : "Simpan Wisata"}
               </Button>
             </div>
           </form>

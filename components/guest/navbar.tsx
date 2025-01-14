@@ -59,7 +59,7 @@ function Navbar() {
     <header className="flex h-20 w-full shrink-0 fixed items-center pl-4 md:px-6 z-[1000] text-white">
       <Link
         href="/"
-        className="gap-4 flex items-center bg-gray px-4 py-2.5 shadow-md rounded-full text-white"
+        className="gap-4 flex items-center bg-gray ml-3 px-4 py-2.5 shadow-md rounded-full text-white"
         prefetch={false}
       >
         <Image

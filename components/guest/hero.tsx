@@ -1,6 +1,7 @@
 "use client";
 
 import { Questa } from "@/app/fonts";
+import { CDN_GITHUB_URL } from "@/lib/utils";
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import React, { useRef } from "react";
@@ -18,42 +19,42 @@ export default function Hero() {
   return (
     <div
       ref={ref}
-      className="w-full min-h-screen overflow-hidden relative grid place-items-center"
+      className="w-full min-h-screen overflow-hidden relative grid place-items-center border border-red-500"
     >
-      <div className="flex justify-center items-center flex-col z-40">
+      <div className="flex justify-center items-center flex-col z-40 text-center">
         <motion.p
           style={{ y: textY }}
           className={`font-bold text-white text-lg relative z-40 ${Questa.className}`}
         >
-          Desa Wisata
+          Telusuri Wisata
         </motion.p>
 
         <motion.h1
           style={{ y: textY }}
-          className={`font-bold text-white text-7xl md:text-9xl relative z-40 ${Questa.className}`}
+          className={`font-bold text-white text-5xl md:text-7xl relative z-40 ${Questa.className}`}
         >
-          Suka Marga
+          Wisata Suka Marga
         </motion.h1>
       </div>
 
       <motion.div
-        className="absolute inset-0 z-0 top-0 grayscale brightness-50"
+        className="absolute inset-0 z-0 top-0 brightness-50"
         style={{
-          backgroundImage: `url(/image-full.png)`,
+          backgroundImage: `url(${CDN_GITHUB_URL}parralax/1.png)`,
           backgroundPosition: "bottom",
           backgroundSize: "cover",
           y: backgroundY,
         }}
       />
 
-      <motion.div
-        className="absolute inset-0 z-20"
+      {/* <motion.div
+        className="absolute inset-0 z-20 bo"
         style={{
-          backgroundImage: `url(/image-bottom.png)`,
+          backgroundImage: `url(${CDN_GITHUB_URL}parralax/1.png)`,
           backgroundPosition: "bottom",
           backgroundSize: "cover",
         }}
-      />
+      /> */}
 
       <div className="absolute inset-0 bg-gradient-to-t from-gray to-transparent z-30" />
     </div>
