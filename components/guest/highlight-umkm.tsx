@@ -208,7 +208,10 @@ function HighlightUMKM({ page = 1, pageSize = 5, search = "" }) {
                     </p>
 
                     <div className="mt-6 flex w-full justify-between items-center">
-                      <h3 className="font-bold text-lg">Rp{umkm.price}</h3>
+                      <h3 className="font-bold text-lg">
+                        {" "}
+                        Rp{umkm.price.toLocaleString("id-ID")}
+                      </h3>
 
                       <Link href={`/umkm/${umkm.slug}`} passHref>
                         <Button className="rounded-full px-3">

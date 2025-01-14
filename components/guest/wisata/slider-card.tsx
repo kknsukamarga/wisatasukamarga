@@ -43,7 +43,7 @@ export default function SliderCard({ data }: SliderCardProps) {
             layoutId={`${data.location}`}
             className="text-xs z-10 text-white"
           >
-            {data.location}
+            Suoh, Sukamarga
           </motion.p>
 
           <motion.h1

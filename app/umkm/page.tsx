@@ -3,6 +3,7 @@ import Navbar from "@/components/guest/navbar";
 import Footer from "@/components/guest/footer";
 import Hero from "@/components/guest/umkm/hero";
 import UMKMSection from "@/components/guest/umkm/UMKMSection";
+import { CDN_GITHUB_URL } from "@/lib/utils";
 
 // Define metadata for the page
 export const metadata: Metadata = {
@@ -14,13 +15,13 @@ export const metadata: Metadata = {
   authors: [{ name: "Desa Wisata Suka Marga" }],
   openGraph: {
     type: "website",
-    url: "https://wisatasukamarga.my.id/",
+    url: "https://wisatasukamarga.my.id/umkm",
     title: "Bantu UMKM - Desa Wisata Suka Marga",
     description:
       "Dukung pertumbuhan UMKM di Desa Suka Marga melalui inisiatif yang mengedepankan kolaborasi dan inovasi lokal.",
     images: [
       {
-        url: "https://wisatasukamarga.my.id/",
+        url: `${CDN_GITHUB_URL}og-image/umkm.png`,
         alt: "Bantu UMKM - Desa Wisata Suka Marga",
       },
     ],
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
       "Dukung pertumbuhan UMKM di Desa Suka Marga melalui inisiatif yang mengedepankan kolaborasi dan inovasi lokal.",
     images: [
       {
-        url: "https://wisatasukamarga.my.id/",
+        url: `${CDN_GITHUB_URL}og-image/umkm.png`,
         alt: "Bantu UMKM - Desa Wisata Suka Marga",
       },
     ],

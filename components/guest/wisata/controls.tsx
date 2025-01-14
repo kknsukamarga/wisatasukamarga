@@ -28,21 +28,20 @@ function Controls({
       transitionData ? transitionData : initData,
       ...prevData.slice(0, prevData.length - 1),
     ]);
-    handleCurrentSlideData({
+    handleCurrentSlideData((prev) => ({
       data: transitionData ? transitionData : sliderData[0],
-      index: sliderData.findIndex(
-        (ele) => ele.img === data[data.length - 1].img
-      ),
-    });
+      index: prev.index === 0 ? sliderData.length : prev.index - 1,
+    }));
     handleTransitionData(data[data.length - 1]);
   };
 
   const handleNext = () => {
     handleData((prev) => prev.slice(1));
-    handleCurrentSlideData({
+    handleCurrentSlideData((prev) => ({
       data: transitionData ? transitionData : initData,
-      index: sliderData.findIndex((ele) => ele.img === data[0].img),
-    });
+      index: prev.index === sliderData.length ? 0 : prev.index + 1,
+    }));
+
     handleTransitionData(data[0]);
     setTimeout(() => {
       handleData((newData) => [

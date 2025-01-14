@@ -135,7 +135,7 @@ export default async function BlogDetailPage({
         <article className="max-w-6xl mx-auto">
           <div className="space-y-6 my-5 flex flex-col items-center justify-center">
             <Badge className="rounded-md bg-orange-secondary/70 text-gray">
-              WISATA
+              {blog.category}
             </Badge>
             <h1
               className={`text-5xl font-bold text-gray-900 text-center ${Questa.className}`}
@@ -143,6 +143,7 @@ export default async function BlogDetailPage({
               {blog.title}
             </h1>
             <p className="text-sm">
+              {blog.author} -{" "}
               {new Date(blog.updatedAt).toLocaleDateString("id-ID", {
                 weekday: "long",
                 year: "numeric",

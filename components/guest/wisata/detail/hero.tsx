@@ -1,65 +1,34 @@
-"use client";
+import { Questa } from "@/app/fonts";
 
-import {
-  Questa,
-  TangoSansBold,
-  TangoSans,
-  TangoSansBoldItalic,
-  TangoSansItalic,
-} from "@/app/fonts";
-
-import { motion, useScroll, useTransform } from "framer-motion";
+import { MapPin, MoveRight } from "lucide-react";
+import Image from "next/image";
 import React, { useRef } from "react";
 
-export default function Hero() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "70%"]);
-
+export default function Hero({ data }: { data: any }) {
   return (
-    <div
-      ref={ref}
-      className="w-full min-h-screen overflow-hidden relative grid place-items-center"
-    >
-      <div className="flex justify-center items-center flex-col">
-        <motion.p
-          style={{ y: textY }}
-          className={`font-bold text-white text-lg relative z-10 ${Questa.className}`}
-        >
-          Detail Wisata
-        </motion.p>
+    <div className="h-screen text-white relative">
+      <Image
+        src={data.imageCover}
+        alt="Image 2"
+        layout="fill"
+        className="absolute inset-0 z-10 brightness-50"
+      />
 
-        <motion.h1
-          style={{ y: textY }}
-          className={`font-bold text-white text-7xl md:text-9xl relative z-10 ${Questa.className}`}
-        >
-          Suka Marga
-        </motion.h1>
+      <div className="w-full h-full flex gap-5 justify-end items-start p-8 md:p-20 flex-col md:w-[50%]">
+        <div className="flex items-center gap-2 px-4 py-3 rounded-full bg-white/10 border-white border z-20 text-white">
+          <MapPin /> Sukamarga, Suoh, Lampung Barat
+        </div>
+
+        <h1 className={`text-white text-5xl z-20 ${Questa.className}`}>
+          {data.name}
+        </h1>
+
+        <p className="z-20 text-white">
+          {data.price < 100
+            ? "Rp Gratis"
+            : `Rp${data.price.toLocaleString("id-ID")},00`}
+        </p>
       </div>
-
-      <motion.div
-        className="absolute inset-0 z-0 top-0 grayscale brightness-50"
-        style={{
-          backgroundImage: `url(/image-full.png)`,
-          backgroundPosition: "bottom",
-          backgroundSize: "cover",
-          y: backgroundY,
-        }}
-      />
-
-      <motion.div
-        className="absolute inset-0 z-20"
-        style={{
-          backgroundImage: `url(/image-bottom.png)`,
-          backgroundPosition: "bottom",
-          backgroundSize: "cover",
-        }}
-      />
     </div>
   );
 }

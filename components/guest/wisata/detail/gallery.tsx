@@ -54,7 +54,7 @@ export default function Gallery({ images }) {
               alt={`Gallery Image ${index + 1}`}
               width={300}
               height={200}
-              className="rounded-md cursor-pointer"
+              className="rounded-md cursor-pointer w-full h-full"
               onClick={() => handleImageClick(index)} // Open modal with selected image
               priority
             />

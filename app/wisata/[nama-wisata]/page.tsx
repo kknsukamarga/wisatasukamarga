@@ -3,6 +3,7 @@ import WisataDetails from "@/components/guest/wisata/detail/wisata-details";
 import Hero from "@/components/guest/wisata/detail/hero";
 import FooterDetailWisata from "@/components/guest/wisata/detail/footer";
 import { Metadata } from "next";
+import { ParralaxBanner } from "@/components/guest/wisata/detail/ParralaxBanner";
 
 // Define the type for the dynamic params
 interface PageProps {
@@ -42,14 +43,10 @@ export async function generateMetadata({
   };
 }
 
-const jenisWisata = ["Danau", "Air Terjun"];
-
 export default function Page({ params }: PageProps) {
   const namaWisata = decodeURIComponent(params["nama-wisata"]);
 
-  const currentJenisWisata = "Danau";
-
-  const conditionalClassName = jenisWisata.includes(currentJenisWisata)
+  const conditionalClassName = namaWisata.includes("danau")
     ? "bg-gray text-white"
     : "bg-white text-gray";
 
@@ -57,7 +54,6 @@ export default function Page({ params }: PageProps) {
     <main className={`mx-auto ${conditionalClassName}`}>
       <Navbar />
 
-      <Hero />
       <WisataDetails namaWisata={namaWisata} />
 
       <FooterDetailWisata link={`http://localhost:3000/wisata/detail`} />

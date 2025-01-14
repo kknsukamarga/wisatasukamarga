@@ -11,7 +11,7 @@ function Progress({ currIndex, length }: ProgressProps) {
       <div className="flex h-[1px] flex-1 items-center rounded-full bg-white bg-opacity-50">
         <div
           style={{
-            width: (((currIndex = 1) / length) * 100).toString() + "%",
+            width: ((currIndex / length) * 100).toString() + "%", // Perhitungan yang benar
           }}
           className={`h-[1px] rounded-full bg-yellow-400 bg-opacity-50`}
         ></div>

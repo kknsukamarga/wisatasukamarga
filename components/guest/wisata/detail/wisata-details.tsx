@@ -2,14 +2,13 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { TangoSansBold } from "@/app/fonts";
-import { MapPin } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import Gallery from "@/components/guest/wisata/detail/gallery";
 import CarouselAttractions from "@/components/guest/wisata/detail/carousel-attractive";
+import Hero from "./hero";
 
 const fetchWisataData = async (namaWisata) => {
-  const response = await fetch(
-    `/api/wisata?name=${encodeURIComponent(namaWisata)}`
-  );
+  const response = await fetch(`/api/wisata?name=${namaWisata}`);
   if (!response.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -20,16 +19,74 @@ const fetchWisataData = async (namaWisata) => {
 const WisataDetails = ({ namaWisata }) => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["wisata", { namaWisata }],
-    queryFn: fetchWisataData,
+    queryFn: () => fetchWisataData(namaWisata),
   });
+  console.log(data);
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-  if (!data) return <p>Data not found</p>;
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="flex flex-col items-center space-y-4 text-center">
+          <Loader2 size={32} className="text-orange-primary animate-spin" />
+          <p className="text-lg text-gray-700">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-red-100">
+        <div className="flex flex-col items-center space-y-4 text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-16 w-16 text-red-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M18 6L6 18M6 6l12 12"
+            />
+          </svg>
+          <p className="text-lg text-red-700">Error: {error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="flex flex-col items-center space-y-4 text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-16 w-16 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M17 12h2M5 12h2M12 5v2M12 17v2M16.24 7.76l1.42 1.42M7.76 16.24l1.42 1.42M16.24 16.24l1.42-1.42M7.76 7.76l1.42-1.42"
+            />
+          </svg>
+          <p className="text-lg text-gray-700">Data not found</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
-      <div className="md:px-10 px-2 py-20">
+      <Hero data={data} />
+
+      <div className="md:px-10 xl:px-20 px-2 py-20">
         <h1 className="text-4xl font-bold mb-4">Deskripsi {data.name}</h1>
         <p className="text-sm md:text-lg mb-6 text-justify">
           {data.description}
@@ -96,7 +153,7 @@ const WisataDetails = ({ namaWisata }) => {
           </p>
 
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15892.7259157773!2d104.26442244958294!3d-5.234166515897918!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e47a004b244689f%3A0x50758b3515ab1ee4!2sDanau%20Asam!5e0!3m2!1sid!2sid!4v1736223010351!5m2!1sid!2sid"
+            src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&q=${data.name}+suka+marga`}
             loading="lazy"
             className="rounded-md mt-10 w-[300px] h-[300px] md:w-[450px] md:h-[450px] xl:w-[600px] xl:h-[600px]"
           ></iframe>

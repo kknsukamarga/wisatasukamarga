@@ -7,6 +7,7 @@ import SlideInfo from "./slideinfo";
 import Slides from "./slides";
 import Controls from "./controls";
 import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 
 export type DataShowcase = {
   img: string;
@@ -19,6 +20,39 @@ export type DataShowcase = {
 export type CurrentSlide = {
   data: DataShowcase;
   index: number;
+};
+
+const SkeletonLarge = () => {
+  return (
+    <div className="relative w-full h-[70vh] bg-gray-300 animate-pulse">
+      <div className="w-full h-full bg-gray-400"></div>
+
+      <div className="absolute inset-0 flex flex-col justify-center items-start space-y-4 px-5">
+        <div className="w-[60%] h-10 bg-black/10 rounded-md"></div>
+        <div className="w-[80%] h-6 bg-black/10 rounded-md"></div>
+        <div className="w-[70%] h-6 bg-black/10 rounded-md"></div>
+        <div className="mt-5 w-32 h-10 bg-black/10 rounded-full"></div>
+      </div>
+    </div>
+  );
+};
+
+const SkeletonCarousel = () => {
+  return (
+    <div className="flex space-x-4 mt-8">
+      {Array(4)
+        .fill(0)
+        .map((_, index) => (
+          <div
+            key={index}
+            className="w-[200px] h-[120px] bg-black/20 rounded-md animate-pulse"
+          >
+            <div className="w-full h-full bg-black/10"></div>
+            <div className="mt-2 w-3/4 h-4 bg-black/10 rounded-md"></div>
+          </div>
+        ))}
+    </div>
+  );
 };
 
 export default function ShowcaseWisata() {
@@ -35,7 +69,6 @@ export default function ShowcaseWisata() {
       }
       return response.json();
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   const [data, setData] = useState<DataShowcase[]>([]);
@@ -52,7 +85,7 @@ export default function ShowcaseWisata() {
           title: item.name, // Name becomes title
           description: item.description, // Description maps directly
           location: item.location, // Location maps directly
-          slug: item.id, // Use `id` as slug
+          slug: item.name.toLowerCase().replace(/\s+/g, "-"), // Use `id` as slug
         })
       );
 
@@ -66,11 +99,49 @@ export default function ShowcaseWisata() {
   }, [fetchedData]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center space-y-8 flex-col md:flex-row overflow-hidden">
+        {/* Large Image Placeholder */}
+        <SkeletonLarge />
+        {/* Carousel Images Placeholder */}
+        <div className="flex flex-col items-start justify-start">
+          <SkeletonCarousel />
+
+          <div className="flex items-center justify-center mt-20 w-full gap-2">
+            <div className="w-12 h-12 rounded-full bg-black/20"></div>
+            <div className="w-12 h-12 rounded-full bg-black/20"></div>
+            <div className="w-[80%] h-1 bg-black/20"></div>
+            <div className="w-12 h-12 rounded-full bg-black/20"></div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error fetching data: {error.message}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-6 text-center">
+        {/* Mascot Image */}
+        <div className="w-48 h-48 overflow-hidden">
+          <Image
+            src="/eror-maskot.png"
+            alt="Leaf Mascot"
+            width={1080}
+            height={1080}
+            className="rotate-[10deg]"
+          />
+        </div>
+
+        {/* Error Message */}
+        <h2 className="text-2xl font-bold text-red-500 mt-4">
+          Oops! Sepertinya ada yang salah.
+        </h2>
+        <p className="text-gray-600 mt-2">
+          Silakan coba refresh lagi nanti atau hubungi dukungan jika masalah
+          berlanjut.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -93,7 +164,7 @@ export default function ShowcaseWisata() {
                 </div>
 
                 {/* Slider Right Carousel Content */}
-                <div className="col-span-6 flex flex-1 md:justify-center justify-start md:p-10 flex-col h-full">
+                <div className="col-span-6 flex flex-1 md:justify-center justify-start md:p-10 flex-col h-full mt-20 md:mt-0">
                   <Slides datas={data} />
                   <Controls
                     currentSlideData={currentSlide}

@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import Navbar from "@/components/guest/navbar";
 import Footer from "@/components/guest/footer";
 import LandingPage from "@/components/guest/landingpage";
+import { CDN_GITHUB_URL } from "@/lib/utils";
 
 // Static metadata
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
       "Desa Wisata Sukamarga menawarkan keindahan alam yang memukau dengan kawah keramikan belerang, danau-danau yang indah, hamparan sawah yang hijau, serta suasana pedesaan asri. Cocok untuk destinasi wisata alam dan relaksasi.",
     images: [
       {
-        url: "https://wisatasukamarga.my.id/", // Replace with your actual image URL
+        url: `${CDN_GITHUB_URL}og-image/landing-page.png`, // Replace with your actual image URL
         alt: "Desa Wisata Suka Marga",
       },
     ],
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
       "Desa Wisata Sukamarga menawarkan keindahan alam yang memukau dengan kawah keramikan belerang, danau-danau yang indah, hamparan sawah yang hijau, serta suasana pedesaan asri. Cocok untuk destinasi wisata alam dan relaksasi.",
     images: [
       {
-        url: "https://wisatasukamarga.my.id/", // Replace with your actual image URL
+        url: `${CDN_GITHUB_URL}og-image/landing-page.png`, // Replace with your actual image URL
         alt: "Desa Wisata Suka Marga",
       },
     ],
