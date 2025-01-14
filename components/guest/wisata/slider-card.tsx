@@ -40,7 +40,7 @@ export default function SliderCard({ data }: SliderCardProps) {
           ></motion.div>
 
           <motion.p
-            layoutId={`${data.img}-location`}
+            layoutId={`${data.location}`}
             className="text-xs z-10 text-white"
           >
             {data.location}

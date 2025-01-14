@@ -7,38 +7,7 @@ import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-const CategoryPhoto = [
-  {
-    name: "Kapal Laut",
-    src: "https://picsum.photos/200/300",
-  },
-  {
-    name: "Kawah",
-    src: "https://picsum.photos/200/300",
-  },
-  {
-    name: "Air Terjun",
-    src: "https://picsum.photos/200/300",
-  },
-  {
-    name: "Pantai",
-    src: "https://picsum.photos/200/300",
-  },
-  {
-    name: "Gunung",
-    src: "https://picsum.photos/200/300",
-  },
-  {
-    name: "Gunung",
-    src: "https://picsum.photos/200/300",
-  },
-  {
-    name: "Gunung",
-    src: "https://picsum.photos/200/300",
-  },
-];
-
-export default function CarouselAttractions() {
+export default function CarouselAttractions({ attractions }) {
   const [activeItem, setActiveItem] = useState(0);
   const wrapperRef = useRef<HTMLUListElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -76,7 +45,7 @@ export default function CarouselAttractions() {
           ref={wrapperRef}
           className="group flex justify-start md:w-full md:animate-none overflow-scroll md:overflow-hidden gap-5 h-[400px] md:flex-row md:gap-[1.5%] mt-10 md:mt-0"
         >
-          {CategoryPhoto.map((item, index) => (
+          {attractions.map((item, index) => (
             <li
               onClick={() => setActiveItem(index)}
               aria-current={activeItem === index}
@@ -91,7 +60,7 @@ export default function CarouselAttractions() {
               <div className="relative w-full h-full overflow-hidden rounded-2xl">
                 <Image
                   className="absolute object-cover w-full -translate-y-1/2 opacity-80 z-10 top-1/2 max-w-none md:left-1/2 md:h-full md:-translate-x-1/2 md:rounded-none"
-                  src={item.src}
+                  src={item.image}
                   alt={item.name}
                   width={600}
                   height={700}
