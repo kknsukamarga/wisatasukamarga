@@ -14,23 +14,11 @@ import "swiper/css/navigation";
 import { EffectCoverflow, Pagination, Navigation } from "swiper/modules";
 import Image from "next/image";
 
-const images = [
-  "https://swiperjs.com/demos/images/nature-1.jpg",
-  "https://swiperjs.com/demos/images/nature-2.jpg",
-  "https://swiperjs.com/demos/images/nature-3.jpg",
-  "https://swiperjs.com/demos/images/nature-4.jpg",
-  "https://swiperjs.com/demos/images/nature-5.jpg",
-  "https://swiperjs.com/demos/images/nature-6.jpg",
-  "https://swiperjs.com/demos/images/nature-7.jpg",
-  "https://swiperjs.com/demos/images/nature-8.jpg",
-  "https://swiperjs.com/demos/images/nature-9.jpg",
-];
-
-export default function Gallery() {
+export default function Gallery({ images }) {
   const [showModal, setShowModal] = useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
 
-  const handleImageClick = (index: number) => {
+  const handleImageClick = (index) => {
     setInitialSlide(index);
     setShowModal(true);
   };
@@ -63,7 +51,7 @@ export default function Gallery() {
           <SwiperSlide key={index} className="my-10">
             <Image
               src={src}
-              alt={`Nature Image ${index + 1}`}
+              alt={`Gallery Image ${index + 1}`}
               width={300}
               height={200}
               className="rounded-md cursor-pointer"
@@ -96,7 +84,7 @@ export default function Gallery() {
                 <SwiperSlide key={index}>
                   <Image
                     src={src}
-                    alt={`Nature Image ${index + 1}`}
+                    alt={`Gallery Image ${index + 1}`}
                     width={800}
                     height={600}
                     className="rounded-md"
