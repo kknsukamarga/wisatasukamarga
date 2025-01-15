@@ -6,7 +6,7 @@ import React, { useRef } from "react";
 
 export default function Hero({ data }: { data: any }) {
   return (
-    <div className="h-screen text-white relative">
+    <div className="h-[50vh] md:h-screen text-white relative">
       <Image
         src={data.imageCover}
         alt="Image 2"
@@ -15,7 +15,7 @@ export default function Hero({ data }: { data: any }) {
       />
 
       <div className="w-full h-full flex gap-5 justify-end items-start p-8 md:p-20 flex-col md:w-[50%]">
-        <div className="flex items-center gap-2 px-4 py-3 rounded-full bg-white/10 border-white border z-20 text-white">
+        <div className="items-center text-sm gap-2 px-4 py-3 rounded-full bg-white/10 border-white border z-20 text-white hidden md:flex">
           <MapPin /> Sukamarga, Suoh, Lampung Barat
         </div>
 

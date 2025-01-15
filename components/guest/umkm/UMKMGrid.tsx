@@ -97,7 +97,7 @@ export default function UMKMGrid({ data }: { data: any[] }) {
               />
             </svg>
           </div>
-          Sebelumnya
+          <span className="hidden md:block">Sebelumnya</span>
         </Button>
         <span>
           Halaman {currentPage} dari {totalPages}
@@ -109,7 +109,7 @@ export default function UMKMGrid({ data }: { data: any[] }) {
             currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-          Selanjutnya
+          <span className="hidden md:block">Selanjutnya</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"

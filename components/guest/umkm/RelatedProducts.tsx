@@ -114,7 +114,23 @@ export default function RelatedProducts() {
             currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-          Sebelumnya
+          <div className="rotate-180">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+          <span className="hidden md:block">Sebelumnya</span>
         </Button>
         <span className="text-[12px] text-center sm:text-base">
           Halaman {currentPage} dari {totalPages}
@@ -126,7 +142,21 @@ export default function RelatedProducts() {
             currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-          Selanjutnya
+          <span className="hidden md:block">Selanjutnya</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
         </Button>
       </div>
     </div>

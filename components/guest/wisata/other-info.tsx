@@ -47,7 +47,7 @@ function OtherInfo({ data }: OtherInfoProps) {
 
       <AnimatedText
         data={data?.title}
-        className={`my-1 text-4xl font-semibold md:my-3 md:text-8xl md:leading-[100px] ${TangoSans.className}`}
+        className={`my-1 text-4xl font-semibold md:my-3 md:text-6xl md:leading-[70px] xl:text-8xl xl:leading-[100px] ${TangoSans.className}`}
       />
 
       <AnimatedText

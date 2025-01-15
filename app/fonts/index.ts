@@ -1,4 +1,10 @@
 import localFont from "next/font/local";
+import { Manrope } from "next/font/google";
+
+export const manrope = Manrope({
+  weight: ["400"],
+  subsets: ["latin-ext"],
+});
 
 export const Questa = localFont({
   src: "./questa/Questa_Regular.otf",

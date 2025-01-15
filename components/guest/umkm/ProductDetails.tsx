@@ -116,7 +116,14 @@ export default function ProductDetails({ slug }: { slug: string }) {
               <div className="flex flex-col gap-4 mt-2 relative">
                 <div className="flex gap-4 h-fit">
                   <Link
-                    href="https://x.com/intent/post?text=Ayo+jalan+jalan"
+                    href={`https://x.com/intent/tweet?text=${encodeURIComponent(
+                      `Check out ${
+                        product.product_name
+                      }! ${product.description.substring(
+                        0,
+                        100
+                      )}... Learn more: ${window.location.href}`
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white p-2 bg-green rounded-full"
@@ -138,7 +145,11 @@ export default function ProductDetails({ slug }: { slug: string }) {
                     </svg>
                   </Link>
                   <Link
-                    href="https://web.facebook.com/share_channel/?type=reshare&link=https://wisatasukamarga.my.id&app_id=966242223397117&source_surface=external_reshare&display&hashtag"
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                      window.location.href
+                    )}&quote=Check%20out%20${encodeURIComponent(
+                      product.product_name
+                    )}%20-%20${encodeURIComponent(product.description)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white p-2 bg-green rounded-full"
@@ -160,7 +171,14 @@ export default function ProductDetails({ slug }: { slug: string }) {
                     </svg>
                   </Link>
                   <Link
-                    href="https://api.whatsapp.com/send/?text=Produk+Desa+Suka+Marga+https://wisatasukamarga.my.id&type=custom_url&app_absent=0"
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                      `Lihat produk keren ini: ${
+                        product.product_name
+                      }! ${product.description.substring(
+                        0,
+                        100
+                      )}... Selengkapnya di sini: https://wisatasukamarga.my.id/umkm/${slug}`
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white p-2 bg-green rounded-full"
