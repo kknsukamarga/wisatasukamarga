@@ -56,7 +56,10 @@ export default function Page({ params }: PageProps) {
 
       <WisataDetails namaWisata={namaWisata} />
 
-      <FooterDetailWisata link={`http://localhost:3000/wisata/detail`} />
+      <FooterDetailWisata
+        link={`http://localhost:3000/wisata/detail`}
+        namaWisata={namaWisata}
+      />
     </main>
   );
 }

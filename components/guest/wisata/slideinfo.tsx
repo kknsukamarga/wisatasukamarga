@@ -39,7 +39,7 @@ function SlideInfo({ transitionData, currentSlide }: SlideInfoProps) {
 
           <Link
             href={`/wisata/${transitionData.slug}`}
-            className="min-w-[200px] md:min-w-[300px] rounded-full border-[1px] border-white py-2 text-[10px] font-thin transition ease-in-out hover:bg-white hover:text-black flex items-center justify-center"
+            className="min-w-[200px] lg:min-w-[300px] rounded-full border-[1px] border-white py-2 text-[10px] font-thin transition ease-in-out hover:bg-white hover:text-black flex items-center justify-center"
           >
             Lihat Detail
             <svg

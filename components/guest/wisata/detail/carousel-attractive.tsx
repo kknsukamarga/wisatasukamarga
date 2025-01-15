@@ -59,7 +59,7 @@ export default function CarouselAttractions({ attractions }) {
             >
               <div className="relative w-full h-full overflow-hidden rounded-2xl">
                 <Image
-                  className="absolute object-cover w-full -translate-y-1/2 opacity-80 z-10 top-1/2 max-w-none md:left-1/2 md:h-full md:-translate-x-1/2 md:rounded-none"
+                  className="absolute object-cover w-full -translate-y-1/2 opacity-80 z-10 top-1/2 max-w-none md:left-1/2 md:h-full md:-translate-x-1/2 md:rounded-none h-full brightness-75"
                   src={item.image}
                   alt={item.name}
                   width={600}
@@ -83,12 +83,12 @@ export default function CarouselAttractions({ attractions }) {
                       : "md:translate-x-4 md:opacity-0"
                   )}
                 >
-                  <p className="text-2xl font-extrabold md:text-4xl z-20 text-gray">
+                  <p className="text-2xl font-extrabold md:text-4xl z-20 text-white">
                     {item.name}
                   </p>
                 </div>
 
-                <div
+                {/* <div
                   className={cn(
                     "md:left-4 xl:left-8 bottom-2 md:bottom-[15%] w-full p-4 transition-[transform,opacity] absolute md:p-0 z-20",
                     activeItem === index
@@ -104,7 +104,7 @@ export default function CarouselAttractions({ attractions }) {
                       <ExternalLink /> {item.name} Detail
                     </Link>
                   </p>
-                </div>
+                </div> */}
               </div>
             </li>
           ))}

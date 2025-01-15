@@ -1,6 +1,5 @@
 "use client";
 
-import Hero from "@/components/guest/hero";
 import About from "@/components/guest/about";
 import HighlightWisata from "@/components/guest/highlight-wisata";
 import HighlightUMKM from "@/components/guest/highlight-umkm";
@@ -15,7 +14,6 @@ function LandingPage() {
   return (
     <ParallaxProvider>
       <ReactLenis root>
-        {/* <Hero /> */}
         <ParralaxBanner />
         <About />
         <HighlightWisata />

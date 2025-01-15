@@ -6,13 +6,26 @@ import { useState } from "react";
 
 interface FooterDetailWisataProps {
   link?: string;
+  namaWisata: string;
 }
 
-export default function FooterDetailWisata({ link }: FooterDetailWisataProps) {
+function formatNamaWisata(slug: string): string {
+  return slug
+    .split("-") // Pisahkan kata berdasarkan tanda "-"
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Kapitalisasi huruf pertama
+    .join(" "); // Gabungkan kembali menjadi satu string dengan spasi
+}
+
+export default function FooterDetailWisata({
+  link,
+  namaWisata,
+}: FooterDetailWisataProps) {
   const [copySuccess, setCopySuccess] = useState(false);
 
+  const namaWisataFormatted = formatNamaWisata(namaWisata);
+
   const handleCopyLink = () => {
-    const linkToCopy = link ? link : "https://wisatasukamarga.my.id";
+    const linkToCopy = window.location.href;
 
     navigator.clipboard.writeText(linkToCopy).then(() => {
       setCopySuccess(true);
@@ -48,7 +61,7 @@ export default function FooterDetailWisata({ link }: FooterDetailWisataProps) {
         <h2
           className={`${TangoSansBold.className} mt-5 w-fit rounded-md text-2xl text-center`}
         >
-          Share Wisata {`Tes`}
+          Share Wisata {namaWisataFormatted}
         </h2>
 
         <p className="md:w-[50%] w-[90%] mx-auto mt-2">
@@ -59,7 +72,11 @@ export default function FooterDetailWisata({ link }: FooterDetailWisataProps) {
         <div className="flex flex-col gap-4 mt-10 relative">
           <div className="flex gap-4 h-fit">
             <Link
-              href="https://x.com/intent/post?text=Ayo+jalan+jalan"
+              href={`https://x.com/intent/tweet?text=${encodeURIComponent(
+                `Ayo kunjungi ${namaWisataFormatted} di Sukamarga Suoh, Lampung Barat! Nikmati keindahan alamnya. Info lebih lanjut di sini: ${
+                  link || window.location.href
+                }`
+              )}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-white p-2 bg-green rounded-full"
@@ -81,7 +98,11 @@ export default function FooterDetailWisata({ link }: FooterDetailWisataProps) {
               </svg>
             </Link>
             <Link
-              href="https://web.facebook.com/share_channel/?type=reshare&link=https://wisatasukamarga.my.id&app_id=966242223397117&source_surface=external_reshare&display&hashtag"
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                link || window.location.href
+              )}&quote=${encodeURIComponent(
+                `Temukan keindahan alam di ${namaWisataFormatted}, Sukamarga Suoh, Lampung Barat! Klik tautan berikut untuk informasi lengkap.`
+              )}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-white p-2 bg-green rounded-full"
@@ -103,7 +124,11 @@ export default function FooterDetailWisata({ link }: FooterDetailWisataProps) {
               </svg>
             </Link>
             <Link
-              href="https://api.whatsapp.com/send/?text=Ayo+Jalan+Jalan+ke+Sukamarga+https://wisatasukamarga.my.id&type=custom_url&app_absent=0"
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                `Halo! Kamu harus coba berkunjung ke ${namaWisataFormatted} di Sukamarga Suoh, Lampung Barat. Keindahan alamnya luar biasa! Lihat info lengkapnya di sini: ${
+                  link || window.location.href
+                }`
+              )}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-white p-2 bg-green rounded-full"

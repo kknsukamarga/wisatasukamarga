@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function UMKMPage() {
   return (
-    <main className="bg-[#e5e0d5]">
+    <main className="bg-white">
       <Navbar />
       <Hero />
       <UMKMSection />
