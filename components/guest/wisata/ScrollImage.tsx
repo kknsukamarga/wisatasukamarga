@@ -55,14 +55,14 @@ export default function ScrollMultipleImages() {
       <div ref={container} className="brightness-75 mix-blend-darken">
         <Slide
           images={[
-            `${CDN_GITHUB_URL}wisata/image/DANAU-ASAM-1.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/DANAU-ASAM-2.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/DANAU-LEBAR.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/DANAU-MINYAK.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/KAWAH-KRAMIKAN.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/KAWAH-MERAH-SS.jpg`,
-            `${CDN_GITHUB_URL}wisata/image/KAWAH-NIRWANA.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/PASIR-KUNING-BLUR.JPG`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-ASAM-1.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-ASAM-2.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-LEBAR.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-MINYAK.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-KRAMIKAN.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-MERAH-SS.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-NIRWANA.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/PASIR-KUNING-BLUR.jpg`,
           ]}
           direction={"left"}
           left={"-50%"}
@@ -70,14 +70,14 @@ export default function ScrollMultipleImages() {
         />
         <Slide
           images={[
-            `${CDN_GITHUB_URL}wisata/image/DANAU-ASAM-1.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/KAWAH-KRAMIKAN.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/KAWAH-MERAH-SS.jpg`,
-            `${CDN_GITHUB_URL}wisata/image/PASIR-KUNING-BLUR.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/DANAU-MINYAK.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/KAWAH-NIRWANA.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/DANAU-ASAM-2.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/DANAU-LEBAR.JPG`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-ASAM-1.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-KRAMIKAN.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-MERAH-SS.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/PASIR-KUNING-BLUR.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-MINYAK.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-NIRWANA.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-ASAM-2.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-LEBAR.jpg`,
           ]}
           direction={"right"}
           left={"-40%"}
@@ -85,14 +85,14 @@ export default function ScrollMultipleImages() {
         />
         <Slide
           images={[
-            `${CDN_GITHUB_URL}wisata/image/DANAU-MINYAK.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/KAWAH-KRAMIKAN.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/DANAU-ASAM-2.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/KAWAH-NIRWANA.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/DANAU-LEBAR.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/KAWAH-MERAH-SS.jpg`,
-            `${CDN_GITHUB_URL}wisata/image/PASIR-KUNING-BLUR.JPG`,
-            `${CDN_GITHUB_URL}wisata/image/DANAU-ASAM-1.JPG`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-MINYAK.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-KRAMIKAN.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-ASAM-2.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-NIRWANA.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-LEBAR.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-MERAH-SS.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/PASIR-KUNING-BLUR.jpg`,
+            `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-ASAM-1.jpg`,
           ]}
           direction={"left"}
           left={"-30%"}

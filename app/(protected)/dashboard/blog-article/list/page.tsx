@@ -28,7 +28,9 @@ export default function BlogListPage() {
     <div className="h-full flex-1 flex-col space-y-2 px-8 md:flex">
       <h1>List Data Blog</h1>
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground">Here's a list of your blogs!</p>
+        <p className="text-muted-foreground">
+          Berikut adalah daftar data Blog dan Artikel yang tersedia!
+        </p>
       </div>
 
       <div className="relative">

@@ -19,6 +19,7 @@ import {
 import { useState } from "react";
 import DeleteConfirmModal from "../../_components/delete-pop-up";
 import { revalidatePath } from "next/cache";
+import { useToast } from "@/hooks/use-toast";
 
 interface WisataData {
   id: string; // Ensure 'slug' exists as a property
@@ -32,6 +33,7 @@ interface DataTableRowActionsProps {
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const router = useRouter();
   const { id } = row.original;
+  const { toast } = useToast();
 
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,7 +44,12 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   };
   const confirmDelete = async () => {
     if (!id) {
-      alert("Error: ID not found for this item.");
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan pada bagian ini",
+        variant: "destructive",
+      });
+
       return;
     }
 
@@ -57,12 +64,20 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         throw new Error("Failed to delete Wisata.");
       }
 
-      alert("Wisata deleted successfully.");
+      toast({
+        title: "Wisata berhasil dihapus !",
+        description: "Wisata berhasil dihapus dari list.",
+      });
+
       revalidatePath("/dashboard/wisata/list");
       // Optionally refresh data or perform navigation
       onClose();
     } catch (error) {
-      alert("An error occurred while deleting the Wisata.");
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan pada bagian ini",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false); // End loading state
       setIsOpen(false); // Close the modal
@@ -77,7 +92,11 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
   const handleEdit = () => {
     if (!id) {
-      alert("Error: Slug not found for this row.");
+      toast({
+        title: "Error",
+        description: "Slug tidak ditemukan untuk bagian ini",
+        variant: "destructive",
+      });
       return;
     }
 

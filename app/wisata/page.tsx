@@ -1,13 +1,8 @@
 import Footer from "@/components/guest/footer";
-import Hero from "@/components/guest/wisata/hero";
 import Navbar from "@/components/guest/navbar";
-import ScrollWisata from "@/components/guest/wisata/scroll-wisata";
 import { Metadata } from "next";
 import ShowcaseWisata from "@/components/guest/wisata/showcase";
 import { CDN_GITHUB_URL } from "@/lib/utils";
-import { ParralaxBanner } from "@/components/guest/wisata/ParralaxBanner";
-import { ParallaxProvider } from "react-scroll-parallax";
-import ScrollText from "@/components/guest/wisata/ScrollImage";
 import ScrollMultipleImages from "@/components/guest/wisata/ScrollImage";
 
 export const metadata: Metadata = {
@@ -48,13 +43,7 @@ export default async function Page() {
     <main className="bg-white">
       <Navbar />
 
-      {/* <Hero /> */}
-
       <ScrollMultipleImages />
-
-      {/* <ParallaxProvider>
-        <ParralaxBanner />
-      </ParallaxProvider> */}
 
       <ShowcaseWisata />
 

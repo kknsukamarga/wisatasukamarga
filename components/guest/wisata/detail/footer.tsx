@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 
 interface FooterDetailWisataProps {
-  link?: string;
   namaWisata: string;
 }
 
@@ -17,7 +16,6 @@ function formatNamaWisata(slug: string): string {
 }
 
 export default function FooterDetailWisata({
-  link,
   namaWisata,
 }: FooterDetailWisataProps) {
   const [copySuccess, setCopySuccess] = useState(false);
@@ -25,7 +23,7 @@ export default function FooterDetailWisata({
   const namaWisataFormatted = formatNamaWisata(namaWisata);
 
   const handleCopyLink = () => {
-    const linkToCopy = window.location.href;
+    const linkToCopy = `https://wisatasukamarga.my.id/${namaWisata}`;
 
     navigator.clipboard.writeText(linkToCopy).then(() => {
       setCopySuccess(true);
@@ -73,9 +71,7 @@ export default function FooterDetailWisata({
           <div className="flex gap-4 h-fit">
             <Link
               href={`https://x.com/intent/tweet?text=${encodeURIComponent(
-                `Ayo kunjungi ${namaWisataFormatted} di Sukamarga Suoh, Lampung Barat! Nikmati keindahan alamnya. Info lebih lanjut di sini: ${
-                  link || window.location.href
-                }`
+                `Ayo kunjungi ${namaWisataFormatted} di Sukamarga Suoh, Lampung Barat! Nikmati keindahan alamnya. Info lebih lanjut di sini: ${window.location.href}`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -99,7 +95,7 @@ export default function FooterDetailWisata({
             </Link>
             <Link
               href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                link || window.location.href
+                window.location.href
               )}&quote=${encodeURIComponent(
                 `Temukan keindahan alam di ${namaWisataFormatted}, Sukamarga Suoh, Lampung Barat! Klik tautan berikut untuk informasi lengkap.`
               )}`}
@@ -125,9 +121,7 @@ export default function FooterDetailWisata({
             </Link>
             <Link
               href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                `Halo! Kamu harus coba berkunjung ke ${namaWisataFormatted} di Sukamarga Suoh, Lampung Barat. Keindahan alamnya luar biasa! Lihat info lengkapnya di sini: ${
-                  link || window.location.href
-                }`
+                `Halo! Kamu harus coba berkunjung ke ${namaWisataFormatted} di Sukamarga Suoh, Lampung Barat. Keindahan alamnya luar biasa! Lihat info lengkapnya di sini: ${window.location.href}`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -154,7 +148,6 @@ export default function FooterDetailWisata({
             </Link>
 
             {/* Icon to copy link di page komponen ini dirender */}
-
             {copySuccess && (
               <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-green-500 text-sm px-3 py-1 rounded-md shadow-md">
                 Link Disalin!
