@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       <DataTableToolbar table={table} />
       <ScrollArea
-        className={`border rounded-md max-w-[400px] md:max-w-[600px] xl:max-w-full`}
+        className={`border rounded-md max-w-[400px] md:max-w-[600px] xl:max-w-[1400px]`}
       >
         <Table>
           <TableHeader>

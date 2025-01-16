@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation"; // Gunakan useRouter dari next/navigation
+import { useRouter } from "next/navigation";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Row } from "@tanstack/react-table";
 
@@ -10,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
@@ -29,7 +28,6 @@ import {
 
 interface BlogData {
   slug: string;
-  // Tambahkan field lainnya jika diperlukan
 }
 
 interface DataTableRowActionsProps<TData extends BlogData> {

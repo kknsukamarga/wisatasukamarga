@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { MapPinned } from "lucide-react";
+import { CDN_GITHUB_URL } from "@/lib/utils";
 
 function InteractiveMap() {
   return (
@@ -12,7 +13,25 @@ function InteractiveMap() {
     >
       <div className="flex mx-auto justify-center items-center flex-col text-center w-fit">
         <div className="p-2 rounded-full bg-orange-primary z-20">
-          <Image src="/icon-lake.png" alt="icon-lake" width={32} height={32} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="icon icon-tabler icons-tabler-outline icon-tabler-map-question"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M15 20l-6 -3l-6 3v-13l6 -3l6 3l6 -3v7.5" />
+            <path d="M9 4v13" />
+            <path d="M15 7v5.5" />
+            <path d="M19 22v.01" />
+            <path d="M19 19a2.003 2.003 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483" />
+          </svg>
         </div>
 
         <h2
@@ -25,9 +44,9 @@ function InteractiveMap() {
         </h2>
       </div>
 
-      <div className="mt-10 px-2 md:px-0">
+      <div className="mt-10 px-2 md:px-0 rounded-xl overflow-hidden">
         <Image
-          src="/interactive-map.png"
+          src={`${CDN_GITHUB_URL}map.png`}
           alt="icon-lake"
           width={1314}
           height={910}
