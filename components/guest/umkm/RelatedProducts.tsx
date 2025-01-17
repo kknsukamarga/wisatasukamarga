@@ -100,7 +100,9 @@ export default function RelatedProducts() {
             </p>
             <div className="flex justify-between items-center">
               <span className="text-lg font-bold">
-                Rp{item.price.toLocaleString("id-ID")},00
+                {item.price > 100
+                  ? `Rp${item.price.toLocaleString("id-ID")},00`
+                  : "Harga Hubungi Penjual"}
               </span>
             </div>
           </div>
