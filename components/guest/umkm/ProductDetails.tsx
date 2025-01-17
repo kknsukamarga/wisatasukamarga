@@ -88,7 +88,9 @@ export default function ProductDetails({ slug }: { slug: string }) {
             Pemilik : {product.owner}
           </p>
           <div className="text-2xl text-green-700 font-bold mb-4">
-            Rp{product.price.toLocaleString("id-ID")},00
+            {product.price > 100
+              ? `Rp${product.price.toLocaleString("id-ID")},00`
+              : "Harga Hubungi Penjual"}
           </div>
           <p className="text-gray-700 mb-4 text-justify">
             {product.description}

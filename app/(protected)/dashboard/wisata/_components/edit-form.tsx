@@ -46,15 +46,12 @@ const formSchema = z.object({
   description: z.string().min(50, {
     message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
-  price: z
-    .string()
-    .refine((value) => !isNaN(Number(value)), {
-      message: "Harga harus berupa angka yang valid.",
+  price: z.preprocess(
+    (value) => Number(value),
+    z.number().int().positive({
+      message: "Harga harus berupa angka positif.",
     })
-    .transform((value) => Number(value))
-    .refine((value) => value > 0, {
-      message: "Harga wajib diisi dan harus lebih besar dari 0.",
-    }),
+  ),
   location: z
     .string()
     .min(2, {
@@ -146,7 +143,7 @@ export default function WisataEditForm({
       imageCover: initialData?.imageCover || null,
       images: [],
       description: initialData?.description || "",
-      price: initialData?.price || 0,
+      price: initialData?.price || "0",
       location: initialData?.location || "",
       status: initialData?.status || "Buka",
     },
@@ -242,7 +239,7 @@ export default function WisataEditForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
                     <Input placeholder="Masukkan Nama Wisata..." {...field} />
                   </FormControl>
@@ -276,7 +273,7 @@ export default function WisataEditForm({
               name="images"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gambar Gallery</FormLabel>
+                  <FormLabel>Gambar Galeri</FormLabel>
                   <FormControl>
                     <FileUploader
                       value={imageFiles}
@@ -318,7 +315,7 @@ export default function WisataEditForm({
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel>Harga</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -335,7 +332,7 @@ export default function WisataEditForm({
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location</FormLabel>
+                  <FormLabel>Lokasi</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Masukkan Link Lokasi Google Maps..."

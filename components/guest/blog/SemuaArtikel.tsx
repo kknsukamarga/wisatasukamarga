@@ -124,7 +124,8 @@ const SemuaArtikel: React.FC = () => {
             Hasil dari "{searchTerm}"
           </p>
         )}
-        <div className="ml-auto">
+
+        <div className="ml-auto px-4">
           <Select onValueChange={(value) => setSelectedCategory(value)}>
             <SelectTrigger className="w-[180px] bg-white border border-black shadow-sm">
               <SelectValue
