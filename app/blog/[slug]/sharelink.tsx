@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 function Sharelink() {
   const [copySuccess, setCopySuccess] = useState(false);
+
+  const pathname = usePathname();
+  const linkToCopyOutside = `https://wisatasukamarga.my.id${pathname}`;
 
   const handleCopyLink = () => {
     const linkToCopy = window.location.href;
@@ -20,7 +24,9 @@ function Sharelink() {
       <div className="flex flex-col gap-4 mt-2 relative">
         <div className="flex flex-row gap-4 md:flex-col">
           <Link
-            href="https://x.com/intent/post?text=Ayo+jalan+jalan"
+            href={`https://twitter.com/intent/tweet?text=Baca+dan+eksplorasi+wisata+dan+UMKM+di+Suoh+Suka+Marga!+${encodeURIComponent(
+              linkToCopyOutside
+            )}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-white p-2 bg-green rounded-full"
@@ -42,7 +48,9 @@ function Sharelink() {
             </svg>
           </Link>
           <Link
-            href="https://web.facebook.com/share_channel/?type=reshare&link=https://wisatasukamarga.my.id&app_id=966242223397117&source_surface=external_reshare&display&hashtag"
+            href={`https://web.facebook.com/share_channel/?type=reshare&link=${encodeURIComponent(
+              linkToCopyOutside
+            )}&app_id=966242223397117&source_surface=external_reshare&display&hashtag`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-white p-2 bg-green rounded-full"
@@ -64,7 +72,9 @@ function Sharelink() {
             </svg>
           </Link>
           <Link
-            href="https://api.whatsapp.com/send/?text=Ayo+Jalan+Jalan+ke+Sukamarga+https://wisatasukamarga.my.id&type=custom_url&app_absent=0"
+            href={`https://api.whatsapp.com/send/?text=Temukan+informasi+menarik+tentang+wisata+dan+UMKM:+${encodeURIComponent(
+              linkToCopyOutside
+            )}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-white p-2 bg-green rounded-full"
