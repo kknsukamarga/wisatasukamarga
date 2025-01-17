@@ -98,7 +98,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(data);
     }
 
-    let umkms = await prisma.umkm.findMany();
+    let umkms = await prisma.umkm.findMany({
+      orderBy: { price: "asc" },
+    });
     // Ambil semua data UMKM
     return NextResponse.json(umkms);
   } catch (error: any) {
