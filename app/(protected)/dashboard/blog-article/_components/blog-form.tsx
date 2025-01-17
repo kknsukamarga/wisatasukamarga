@@ -151,7 +151,7 @@ export default function BlogForm({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>Judul</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter blog title" {...field} />
                   </FormControl>
@@ -164,7 +164,7 @@ export default function BlogForm({
               name="coverImage"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cover Image</FormLabel>
+                  <FormLabel>Gambar Cover</FormLabel>
                   <FormControl>
                     <FileUploader
                       value={field.value}
@@ -182,7 +182,7 @@ export default function BlogForm({
               name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Content</FormLabel>
+                  <FormLabel>Isi Konten</FormLabel>
                   <FormControl>
                     <ReactQuill
                       value={field.value}
@@ -242,7 +242,7 @@ export default function BlogForm({
               name="author"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Author</FormLabel>
+                  <FormLabel>Penulis</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter author name" {...field} />
                   </FormControl>
@@ -255,7 +255,7 @@ export default function BlogForm({
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Kategori</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
