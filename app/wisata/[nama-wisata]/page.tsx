@@ -1,11 +1,8 @@
 import Navbar from "@/components/guest/navbar";
 import WisataDetails from "@/components/guest/wisata/detail/wisata-details";
-import Hero from "@/components/guest/wisata/detail/hero";
-import FooterDetailWisata from "@/components/guest/wisata/detail/footer";
 import { Metadata } from "next";
-import { ParralaxBanner } from "@/components/guest/wisata/detail/ParralaxBanner";
+import { CDN_GITHUB_URL } from "@/lib/utils";
 
-// Define the type for the dynamic params
 interface PageProps {
   params: {
     "nama-wisata": string;
@@ -29,7 +26,7 @@ export async function generateMetadata({
       description: `Discover ${wisataTitle}, a hidden gem in Desa Wisata Suka Marga.`,
       images: [
         {
-          url: `https://example.com/images/${namaWisata}.jpg`, // Replace with actual image URL
+          url: `${CDN_GITHUB_URL}og-image/wisata/${namaWisata}.jpg`, // Replace with actual image URL
           alt: `${wisataTitle}`,
         },
       ],
@@ -38,7 +35,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: `${wisataTitle} - Desa Wisata Suka Marga`,
       description: `Discover the hidden beauty of ${wisataTitle} in Desa Wisata Suka Marga.`,
-      images: [`https://example.com/images/${namaWisata}.jpg`], // Replace with actual image URL
+      images: [`${CDN_GITHUB_URL}og-image/wisata/${namaWisata}.jpg`], // Replace with actual image URL
     },
   };
 }
@@ -55,11 +52,6 @@ export default function Page({ params }: PageProps) {
       <Navbar />
 
       <WisataDetails namaWisata={namaWisata} />
-
-      <FooterDetailWisata
-        link={`http://localhost:3000/wisata/detail`}
-        namaWisata={namaWisata}
-      />
     </main>
   );
 }

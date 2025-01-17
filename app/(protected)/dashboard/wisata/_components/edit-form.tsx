@@ -46,9 +46,15 @@ const formSchema = z.object({
   description: z.string().min(50, {
     message: "Deskripsi harus terdiri dari minimal 50 karakter.",
   }),
-  price: z.number().min(1, {
-    message: "Harga wajib diisi dan harus lebih besar dari 0.",
-  }),
+  price: z
+    .string()
+    .refine((value) => !isNaN(Number(value)), {
+      message: "Harga harus berupa angka yang valid.",
+    })
+    .transform((value) => Number(value))
+    .refine((value) => value > 0, {
+      message: "Harga wajib diisi dan harus lebih besar dari 0.",
+    }),
   location: z
     .string()
     .min(2, {

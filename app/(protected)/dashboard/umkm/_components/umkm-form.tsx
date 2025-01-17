@@ -267,7 +267,7 @@ export default function UMKMForm({ initialData, pageTitle }: UMKMFormProps) {
                   <FormControl>
                     <Input
                       type="text"
-                      placeholder="Masukkan nomor WhatsApp contoh : 0851125399812"
+                      placeholder="contoh : 0851125399812"
                       {...field}
                     />
                   </FormControl>
