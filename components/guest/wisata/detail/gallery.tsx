@@ -45,7 +45,7 @@ export default function Gallery({ images }) {
         loop={true}
         pagination={true}
         modules={[EffectCoverflow, Pagination]}
-        className="mySwiper"
+        className="mySwiper max-h-96"
       >
         {images.map((src, index) => (
           <SwiperSlide key={index} className="my-10">
