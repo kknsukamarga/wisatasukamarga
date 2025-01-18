@@ -47,6 +47,7 @@ export function BentoGridBlog({ articles }: { articles: Artikel[] }) {
             month: "long",
             day: "numeric",
           })}
+          view_count={article.view_count}
         />
       ))}
     </BentoGrid>
@@ -61,6 +62,7 @@ interface Artikel {
   createdAt: string;
   updatedAt: string;
   slug: string;
+  view_count: number;
 }
 
 function BentoGridSkeleton() {

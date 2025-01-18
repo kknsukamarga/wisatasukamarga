@@ -59,6 +59,12 @@ export default function RootLayout({
           gtag('config', 'G-YSD9LB84P7');
         `}
       </Script>
+      <head>
+        <meta
+          name="google-site-verification"
+          content="jJLF3H0UohOmp6uVZN-FzT21xRk0K0qAN561Xeqy1BA"
+        />
+      </head>
       <body className={`antialiased overflow-x-hidden ${manrope.className}`}>
         <ReactQueryProvider>
           {children}

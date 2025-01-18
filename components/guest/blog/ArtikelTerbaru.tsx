@@ -14,6 +14,7 @@ interface Artikel {
   createdAt: string;
   updatedAt: string;
   slug: string; // Tambahkan slug untuk navigasi
+  view_count: number;
 }
 
 const ArtikelSkeleton: React.FC = () => (
@@ -116,9 +117,15 @@ const ArtikelTerbaru: React.FC = () => {
               className="w-full h-[70%] object-cover rounded-2xl p-2 my-2"
             />
             <div className="p-4">
-              <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray px-2 py-1 shadow-md rounded-full">
-                {artikels[0].category.replace("_", " ")}
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray px-2 py-1 shadow-md rounded-full">
+                  {artikels[0].category.replace("_", " ")}
+                </span>
+
+                <p className="text-xs  rounded-md bg-gray px-3 py-1 text-white">
+                  Dibaca {artikels[0].view_count}x
+                </p>
+              </div>
 
               <p className="text-xs text-gray-400 mt-2">
                 {new Date(artikels[0].updatedAt).toLocaleDateString("id-ID", {
@@ -161,9 +168,15 @@ const ArtikelTerbaru: React.FC = () => {
                 className="w-full h-40 object-cover rounded-2xl p-2 my-2"
               />
               <div className="p-4">
-                <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-full px-2 py-1 shadow-md">
-                  {artikel.category.replace("_", " ")}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-full px-2 py-1 shadow-md">
+                    {artikel.category.replace("_", " ")}
+                  </span>
+
+                  <p className="text-xs  rounded-md bg-gray px-3 py-1 text-white">
+                    Dibaca {artikels[0].view_count}x
+                  </p>
+                </div>
 
                 <p className="text-xs text-gray-400 mt-2">
                   {new Date(artikel.updatedAt).toLocaleDateString("id-ID", {

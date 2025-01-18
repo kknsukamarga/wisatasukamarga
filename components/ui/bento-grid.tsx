@@ -31,6 +31,7 @@ export const BentoGridItem = ({
   category,
   date,
   link,
+  view_count,
 }: {
   className?: string;
   title?: string | React.ReactNode;
@@ -41,6 +42,7 @@ export const BentoGridItem = ({
   category: string;
   date?: string;
   link: string;
+  view_count?: number;
 }) => {
   return (
     <Link
@@ -52,12 +54,18 @@ export const BentoGridItem = ({
     >
       <div className="relative w-full h-48 mb-4">{header}</div>
 
-      <Badge
-        variant="default"
-        className="w-fit bg-orange-secondary/65 -ml-1 text-gray rounded-full hover:bg-orange-secondary/65 hover:text-gray"
-      >
-        {category.replace("_", " ")}
-      </Badge>
+      <div className="flex items-center justify-between w-full">
+        <Badge
+          variant="default"
+          className="w-fit bg-orange-secondary/65 -ml-1 text-gray rounded-full hover:bg-orange-secondary/65 hover:text-gray"
+        >
+          {category.replace("_", " ")}
+        </Badge>
+
+        <p className="text-xs  rounded-md bg-gray px-3 py-1 text-white">
+          Dibaca {view_count}x
+        </p>
+      </div>
 
       <div className="flex flex-col items-start gap-2 mt-1">
         {/* {icon} */}
