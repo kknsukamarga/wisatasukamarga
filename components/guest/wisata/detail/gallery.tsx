@@ -45,7 +45,7 @@ export default function Gallery({ images }) {
         loop={true}
         pagination={true}
         modules={[EffectCoverflow, Pagination]}
-        className="mySwiper max-h-96"
+        className="mySwiper"
       >
         {images.map((src, index) => (
           <SwiperSlide key={index} className="my-10">
@@ -54,7 +54,7 @@ export default function Gallery({ images }) {
               alt={`Gallery Image ${index + 1}`}
               width={800}
               height={600}
-              className="rounded-md cursor-pointer md:cursor-grab w-full h-full min-h-[200px] md:min-h-[500px]"
+              className="rounded-md cursor-pointer md:cursor-grab w-full h-full min-h-[200px] md:min-h-[500px] max-h-96"
               onClick={() => handleImageClick(index)} // Open modal with selected image
               priority
             />
@@ -87,7 +87,7 @@ export default function Gallery({ images }) {
                     alt={`Gallery Image ${index + 1}`}
                     width={800}
                     height={600}
-                    className="rounded-md"
+                    className="rounded-md max-h-[500px]"
                   />
                 </SwiperSlide>
               ))}

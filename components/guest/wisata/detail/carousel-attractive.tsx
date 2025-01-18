@@ -36,7 +36,7 @@ export default function CarouselAttractions({ attractions }) {
 
   return (
     <div className="flex items-center justify-center w-full h-full">
-      <div className="w-[320px] md:w-[700px] lg:w-[1400px] max-w-full">
+      <div className="w-[320px] md:w-[700px] xl:w-[1400px] max-w-full">
         <p className="mb-5 text-center md:hidden mt-10">
           Scroll ke kanan untuk melihat lebih banyak
         </p>
