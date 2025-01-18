@@ -17,7 +17,7 @@ const dataVideoWisata = [
   },
   {
     nama: "kawah-merah",
-    src: "https://youtu.be/hrVvTOhAzlo",
+    src: "https://www.youtube.com/embed/hrVvTOhAzlo?si=S-aElKQNXjshLVUw",
   },
   {
     nama: "pasir-kuning",
@@ -25,7 +25,7 @@ const dataVideoWisata = [
   },
   {
     nama: "kawah-nirwana",
-    src: "https://youtu.be/975jT3xSl2g",
+    src: "https://www.youtube.com/embed/975jT3xSl2g?si=ZegwAPJ0XHsUaKUC",
   },
 ];
 
