@@ -1,22 +1,22 @@
-"use client";
+// "use client";
 import Link from "next/link";
 import { links } from "../ui/morph-menu/data";
 import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
+// import { useQuery } from "@tanstack/react-query";
 
-const getAnalyticsData = async () => {
-  const response = await fetch("/api/analytics", {
-    method: "GET",
-  });
+// const getAnalyticsData = async () => {
+//   const response = await fetch("/api/analytics", {
+//     method: "GET",
+//   });
 
-  return response.json();
-};
+//   return response.json();
+// };
 
 export default function Footer() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["analytics"],
-    queryFn: getAnalyticsData,
-  });
+  // const { data, isLoading, error } = useQuery({
+  //   queryKey: ["analytics"],
+  //   queryFn: getAnalyticsData,
+  // });
 
   return (
     <footer className="bg-white py-8 md:py-12">
@@ -36,10 +36,10 @@ export default function Footer() {
             Website informasi pariwisata dan umkm di Desa Suka Marga
           </p>
 
-          <p className="text-muted-foreground md:max-w-[60%]">
+{/*           <p className="text-muted-foreground md:max-w-[60%]">
             Total Pengunjung :{" "}
             {isLoading ? "Loading..." : data ? data[0].activeUsers : ""}
-          </p>
+          </p> */}
         </div>
 
         <div className="flex flex-col md:flex-row gap-8 md:gap-16">
