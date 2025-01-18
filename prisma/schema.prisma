@@ -55,7 +55,6 @@ model Blog {
   content     String        // Content dari rich text editor akan disimpan dalam bentuk String (HTML/JSON)
   author      String        // Author akan ditulis manual di dashboard
   category    BlogCategory  // Kategori menggunakan enum
-  view_count  Int           @default(0)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }
