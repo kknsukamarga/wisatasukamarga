@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   description:
     "Temukan pesona tersembunyi di Desa Suka Marga, destinasi wisata yang menawarkan pengalaman unik dengan keindahan alam dan kekayaan budaya lokal. Artikel ini memandu Anda melalui atraksi, kegiatan, dan tradisi desa yang menjadikan kunjungan Anda tak terlupakan",
   robots: "index, follow",
+  alternates: {
+    canonical: "https://wisatasukamarga.my.id/",
+  },
+  keywords:
+    "Desa, Wisata di Sukamarga, Sukamarga, Suoh, Lampung Barat, Wisata di Lampung Barat, UMKM di Suka Marga, UMKM di Lampung Barat, Danau Lebar, Danau Minyak, Keramikan, Belerang, Gajah, Taman Nasional Bukit Barisan Selatan, TNBBS",
   authors: [{ name: "Desa Wisata Suka Marga" }],
   openGraph: {
     type: "website",

@@ -9,9 +9,14 @@ import { CDN_GITHUB_URL } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "Desa Wisata Suka Marga",
   description:
-    "Desa Wisata Sukamarga menawarkan keindahan alam yang memukau dengan kawah keramikan belerang, danau-danau yang indah, hamparan sawah yang hijau, serta suasana pedesaan asri. Cocok untuk destinasi wisata alam dan relaksasi.",
+    "Desa Wisata Sukamarga menyuguhkan kawah belerang, danau indah, sawah hijau, dan suasana asri, sempurna untuk wisata alam dan relaksasi.",
+  keywords:
+    "Desa, Wisata di Sukamarga, Sukamarga, Suoh, Lampung Barat, Wisata di Lampung Barat, UMKM di Suka Marga, UMKM di Lampung Barat, Danau Lebar, Danau Minyak, Keramikan, Belerang, Gajah, Taman Nasional Bukit Barisan Selatan, TNBBS",
   robots: "index, follow",
   authors: [{ name: "Desa Wisata Suka Marga" }],
+  alternates: {
+    canonical: "https://wisatasukamarga.my.id/",
+  },
   openGraph: {
     type: "website",
     url: "https://wisatasukamarga.my.id/",

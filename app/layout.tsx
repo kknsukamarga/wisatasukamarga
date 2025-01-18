@@ -9,7 +9,7 @@ import { manrope } from "./fonts";
 export const metadata: Metadata = {
   title: "Desa Wisata Suka Marga",
   description:
-    "Desa Wisata Sukamarga menawarkan keindahan alam yang memukau dengan kawah keramikan belerang, danau-danau yang indah, hamparan sawah yang hijau, serta suasana pedesaan asri. Cocok untuk destinasi wisata alam dan relaksasi.",
+    "Desa Wisata Sukamarga menyuguhkan kawah belerang, danau indah, sawah hijau, dan suasana asri, sempurna untuk wisata alam dan relaksasi.",
   robots: "index, follow",
   authors: [{ name: "Desa Wisata Suka Marga" }],
   openGraph: {
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     url: "https://wisatasukamarga.my.id/",
     title: "Desa Wisata Suka Marga",
     description:
-      "Desa Wisata Sukamarga menawarkan keindahan alam yang memukau dengan kawah keramikan belerang, danau-danau yang indah, hamparan sawah yang hijau, serta suasana pedesaan asri. Cocok untuk destinasi wisata alam dan relaksasi.",
+      "Desa Wisata Sukamarga menyuguhkan kawah belerang, danau indah, sawah hijau, dan suasana asri, sempurna untuk wisata alam dan relaksasi.",
     images: [
       {
         url: `${CDN_GITHUB_URL}og-image/landing-page.png`, // Replace with your actual image URL

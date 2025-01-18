@@ -21,6 +21,13 @@ export async function generateMetadata({
   return {
     title: `${wisataTitle} - Desa Wisata Suka Marga`,
     description: `Explore the beauty of ${wisataTitle} in Desa Wisata Suka Marga. A perfect destination for nature lovers.`,
+    keywords:
+      "Desa, Wisata di Sukamarga, Sukamarga, Suoh, Lampung Barat, Wisata di Lampung Barat, UMKM di Suka Marga, UMKM di Lampung Barat, Danau Lebar, Danau Minyak, Keramikan, Belerang, Gajah, Taman Nasional Bukit Barisan Selatan, TNBBS",
+    robots: "index, follow",
+    authors: [{ name: "Desa Wisata Suka Marga" }],
+    alternates: {
+      canonical: "https://wisatasukamarga.my.id/",
+    },
     openGraph: {
       title: `${wisataTitle} - Desa Wisata Suka Marga`,
       description: `Discover ${wisataTitle}, a hidden gem in Desa Wisata Suka Marga.`,
