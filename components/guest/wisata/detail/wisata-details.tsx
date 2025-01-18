@@ -130,14 +130,9 @@ const WisataDetails = ({ namaWisata }) => {
           >
             Video Wisata {data.name}
           </h2>
-          {/* <p className="md:w-[50%] w-[90%] mx-auto mt-2">
-            Nikmati keindahan Suka Marga melalui galeri wisata yang memamerkan
-            panorama alam memukau, dari perbukitan hijau, kawah, air terjun,
-            hingga danau yang memikat.
-          </p> */}
         </div>
 
-        <VideoSection />
+        <VideoSection namaWisata={namaWisata} />
       </div>
 
       <div className="py-10">

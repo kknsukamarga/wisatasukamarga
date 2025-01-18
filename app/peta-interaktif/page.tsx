@@ -8,7 +8,7 @@ import { CDN_GITHUB_URL } from "@/lib/utils";
 export default function Page() {
   const [modalData, setModalData] = useState({
     isOpen: false,
-    description:"",
+    description: "",
     title: "",
     img: "",
   });
@@ -24,54 +24,49 @@ export default function Page() {
       title: "Danau Minyak",
       description:
         "Danau Minyak merupakan danau yang terletak berdekatan dengan Danau Asam tepatnya di sebelah selatannya. Danau minyak juga berada di satu area yang sama dengan Kawah Merah. Danau ini memiliki nama Danau Minyak karena danau ini memiliki siluet atau kenampakan air yang seolah-olah seperti minyak. Danau Minyak juga menjadi tempat favorit kawanan gajah untuk berendam sehingga apabila beruntung kita bisa menjumpai kawanan gajah yang berendam di Danau Minyak ketika sore hari.",
-        img: `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-KRAMIKAN.jpg`,
+      img: `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-MINYAK.jpg`,
     },
     {
       title: "Danau Lebar",
-      description: "Danau Lebar merupakan danau yang berada di sebelah selatan. Danau Asam dan secara administratif masuk ke dalam wilayah. Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat. Danau ini memiliki luas yang lebih kecil dibandingan Danau Asam yaitu sekitar 0.6 km2. Sama halnya dengan Danau Asam, Danau Lebar memiliki akses yang mudah dijangkau karena berada tepat di Jalan Lintas Suoh.",
+      description:
+        "Danau Lebar merupakan danau yang berada di sebelah selatan. Danau Asam dan secara administratif masuk ke dalam wilayah. Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat. Danau ini memiliki luas yang lebih kecil dibandingan Danau Asam yaitu sekitar 0.6 km2. Sama halnya dengan Danau Asam, Danau Lebar memiliki akses yang mudah dijangkau karena berada tepat di Jalan Lintas Suoh.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-LEBAR.jpg`,
-
     },
     {
       title: "Air Terjun",
       description:
         "Berlokasi di daerah pegunungan, Suoh juga memiliki air terjun setinggi 25 m yang memberikan kesegaran bagi para pengunjungnya. Pengunjung dapat menikmati kesegaran air yang mengalir langsung dari Pegunungan Bukit Barisan.",
       img: `https://res.cloudinary.com/dflmvraib/image/upload/v1737078102/wisata/air-terjun-cibatuan.png`,
-
     },
     {
       title: "Balai Pekon",
-      description: "Balai Pekon adalah tempat pertemuan dan acara budaya.",
-      img: `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-KRAMIKAN.jpg`,
-
+      description:
+        "Balai pekon adalah balai yang berada di wilayah pekon atau kampung Suka Marga. Pekon adalah wilayah administratif yang menyelenggarakan urusan pemerintahan dan kepentingan masyarakat setempat. ",
+      img: `${CDN_GITHUB_URL}balai-pekon.jpg`,
     },
     {
       title: "Kawah Keramikan",
       description:
         "Kawah Keramikan merupakan salah satu manifestasi dari aktivitas vulkanik pada komplek Kaldera Suoh yang berada di Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat. Destinasi ini memiliki lokasi yang berdekatan dengan Kawah Nirwana tepatnya di sebelah timur Kawah Nirwana dengan luas area sekiat 10.000 m . Kawah keramikan memiliki keunikan yang mana permukaan tanah di area ini akan memiliki kenampakan seperti keramik mengkilap yang berwarna kuning dengan adanya bentuk yang berlapis-lapis akibat pengaruh belerang yang bercampur dengan material vulkanik gunung api. Kenampakan lanskap di Kawah Keramikan ini serupa dengan yang ada di Kaldera Yellowstone di Amerika Serikat. Pada area Kawah Keramikan, dijumpai pula banyak kolam-kolam kecil yang mengeluarkan uap panas atau dalam istilah geologi sering disebut sebagai fumarol. Sama halnya dengan Kawah Nirwana, Kawah Keramikan juga memiliki aktivitas vulkanik yang aktif.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-KRAMIKAN.jpg`,
-
     },
     {
       title: "Pasir Kuning",
       description:
         "Pasir Kuning merupakan salah satu destinasi wisata yang terdapat di Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat. Destinasi ini menawarkan kenampakan lanskap alam berupa hamparan pasir berukuran 52.000 m dan berbatasan langsung dengan Danau Asam. Hamparan pasir ini memiliki keunikan karena berwarna kuning sehingga tempat ini diberi nama Pasir Kuning. Pasir berwarna kuning tersebut tersebut terbentuk akibat kehadiran material vulkanik berupa pasir yang kaya akan kuarsa dan sulfur yang berasal dari Kawah Keramikan dan Kawah Nirwana sehingga memiliki warna kuning. Pasir tersebut terbawa oleh aliran sungai dan mengendap di bibir Danau Asam yang dalam istilah geologi merupakan sebuah kipas aluvial.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/PASIR-KUNING-BLUR.jpg`,
-
     },
     {
       title: "Danau Asam",
       description:
         "Danau Asam merupakan sebuah danau yang terletak di Desa Sukamarga, Kecamatan Suoh dan Desa Gunung Ratu Kecamatan Bandar Negeri Suoh, Kabupaten Lampung Barat. Danau ini memiliki luas 1.2 km2. Danau ini memiliki keunikan berupa kondisi air danaunya yang cenderung asam atau memiliki nilai pH yang rendah sehingga dinamakan sebagai “Danau Asam”. Kondisi air yang asam ini disebabkan karena danau ini berlokasi dekat dengan Kawah Nirwana dan Kawah Keramikan sehingga air yang ada di Danau Asam tercampur dengan material vulkanik dari kawah tersebut yang bersifat asam. Ditinjau dari sejarah pembentukannya, Danau Asam terbentuk akibat gempa dengan kekuatan 7.7 Ms pada tahun 1933 akibat adanya aktivitas tektonik dari Patahan Semangko atau Patahan Sumatra.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-ASAM-1.jpg`,
-
     },
     {
       title: "Kawah Merah",
       description:
         "Kawah Merah merupakan salah satu kawah yang berada di kompleks Kaldera Suoh tepatnya di sebelah timur Kawah Nirwana dan Kawah Keramikan. Secara administratif, Kawah Merah masih termasuk di dalam wilayah Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat dan masih masuk ke dalam wilayah Taman Nasional Bukit Barisan Selatan. Berbeda dengan Kawah Nirwana dan Kawah Keramikan yang cenderung memiliki aktivitas vulkanik yang sangat aktif, Kawah Merah cenderung memiliki aktivitas vulkanik yang lebih rendah. Kawah Merah memiliki keunikan yang berbeda jika dibandingkan dengan 2 kawah lainnya yaitu kawah ini merupakan sebuah danau kawah atau danau vulkanik berukuran kecil yang berwarna merah. Warna merah pada kawah ini disebabkan karena adanya kandunhan usnur Fe (besi) yang teroksidasi dan mengendap di kawah sehingga menciptakan warna merah pada kawah. Untuk mengakses Kawah Merah dapat melalui",
-      img: `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-MERAH.jpg`,
-
+      img: `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-MERAH-SS.jpg`,
     },
   ];
 
@@ -85,7 +80,7 @@ export default function Page() {
   };
 
   const closeModal = () => {
-    setModalData({ isOpen: false, title: "", img: "", description: ""});
+    setModalData({ isOpen: false, title: "", img: "", description: "" });
   };
 
   return (
@@ -97,7 +92,6 @@ export default function Page() {
           <p>Klik salah satu tempat dibawah ini</p>
         </div> */}
         <div className="overflow-x-auto md:w-full md:flex md:flex-col md:items-center md:justify-center w-screen">
-          
           <svg
             width="1441"
             height="811"
@@ -105,7 +99,11 @@ export default function Page() {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <image width="1441" height="811" href={`${CDN_GITHUB_URL}map.png`}></image>
+            <image
+              width="1441"
+              height="811"
+              href={`${CDN_GITHUB_URL}map.png`}
+            ></image>
 
             <path
               d="M962.793 153.346C962.328 147.815 952.401 145.761 949.504 142.269C945.709 137.76 938.959 126.753 937.526 120.571C937.693 117.409 937.858 114.244 938.026 111.082V111.052C937.536 108.783 937.273 106.869 937.273 105.13C937.273 101.66 938.319 98.8934 940.755 95.3885L940.82 95.2959L940.733 95.2209C940.248 94.7981 939.76 94.6405 939.027 94.4654C939.029 90.7178 939.627 87.2128 941.966 85.9194L942.139 85.8219L941.976 85.7068C939.635 84.0556 937.1 84.2333 933.948 83.195C930.864 81.8591 927.776 80.5257 924.692 79.1898L924.659 79.1748L924.624 79.1798C918.955 79.9328 913.284 80.6808 907.612 81.4313H907.595L907.58 81.4413C905.296 82.442 904.618 86.082 903.057 87.7007C899.739 88.6138 896.42 89.5244 893.102 90.4376C892.87 90.4701 892.64 90.4851 892.414 90.4851C889.843 90.4926 887.666 88.5863 885.385 88.1885C885.039 88.1285 884.691 88.101 884.344 88.101C881.046 88.106 877.759 90.5301 875.84 91.4333C874.602 91.2707 873.361 91.103 872.123 90.9379C860.2 88.8039 857.998 83.2176 850.415 77.4536L850.15 77.2534L850.218 77.5786C850.936 81.0235 853.835 82.8798 853.823 86.7775C853.823 87.5255 853.72 88.3511 853.472 89.2793C851.729 95.8788 844.929 97.0572 841.729 102.003C839.613 105.313 839.585 109.768 837.479 112.758C834.006 117.717 828.147 120.996 824.717 126.27C819.669 134.135 826.826 141.483 816.274 145.233L816.239 145.246L816.217 145.273C815.376 146.349 814.745 146.504 814.69 148.598V148.658L814.733 148.696C816.729 150.422 820.96 151.738 821.7 154.392C821.963 155.305 822.051 156.423 822.048 157.642C822.051 159.898 821.753 162.49 821.753 164.769C821.753 166.65 821.95 168.324 822.719 169.437C827.852 176.83 839.655 177.028 846.765 182.229C849.787 184.398 849.537 190.262 853.025 192.488C854.551 193.447 856.882 193.769 859.637 193.769C862.819 193.769 866.574 193.334 870.292 192.899C874.012 192.461 877.694 192.026 880.726 192.026C882.415 192.026 883.906 192.163 885.079 192.503C888.804 193.559 889.788 198.48 894.086 199.758C896.58 200.486 900.145 200.907 903.587 200.907C905.971 200.907 908.293 200.707 910.162 200.261C913.406 199.483 916.929 197.474 921.157 197.477C922.027 197.477 922.931 197.562 923.866 197.76C927.791 198.558 927.734 202.776 931.617 203.761L931.772 203.801V203.141C932.019 201.572 932.267 199.999 932.517 198.43C932.937 197.592 932.845 197.667 933.693 197.254C934.616 196.906 935.467 196.791 936.272 196.791C937.078 196.791 937.801 196.901 938.526 197.012C939.252 197.124 939.957 197.234 940.668 197.234C941.669 197.237 942.679 197.007 943.727 196.236C946.702 194.039 948.834 186.639 948.841 180.247C948.841 178.881 948.743 177.563 948.531 176.35C948.238 174.674 947.885 171.969 947.885 169.452C947.885 167.709 948.058 166.055 948.523 164.912C949.907 161.469 954.43 161.725 957.485 159.716C959.701 158.237 961.397 155.72 962.776 153.421L962.796 153.386V153.346H962.793Z"
@@ -158,8 +156,14 @@ export default function Page() {
 
       {/* Modal */}
       {modalData.isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300 ease-in-out" onClick={closeModal}>
-          <div className="bg-white p-5 rounded-lg shadow-lg max-w-xl transform transition-transform duration-300 ease-in-out scale-100" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300 ease-in-out"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white p-5 rounded-lg shadow-lg max-w-xl transform transition-transform duration-300 ease-in-out scale-100"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
               src={modalData.img}
               className="w-full h-60 object-cover rounded"

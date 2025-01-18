@@ -1,4 +1,5 @@
 "use client";
+
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
@@ -7,18 +8,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import DeleteConfirmModal from "../../_components/delete-pop-up";
-import { revalidatePath } from "next/cache";
 import { useToast } from "@/hooks/use-toast";
 
 interface WisataData {
@@ -37,40 +32,28 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  // Identifier for the Wisata being deleted
 
   const handleDelete = async () => {
     setIsOpen(true); // Open the modal
   };
+
   const confirmDelete = async () => {
-    if (!id) {
-      toast({
-        title: "Error",
-        description: "Terjadi kesalahan pada bagian ini",
-        variant: "destructive",
-      });
-
-      return;
-    }
-
     setLoading(true); // Start loading state
 
     try {
-      const response = await fetch(`/api/wisata?id=${id}`, {
+      await fetch(`/api/wisata?id=${id}`, {
         method: "DELETE",
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete Wisata.");
-      }
 
       toast({
         title: "Wisata berhasil dihapus !",
         description: "Wisata berhasil dihapus dari list.",
       });
 
-      revalidatePath("/dashboard/wisata/list");
-      // Optionally refresh data or perform navigation
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+
       onClose();
     } catch (error) {
       toast({
@@ -79,8 +62,8 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         variant: "destructive",
       });
     } finally {
-      setLoading(false); // End loading state
-      setIsOpen(false); // Close the modal
+      setLoading(false);
+      setIsOpen(false);
     }
   };
 

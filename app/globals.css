@@ -366,3 +366,13 @@ html.lenis body {
   fill: hsla(81, 100%, 50%, 0.185);
   cursor: pointer;
 }
+
+iframe {
+  width: 100%;
+  height: calc((512px / 16) * 9);
+}
+@media (max-width: 512px) {
+  iframe {
+    height: calc((100vw / 16) * 9);
+  }
+}
