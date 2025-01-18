@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 
-const propertyId = "473679036"; // Replace with your GA4 property ID
+const propertyId = process.env.GOOGLE_ANALYTICS_PROPERTY_ID; // Replace with your GA4 property ID
 
 // Initialize the Analytics Data API client
 const analyticsDataClient = new BetaAnalyticsDataClient();
