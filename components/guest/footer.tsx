@@ -1,8 +1,23 @@
+"use client";
 import Link from "next/link";
 import { links } from "../ui/morph-menu/data";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+
+const getAnalyticsData = async () => {
+  const response = await fetch("/api/analytics", {
+    method: "GET",
+  });
+
+  return response.json();
+};
 
 export default function Footer() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["analytics"],
+    queryFn: getAnalyticsData,
+  });
+
   return (
     <footer className="bg-white py-8 md:py-12">
       <div className="container mx-auto flex flex-col md:flex-row justify-between gap-8 px-4 md:px-6 lg:max-w-7xl">
@@ -19,6 +34,11 @@ export default function Footer() {
 
           <p className="text-muted-foreground md:max-w-[60%]">
             Website informasi pariwisata dan umkm di Desa Suka Marga
+          </p>
+
+          <p className="text-muted-foreground md:max-w-[60%]">
+            Total Pengunjung :{" "}
+            {isLoading ? "Loading..." : data ? data[0].activeUsers : ""}
           </p>
         </div>
 

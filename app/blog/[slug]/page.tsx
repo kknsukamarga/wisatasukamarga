@@ -24,6 +24,10 @@ async function getBlogBySlug(slug: string) {
   if (!blog) {
     return null;
   }
+  await prisma.blog.update({
+    where: { slug },
+    data: { view_count: blog?.view_count + 1 },
+  });
 
   return {
     ...blog,
@@ -141,15 +145,20 @@ export default async function BlogDetailPage({
             >
               {blog.title}
             </h1>
-            <p className="text-sm">
-              {blog.author} -{" "}
-              {new Date(blog.updatedAt).toLocaleDateString("id-ID", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
+            <div className="flex flex-col md:flex-row justify-center md:justify-between items-center w-full">
+              <p className="text-sm">
+                {blog.author} -{" "}
+                {new Date(blog.updatedAt).toLocaleDateString("id-ID", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+              <p className="text-sm rounded-md bg-gray px-3 py-1 text-white">
+                Dibaca {blog.view_count}x
+              </p>
+            </div>
           </div>
           <div className="relative h-[500px] w-auto rounded-lg overflow-auto">
             <img
