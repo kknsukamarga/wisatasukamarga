@@ -24,6 +24,7 @@ interface Artikel {
   createdAt: string;
   updatedAt: string;
   slug: string;
+  view_count: number;
 }
 
 const SkeletonCard = () => (
@@ -170,17 +171,30 @@ const SemuaArtikel: React.FC = () => {
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
                 <div className="p-4">
-                  <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-full px-2 py-1 shadow-md">
-                    {artikel.category.replace("_", " ")}
-                  </span>
-                  <p className="text-xs text-gray-400 mt-2">
-                    {new Date(artikel.updatedAt).toLocaleDateString("id-ID", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="text-sm font-semibold -ml-1 uppercase bg-orange-secondary/80 text-gray rounded-full px-2 py-1 shadow-md">
+                        {artikel.category.replace("_", " ")}
+                      </span>
+                      <p className="text-xs text-gray-400 mt-2">
+                        {new Date(artikel.updatedAt).toLocaleDateString(
+                          "id-ID",
+                          {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs  rounded-md bg-gray px-3 py-1 text-white">
+                        Dibaca {artikel.view_count}x
+                      </p>
+                    </div>
+                  </div>
+
                   <h2 className="text-lg font-bold text-gray-800 mt-2">
                     {artikel.title}
                   </h2>
