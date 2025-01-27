@@ -54,7 +54,7 @@ export default function Gallery({ images }) {
               alt={`Gallery Image ${index + 1}`}
               width={800}
               height={600}
-              className="rounded-md cursor-pointer md:cursor-grab w-full h-full min-h-[200px] md:min-h-[500px] max-h-96"
+              className="rounded-md cursor-pointer object-cover md:cursor-grab w-full h-full min-h-[200px] md:min-h-[500px] max-h-96"
               onClick={() => handleImageClick(index)} // Open modal with selected image
               priority
             />
@@ -87,7 +87,7 @@ export default function Gallery({ images }) {
                     alt={`Gallery Image ${index + 1}`}
                     width={800}
                     height={600}
-                    className="rounded-md max-h-[500px]"
+                    className="rounded-md max-h-[500px] object-cover object-center"
                   />
                 </SwiperSlide>
               ))}

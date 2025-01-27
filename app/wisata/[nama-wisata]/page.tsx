@@ -52,7 +52,7 @@ export default function Page({ params }: PageProps) {
 
   const conditionalClassName = namaWisata.includes("danau")
     ? "bg-gray text-white"
-    : "bg-white text-gray";
+    : "bg-gray text-white";
 
   return (
     <main className={`mx-auto ${conditionalClassName}`}>

@@ -34,7 +34,7 @@ export default function VideoSection({ namaWisata }: { namaWisata: string }) {
     <div className="px-2 mt-10">
       <div className="rounded-lg overflow-hidden shadow-lg max-w-2xl mx-auto">
         <iframe
-          className="video"
+          className="video min-h-[200px] md:min-h-[400px]"
           src={dataVideoWisata.find((video) => video.nama === namaWisata)?.src}
           frameBorder="0"
           allowFullScreen

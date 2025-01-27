@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import Image from "next/image";
-import { ExternalLink } from "lucide-react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function CarouselAttractions({ attractions }) {
@@ -59,7 +57,7 @@ export default function CarouselAttractions({ attractions }) {
             >
               <div className="relative w-full h-full overflow-hidden rounded-2xl">
                 <Image
-                  className="absolute object-cover w-full -translate-y-1/2 opacity-80 z-10 top-1/2 max-w-none md:left-1/2 md:h-full md:-translate-x-1/2 md:rounded-none h-full brightness-75"
+                  className="absolute object-cover w-full -translate-y-1/2 opacity-80 z-10 top-1/2 max-w-none md:left-1/2 md:h-full md:-translate-x-1/2 md:rounded-none h-full"
                   src={item.image}
                   alt={item.name}
                   width={600}
@@ -70,7 +68,7 @@ export default function CarouselAttractions({ attractions }) {
 
                 <div
                   className={cn(
-                    "inset-0 opacity-25 duration-300 before:absolute before:bottom-0 before:left-[-546px] before:right-0 before:top-[-148px] before:z-10 before:bg-texture  after:bottom-[28px] after:left-0 after:right-[-434px] after:top-0 after:z-10 after:bg-texture md:absolute md:transition-opacity",
+                    "inset-0 opacity-25 duration-300 before:absolute before:bottom-0 before:left-[-546px] before:right-0 before:top-[-148px] before:z-10 before:bg-texture after:bottom-[28px] after:left-0 after:right-[-434px] after:top-0 after:z-10 after:bg-texture md:absolute md:transition-opacity",
                     activeItem === index ? "md:opacity-25" : "md:opacity-0"
                   )}
                 />
@@ -83,28 +81,23 @@ export default function CarouselAttractions({ attractions }) {
                       : "md:translate-x-4 md:opacity-0"
                   )}
                 >
-                  <p className="text-2xl font-extrabold md:text-4xl z-20 text-white">
+                  <p className="text-2xl font-extrabold md:text-4xl z-20 text-white bg-gray px-2 py-1">
                     {item.name}
                   </p>
                 </div>
 
-                {/* <div
+                <div
                   className={cn(
-                    "md:left-4 xl:left-8 bottom-2 md:bottom-[15%] w-full p-4 transition-[transform,opacity] absolute md:p-0 z-20",
+                    "bottom-2 md:bottom-[15%] w-full text-white bg-gray p-4 transition-[transform,opacity] absolute md:p-0 z-20",
                     activeItem === index
                       ? "md:translate-x-0 md:opacity-100"
                       : "md:translate-x-4 md:opacity-0"
                   )}
                 >
-                  <p className="text-[10px] w-[60%] md:w-[80%] font-bold text-gray md:text-xl z-20">
-                    <Link
-                      href={`projects/${item.name.toLowerCase()}`}
-                      className="flex items-center gap-2 text-[10px] md:text-sm"
-                    >
-                      <ExternalLink /> {item.name} Detail
-                    </Link>
+                  <p className="text-[10px] w-[60%] md:w-[80%] text-left font-bold text-white md:text-xl z-20 p-2">
+                    {item.description}
                   </p>
-                </div> */}
+                </div>
               </div>
             </li>
           ))}
