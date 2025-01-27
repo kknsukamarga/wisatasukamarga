@@ -7,12 +7,15 @@ import { signInAction } from "@/lib/actions";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "../SubmitButton";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export function SignInForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleFormSubmit = async (formData: FormData) => {
     const email = formData.get("email") as string;
@@ -64,7 +67,22 @@ export function SignInForm({
               Forgot your password?
             </a> */}
           </div>
-          <Input id="password" type="password" name="password" required />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-foreground focus:outline-none"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
         {/* <Button type="submit" className="w-full">
