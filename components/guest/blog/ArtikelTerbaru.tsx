@@ -174,7 +174,7 @@ const ArtikelTerbaru: React.FC = () => {
                   </span>
 
                   <p className="text-xs  rounded-md bg-gray px-3 py-1 text-white">
-                    Dibaca {artikels[0].view_count}x
+                    Dibaca {artikel.view_count}x
                   </p>
                 </div>
 
