@@ -26,7 +26,7 @@ const MorphNav = (): JSX.Element => {
         window.innerWidth >= 1024
           ? "80vh" // Desktop
           : window.innerWidth >= 768
-          ? "70vh" // Tablet
+          ? "65vh" // Tablet
           : "60vh"; // Mobile
 
       setResponsiveSize({ width, height });

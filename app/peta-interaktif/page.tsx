@@ -4,6 +4,7 @@ import Footer from "@/components/guest/footer";
 import Navbar from "@/components/guest/navbar";
 import peta from "@/public/peta/map2.png";
 import { CDN_GITHUB_URL } from "@/lib/utils";
+import Link from "next/link";
 
 export default function Page() {
   const [modalData, setModalData] = useState({
@@ -11,6 +12,7 @@ export default function Page() {
     description: "",
     title: "",
     img: "",
+    detail_link: "",
   });
 
   const data = [
@@ -19,54 +21,63 @@ export default function Page() {
       description:
         "Kawah Nirwana merupakan sebuah kaldera atau kawah yang berada di Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat dan berada di dalam wilayah Taman Nasional Bukit Barisan Selatan. Kawah ini berada pada ketinggian sekitar 330 meter di atas permukaan laut (mdpl) dengan luas area sekitar 30.000 m2. Kawah Nirwana tidak hanya tersusun oleh satu kawah saja melainkan tersusun atas beberapa kawah yang saling berdekatan dan membentuk beberapa danau vulkanik berukuran kecil yang memiliki kenampakan berwarna biru muda. Ditinjau dari aktivitas vulkaniknya, Kawah Nirwana merupakan sebuah kawah aktif yang masih mengeluarkan gas belerang dan uap air panas setiap harinya. Untuk mengakses Kawah Nirwana, wisatawan dapat mengaksesnya melalui 2 akses. Akses pertama adalah melalui Dusun Kalibata Bawah, Desa Sukamarga dan akses kedua adalah melalui Danau Asam dengan menggunakan perahu.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-NIRWANA.jpg`,
+      detail_link: "/wisata/kawah-nirwana",
     },
     {
       title: "Danau Minyak",
       description:
         "Danau Minyak merupakan danau yang terletak berdekatan dengan Danau Asam tepatnya di sebelah selatannya. Danau minyak juga berada di satu area yang sama dengan Kawah Merah. Danau ini memiliki nama Danau Minyak karena danau ini memiliki siluet atau kenampakan air yang seolah-olah seperti minyak. Danau Minyak juga menjadi tempat favorit kawanan gajah untuk berendam sehingga apabila beruntung kita bisa menjumpai kawanan gajah yang berendam di Danau Minyak ketika sore hari.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-MINYAK.jpg`,
+      detail_link: "/wisata/danau-minyak",
     },
     {
       title: "Danau Lebar",
       description:
         "Danau Lebar merupakan danau yang berada di sebelah selatan. Danau Asam dan secara administratif masuk ke dalam wilayah. Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat. Danau ini memiliki luas yang lebih kecil dibandingan Danau Asam yaitu sekitar 0.6 km2. Sama halnya dengan Danau Asam, Danau Lebar memiliki akses yang mudah dijangkau karena berada tepat di Jalan Lintas Suoh.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-LEBAR.jpg`,
+      detail_link: "/wisata/danau-lebar",
     },
     {
-      title: "Air Terjun",
+      title: "Air Terjun Cibatuan",
       description:
         "Berlokasi di daerah pegunungan, Suoh juga memiliki air terjun setinggi 25 m yang memberikan kesegaran bagi para pengunjungnya. Pengunjung dapat menikmati kesegaran air yang mengalir langsung dari Pegunungan Bukit Barisan.",
       img: `https://res.cloudinary.com/dflmvraib/image/upload/v1737078102/wisata/air-terjun-cibatuan.png`,
+      detail_link: "/wisata/air-terjun-cibatuan",
     },
     {
       title: "Balai Pekon",
       description:
         "Balai pekon adalah balai yang berada di wilayah pekon atau kampung Suka Marga. Pekon adalah wilayah administratif yang menyelenggarakan urusan pemerintahan dan kepentingan masyarakat setempat. ",
       img: `${CDN_GITHUB_URL}balai-pekon.jpg`,
+      detail_link: "/peta-interaktif",
     },
     {
       title: "Kawah Keramikan",
       description:
         "Kawah Keramikan merupakan salah satu manifestasi dari aktivitas vulkanik pada komplek Kaldera Suoh yang berada di Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat. Destinasi ini memiliki lokasi yang berdekatan dengan Kawah Nirwana tepatnya di sebelah timur Kawah Nirwana dengan luas area sekiat 10.000 m . Kawah keramikan memiliki keunikan yang mana permukaan tanah di area ini akan memiliki kenampakan seperti keramik mengkilap yang berwarna kuning dengan adanya bentuk yang berlapis-lapis akibat pengaruh belerang yang bercampur dengan material vulkanik gunung api. Kenampakan lanskap di Kawah Keramikan ini serupa dengan yang ada di Kaldera Yellowstone di Amerika Serikat. Pada area Kawah Keramikan, dijumpai pula banyak kolam-kolam kecil yang mengeluarkan uap panas atau dalam istilah geologi sering disebut sebagai fumarol. Sama halnya dengan Kawah Nirwana, Kawah Keramikan juga memiliki aktivitas vulkanik yang aktif.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-KRAMIKAN.jpg`,
+      detail_link: "/wisata/kawah-keramikan",
     },
     {
       title: "Pasir Kuning",
       description:
         "Pasir Kuning merupakan salah satu destinasi wisata yang terdapat di Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat. Destinasi ini menawarkan kenampakan lanskap alam berupa hamparan pasir berukuran 52.000 m dan berbatasan langsung dengan Danau Asam. Hamparan pasir ini memiliki keunikan karena berwarna kuning sehingga tempat ini diberi nama Pasir Kuning. Pasir berwarna kuning tersebut tersebut terbentuk akibat kehadiran material vulkanik berupa pasir yang kaya akan kuarsa dan sulfur yang berasal dari Kawah Keramikan dan Kawah Nirwana sehingga memiliki warna kuning. Pasir tersebut terbawa oleh aliran sungai dan mengendap di bibir Danau Asam yang dalam istilah geologi merupakan sebuah kipas aluvial.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/PASIR-KUNING-BLUR.jpg`,
+      detail_link: "/wisata/pasir-kuning",
     },
     {
       title: "Danau Asam",
       description:
         "Danau Asam merupakan sebuah danau yang terletak di Desa Sukamarga, Kecamatan Suoh dan Desa Gunung Ratu Kecamatan Bandar Negeri Suoh, Kabupaten Lampung Barat. Danau ini memiliki luas 1.2 km2. Danau ini memiliki keunikan berupa kondisi air danaunya yang cenderung asam atau memiliki nilai pH yang rendah sehingga dinamakan sebagai “Danau Asam”. Kondisi air yang asam ini disebabkan karena danau ini berlokasi dekat dengan Kawah Nirwana dan Kawah Keramikan sehingga air yang ada di Danau Asam tercampur dengan material vulkanik dari kawah tersebut yang bersifat asam. Ditinjau dari sejarah pembentukannya, Danau Asam terbentuk akibat gempa dengan kekuatan 7.7 Ms pada tahun 1933 akibat adanya aktivitas tektonik dari Patahan Semangko atau Patahan Sumatra.",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/DANAU-ASAM-1.jpg`,
+      detail_link: "/wisata/danau-asam",
     },
     {
       title: "Kawah Merah",
       description:
         "Kawah Merah merupakan salah satu kawah yang berada di kompleks Kaldera Suoh tepatnya di sebelah timur Kawah Nirwana dan Kawah Keramikan. Secara administratif, Kawah Merah masih termasuk di dalam wilayah Desa Sukamarga, Kecamatan Suoh, Kabupaten Lampung Barat dan masih masuk ke dalam wilayah Taman Nasional Bukit Barisan Selatan. Berbeda dengan Kawah Nirwana dan Kawah Keramikan yang cenderung memiliki aktivitas vulkanik yang sangat aktif, Kawah Merah cenderung memiliki aktivitas vulkanik yang lebih rendah. Kawah Merah memiliki keunikan yang berbeda jika dibandingkan dengan 2 kawah lainnya yaitu kawah ini merupakan sebuah danau kawah atau danau vulkanik berukuran kecil yang berwarna merah. Warna merah pada kawah ini disebabkan karena adanya kandunhan usnur Fe (besi) yang teroksidasi dan mengendap di kawah sehingga menciptakan warna merah pada kawah. Untuk mengakses Kawah Merah dapat melalui",
       img: `${CDN_GITHUB_URL}compressed/wisata/gambar/KAWAH-MERAH-SS.jpg`,
+      detail_link: "/wisata/kawah-merah",
     },
   ];
 
@@ -80,7 +91,13 @@ export default function Page() {
   };
 
   const closeModal = () => {
-    setModalData({ isOpen: false, title: "", img: "", description: "" });
+    setModalData({
+      isOpen: false,
+      title: "",
+      img: "",
+      description: "",
+      detail_link: "",
+    });
   };
 
   return (
@@ -143,7 +160,7 @@ export default function Page() {
             <path
               d="M133.212 746.483C132.294 743.399 131.379 740.311 130.46 737.227L130.443 737.172L130.39 737.147C129.059 736.564 127.726 735.981 126.393 735.398C123.168 733.587 122.122 731.815 120.709 727.983V727.88H124.659L124.694 727.82C125.254 726.885 125.612 726.252 125.615 725.551C125.615 725.148 125.487 724.738 125.229 724.258C125.462 723.87 125.697 723.48 125.93 723.092C126.59 722.682 126.655 722.572 127.081 722.569C127.251 722.569 127.483 722.589 127.826 722.627L127.959 722.639L127.964 722.507C127.969 722.354 127.974 722.206 127.974 722.066C127.986 720.333 127.471 719.512 126.265 718.944C126.493 718.569 126.718 718.191 126.946 717.811L127.003 717.716L126.913 717.648C126.64 717.443 126.365 717.235 126.09 717.03C126.855 716.725 127.621 716.42 128.387 716.112L128.429 716.095L128.452 716.052C128.534 715.887 128.617 715.719 128.702 715.552L128.739 715.477L128.684 715.414C127.458 714.041 125.419 712.982 123.461 712.402V712.307C124.361 711.654 125.259 710.999 126.16 710.343L126.228 710.296L126.21 710.213C125.96 709.13 125.71 708.046 125.459 706.963L125.447 706.913L125.407 706.888C124.136 706.035 122.703 705.435 120.966 705.435C120.158 705.435 119.285 705.567 118.337 705.86C118.114 705.785 117.892 705.712 117.672 705.637C117.619 705.532 117.566 705.427 117.514 705.322C118.462 705.084 119.413 704.849 120.363 704.612L120.459 704.587V703.673L120.403 703.633C119.653 703.133 118.902 702.635 118.152 702.135L118.092 702.092L118.027 702.125C117.381 702.448 116.738 702.77 116.095 703.091C115.032 702.272 113.966 701.454 112.903 700.636L112.868 700.609H112.821C111.002 700.721 110.126 701.204 108.938 701.792C108.775 699.521 108.613 697.247 108.45 694.972V694.957L108.443 694.94C107.842 693.261 105.581 692.338 103.91 691.875C102.156 688.576 102.288 683.895 100.937 679.932C100.189 677.788 98.1355 677.831 97.1849 676.417C96.3518 673.09 95.5187 669.76 94.6881 666.433L94.6781 666.403L94.6581 666.378C93.6649 665.304 92.6742 664.229 91.681 663.153C89.8498 651.742 88.016 640.327 86.1822 628.917L86.1622 628.791L86.0396 628.814C81.8192 629.5 79.2599 630.733 75.9276 631.203V630.813H74.8794C74.8919 630.79 74.9019 630.768 74.9144 630.743L75.0045 630.563H73.2708L73.4584 630.77C73.8512 631.228 73.561 631.033 74.2539 631.303L74.2765 631.313H74.6292L74.6642 631.243C74.6917 631.186 74.7218 631.128 74.7518 631.068C74.8544 631.183 74.9194 631.261 74.9719 631.313C74.409 631.366 73.8186 631.393 73.1907 631.393C72.6328 631.393 72.0474 631.371 71.4245 631.321V631.296C71.9724 631.218 72.5202 631.141 73.0681 631.061L73.1757 631.046V630.585L73.0756 630.565C72.6904 630.488 72.3101 630.413 71.9248 630.335V628.799L71.7897 628.812C70.8241 628.884 70.724 628.819 70.2837 629.272C69.1729 628.439 68.8427 628.829 68.6726 627.175L68.6626 627.075L68.565 627.06C67.1465 626.843 66.1758 626.693 65.1726 626.693C64.3571 626.693 63.5215 626.795 62.4182 627.03V625.289L62.2731 625.312C60.4343 625.587 59.6488 626.12 58.7607 627.273C57.5323 626.535 57.072 626.125 56.3115 626.12C55.7386 626.122 55.0481 626.352 53.7447 626.818L53.6521 626.85L53.6622 626.948C53.8848 629.094 54.8655 629.284 55.1682 630.47V630.485L55.1807 630.498C55.2733 630.668 55.3008 630.78 55.3008 630.88C55.3158 631.166 54.9831 631.508 54.918 632.597C54.195 632.839 53.4695 633.079 52.7465 633.32L52.674 633.345L52.664 633.42C52.5789 633.92 52.4963 634.42 52.4138 634.921L52.3888 635.068H52.5389L52.6339 635.066C54.5828 635.101 54.878 635.609 54.913 637.34V637.713L55.1182 637.538C55.5885 637.147 56.0613 636.755 56.5316 636.359C56.5667 636.394 56.6017 636.429 56.6342 636.464C54.1675 640.947 53.7322 650.842 53.1743 656.798C52.8966 656.728 52.6164 656.661 52.3387 656.591C52.1111 656.413 51.8484 656.333 51.5682 656.333C50.2198 656.348 48.411 657.987 46.9825 658.592L46.9525 658.605L46.9325 658.632C46.6823 658.965 46.4321 659.3 46.182 659.633L46.1169 659.72L46.1945 659.796C46.4747 660.078 46.7574 660.361 47.0401 660.641L43.2499 661.587L43.1549 661.612V662.002L43.1774 662.035C43.8603 662.953 44.6209 663.881 45.6391 664.516C45.4089 665.442 45.1588 665.87 45.1562 666.44C45.1562 666.725 45.2263 667.038 45.3889 667.441C44.2281 668.857 43.9454 670.841 41.7639 671.091L41.6538 671.106V671.519L41.6913 671.554C42.1892 672.054 42.692 672.554 43.1924 673.055L43.2349 673.1L43.2975 673.09C44.4182 672.93 45.539 672.772 46.6573 672.609V675.802L46.7323 675.834C47.9657 676.367 48.7587 676.602 49.867 677.037C49.4667 677.916 49.069 678.794 48.6712 679.669L48.6437 679.727L48.6737 679.779C49.2566 680.865 49.842 681.951 50.4249 683.034L50.4324 683.049L50.4474 683.064C50.575 683.192 50.7051 683.322 50.8352 683.452C46.4872 686.181 41.4162 700.336 41.3986 708.122C41.3986 708.224 41.4011 708.324 41.4036 708.424C37.4259 710.946 34.4438 714.091 30.9439 716.9L30.8939 716.94V717C30.9789 719.735 31.0615 722.469 31.144 725.203C29.0851 727.357 24.552 728.17 20.4991 728.165C19.9963 728.165 19.5009 728.153 19.0181 728.13L18.9005 728.125L18.888 728.243C18.7254 729.884 18.5603 731.525 18.3952 733.166C17.9224 733.324 17.447 733.482 16.9717 733.642L16.8441 733.682L16.8941 733.807C17.357 734.928 18.2901 737.184 19.4084 737.842C19.4859 738.075 19.5135 738.275 19.516 738.463C19.516 738.91 19.3483 739.328 19.3458 739.974C19.3458 740.106 19.3583 740.251 19.3759 740.404C16.8491 740.674 15.263 741.647 13.6794 741.64C13.084 741.64 12.4836 741.507 11.8181 741.154L11.643 741.062L11.633 741.26C11.5504 743.261 11.4679 745.262 11.3828 747.264V747.314L11.4128 747.349C12.7688 748.922 13.0315 749.835 14.9503 750.881L14.9978 750.906L15.0479 750.891C17.1593 750.241 19.2758 749.59 21.3898 748.94V748.99C20.7268 750.316 20.0638 751.642 19.4009 752.965L19.3283 753.113L19.4884 753.145C26.0155 754.519 32.3824 757.884 39.4973 759.65C48.2584 761.819 57.6174 761.341 67.2766 762.902C73.8587 763.965 80.6609 764.543 87.3155 764.543H87.318C107.232 764.541 125.84 759.387 133.202 746.581L133.227 746.533L133.212 746.483ZM74.4741 631.063H74.324C73.6835 630.785 73.9737 631.021 73.8211 630.813H74.5091L74.5692 630.875C74.5366 630.938 74.5066 631.001 74.4741 631.063ZM75.6774 631.238C75.6374 631.243 75.5974 631.248 75.5573 631.253C75.0795 631.138 75.2496 631.253 75.0895 631.063H75.6774V631.238Z"
               className="clickable-area"
-              onClick={() => openModal("Air Terjun")}
+              onClick={() => openModal("Air Terjun Cibatuan")}
             />
             <path
               d="M609.886 402.807C609.645 402.807 628.761 376.842 628.761 376.842L627.996 375.165L628.524 373.106L607.109 362.231L602.941 362.519L584.258 385.61L585.504 388.915L585.456 392.267L608.164 402.807H609.888H609.886Z"
@@ -181,12 +198,13 @@ export default function Page() {
               >
                 Tutup
               </button>
-              <button
+              <Link
                 className="mt-4 border border-green text-green px-4 py-2 rounded-lg"
                 onClick={closeModal}
+                href={modalData.detail_link}
               >
                 Lihat Detail
-              </button>
+              </Link>
             </div>
           </div>
         </div>

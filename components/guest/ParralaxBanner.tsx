@@ -18,7 +18,7 @@ export const ParralaxBanner = () => {
     shouldAlwaysCompleteAnimation: true,
     expanded: false,
     children: (
-      <div className="absolute inset-0 flex items-center justify-center z-[70] flex-col text-center -translate-y-36 md:-translate-y-20">
+      <div className="absolute inset-0 flex items-center justify-center z-[70] flex-col text-center -translate-y-24 md:-translate-y-20">
         <p className="text-gray lg:text-xl px-4 py-1 rounded-t-sm">
           Telusuri Wisata
         </p>
