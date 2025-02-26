@@ -66,14 +66,14 @@ export default function ProductDetails({ slug }: { slug: string }) {
             alt={product.product_name}
             className="rounded-lg mb-4 lg:mb-0 aspect-square object-cover object-center max-h-[300px] w-full md:max-h-[500px]"
           />
-          <div className="flex space-x-2 mt-2 overflow-x-scroll">
+          <div className="flex space-x-2 mt-2 overflow-x-scroll p-1">
             {product.image.map((image: string, index: number) => (
               <img
                 key={index}
                 src={image}
                 alt={`Product image ${index + 1}`}
                 className={`w-20 h-20 rounded-lg cursor-pointer ${
-                  selectedImage === image ? "ring-2 ring-blue-500" : ""
+                  selectedImage === image ? "ring-2 ring-gray" : ""
                 }`}
                 onClick={() => setSelectedImage(image)}
               />

@@ -28,20 +28,21 @@ export default function UMKMGrid({ data }: { data: any[] }) {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {paginatedData.map((item: any) => (
-          <div
+          <Link
             key={item.id}
             className="bg-white rounded-lg shadow-md p-4 cursor-pointer"
+            href={`/umkm/${item.slug}`}
           >
-            <Link key={item.id} href={`/umkm/${item.slug}`}>
-              <img
-                src={item.image[0]}
-                alt={item.product_name}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-            </Link>
-            <h2 className="text-xl font-bold mb-2 line-clamp-1">
+            <img
+              src={item.image[0]}
+              alt={item.product_name}
+              className="w-full h-48 object-cover rounded-lg"
+            />
+
+            <h2 className="text-xl font-bold mb-2 line-clamp-1 mt-4">
               {item.product_name}
             </h2>
+
             <p className="text-gray-600 mb-4 line-clamp-2">
               {item.description}
             </p>
@@ -70,7 +71,7 @@ export default function UMKMGrid({ data }: { data: any[] }) {
                 </Button>
               </Link>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
